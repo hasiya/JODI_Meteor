@@ -1,0 +1,22 @@
+<template name="tab_csv">
+    <!--<form class="editorform">-->
+        <div id="editor">
+            <div id="editor">
+                {{> CodeMirror id="codemirror_id" name="codemirro_nme" options=editorOptions  placeholder="Paste your CSV file content or drag and drop the file here..."}}
+            </div>
+            <!--<textarea cols="60" rows="20" class="form-control" id="CSVarea" spellcheck="false"></textarea>-->
+        </div>
+        <br>
+        <div>
+            <button class="pull-right btn-primary btn ProcessCSV" >Process</button>
+        </div>
+    <!--</form>-->
+    <label id="message"></label>
+
+    <div id="panel" style="display: none">
+        {{#each getkeys}}
+           <label>{{.}}</label>
+
+        {{/each}}
+    </div>
+</template>
