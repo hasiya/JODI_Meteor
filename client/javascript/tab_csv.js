@@ -1,6 +1,6 @@
 var CSV_keys;
 var CSV_Data;
-
+var editor;
 
 function linesMatch(lines) {
 
@@ -27,8 +27,8 @@ function getkeys() {
     var innerHtml = "";
     for(i=0; i<CSV_keys.length;i++){
         innerHtml +=
-            "<div class='row'>" +
-                "<div class='col-md-4'>"+
+            "<div class='row top-buffer'>" +
+                "<div class='col-md-4 col-md-offset-1'>"+
                     "<form class='form-inline'>" +
                         "<fieldset class='form-group'>" +
                             "<input type='text' readonly id='"+CSV_keys[i]+"' class='form-control' value='"+CSV_keys[i]+"'>" +
@@ -42,6 +42,8 @@ function getkeys() {
                     "<select id='selectbasicTypeTour' name='selectbasicTypeTour' class='form-control'>"+
                         "<option value='string'>String</option>"+
                         "<option value='number'>Number</option>"+
+                        "<option value='string'>Lon</option>"+
+                        "<option value='string'>Lat</option>"+
                     "</select>" +
                 "</div>" +
                 "<div class='col-md-4'>" +
@@ -49,9 +51,23 @@ function getkeys() {
                 "</div>" +
             "</div>";
     }
+    var button =
+        "<div class='pull-right btn-toolbar'>" +
+            "<button class='pull-right btn-primary btn PanelDone' >Done</button>" +
+        " </div>";
+    innerHtml +=button;
     panel.innerHTML= innerHtml;
 }
 
+
+Template.tab_csv.rendered = function() {
+    editor = CodeMirror.fromTextArea(this.find("#codemirror_id"), {
+        lineNumbers: true,
+        lineWrapping:true,
+        mode:"Plain Text",
+        placeholder:"Paste your CSV file content or drag and drop the file here..."
+    });
+}
 
 Template.tab_csv.helpers({
 
@@ -76,10 +92,60 @@ Template.tab_csv.helpers({
     
 });
 
-Template.tab_csv.events({
-    "click .ProcessCSV":function (e, t) {
-        var text = t.find("#codemirror_id").value;
+if(!$("#codemirror_id").val()){
+    console.log("empty!");
+}
 
+Template.tab_csv.events({
+
+    "keyup .CodeMirror":function (e,t) {
+        console.log(e);
+        var text = editor.getValue();
+        if(!text){
+            var panel = document.getElementById("panel");
+            panel.style.display = "none";
+            panel.innerHTML = "";
+            var Message = $("#message");
+            Message.html("");
+        }
+
+    },
+
+    "change .CodeMirror":function (e,t) {
+        var text = editor.getValue();
+        if(!text){
+            var panel = document.getElementById("panel");
+            panel.style.display = "none";
+            panel.innerHTML = "";
+            var Message = $("#message");
+            Message.html("");
+        }
+
+    },
+
+    "drop .CodeMirror":function (e) {
+        console.log(e);
+
+        var panel = document.getElementById("panel");
+        panel.style.display = "none";
+        panel.innerHTML = "";
+        var Message = $("#message");
+        Message.html("");
+    },
+
+    "paste .CodeMirror":function (e) {
+        console.log(e);
+
+        var panel = document.getElementById("panel");
+        panel.style.display = "none";
+        panel.innerHTML = "";
+        var Message = $("#message");
+        Message.html("");
+    },
+
+    "click .ProcessCSV":function (e, t) {
+        // var text = t.find("#codemirror_id").value;
+        var text = editor.getValue();
         var lines = text.split('\n');
 
         if(lines.length > 1){
@@ -96,6 +162,8 @@ Template.tab_csv.events({
                         CSV_Data = data;
                         CSV_keys = Object.keys(data[0]);
                         getkeys();
+                        var Message = $("#message");
+                        Message.html("");
                     }
                 });
             }
@@ -105,6 +173,17 @@ Template.tab_csv.events({
             }
         }
     },
+
+    "click .ClearCSV":function (e,t) {
+        editor.setValue("");
+
+        var panel = document.getElementById("panel");
+        panel.style.display = "none";
+        panel.innerHTML = "";
+        var Message = $("#message");
+        Message.html("");
+    },
+
     "click .csvHeaderEdit":function (e) {
         var elem = e.currentTarget;
         var id = elem.id;
@@ -116,6 +195,5 @@ Template.tab_csv.events({
             elem.innerHTML = "<span class='glyphicon glyphicon-edit'></span>"
             textbox.readOnly = true;
         }
-
     }
 });
