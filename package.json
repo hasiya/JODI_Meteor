@@ -5,6 +5,7 @@
     "start": "meteor run"
   },
   "dependencies": {
+    "d3": "^3.5.17",
     "meteor-node-stubs": "~0.2.0"
   }
 }

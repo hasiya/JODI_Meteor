@@ -2,21 +2,66 @@
     <!--<form class="editorform">-->
         <div id="editor">
             <div id="editor">
-                {{> CodeMirror id="codemirror_id" name="codemirro_nme" options=editorOptions  placeholder="Paste your CSV file content or drag and drop the file here..."}}
+                <textarea id="codemirror_id" name="codemirro_nme"></textarea>
+                <!--{{> CodeMirror id="codemirror_id" name="codemirro_nme" options=editorOptions  placeholder="Paste your CSV file content or drag and drop the file here..."}}-->
             </div>
             <!--<textarea cols="60" rows="20" class="form-control" id="CSVarea" spellcheck="false"></textarea>-->
         </div>
         <br>
-        <div>
-            <button class="pull-right btn-primary btn ProcessCSV" >Process</button>
+        <div class="pull-right btn-toolbar">
+            <!--<span class="pull-right">  </span>-->
+            <button class="btn-primary btn ClearCSV" >Clear</button>
+            <button class="btn-primary btn ProcessCSV" >Process</button>
+
         </div>
     <!--</form>-->
     <label id="message"></label>
+    <br>
+    <br>
 
     <div id="panel" style="display: none">
-        {{#each getkeys}}
-           <label>{{.}}</label>
+    </div>
+    <br>
+    <br>
 
-        {{/each}}
+    <div id="charts" style="display: none">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel with-nav-tabs panel-info">
+                    <div class="panel-heading">
+                        <ul class="nav nav-tabs">
+                            <li class="active"><a href="#ChartsTab" data-toggle="tab">Charts</a></li>
+                            <li><a href="#MapsTab" data-toggle="tab">Maps</a></li>
+                            <!--<li><a href="#tab3info" data-toggle="tab">Info 3</a></li>-->
+                            <!--<li><a href="#tab4info" data-toggle="tab">info 4</a></li>-->
+                        </ul>
+                    </div>
+                    <div class="panel-body">
+                        <div class="tab-content">
+                            <div class="tab-pane fade in active" id="ChartsTab">
+                                <div id="chartsPanel" class="col-md-4" style="background: white" >
+                                    <div id="headerLabels" class="btn-group-vertical">
+
+                                    </div>
+                                </div>
+                                <div id="chartBody" class="col-md-8">
+                                    <svg id="svgChar"></svg>
+
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="MapsTab">
+                                Maps
+                            </div>
+                            <!--<div class="tab-pane fade" id="tab3info">Info 3</div>-->
+                            <!--<div class="tab-pane fade" id="tab4info">Info 4</div>-->
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div id="chart" style="display: none">
     </div>
 </template>

@@ -262,6 +262,7 @@
         <item url="file://$USER_HOME$/.meteor/packages/ddp-client/1.2.8/web.browser/stream_client_common.js" />
         <item url="file://$USER_HOME$/.meteor/packages/ddp-client/1.2.8/web.browser/random_stream.js" />
         <item url="file://$USER_HOME$/.meteor/packages/ddp-client/1.2.8/web.browser/sockjs-0.3.4.js" />
+        <item url="file://$USER_HOME$/.meteor/packages/d3js_d3/3.5.8/web.browser/packages/d3js_d3.js" />
         <item url="file://$USER_HOME$/.meteor/packages/check/1.2.3/web.browser/match_test.js" />
         <item url="file://$USER_HOME$/.meteor/packages/check/1.2.3/web.browser/isPlainObject.js" />
         <item url="file://$USER_HOME$/.meteor/packages/check/1.2.3/web.browser/match.js" />
@@ -574,6 +575,7 @@
       <root url="file://$USER_HOME$/.meteor/packages/ddp-client/1.2.8/web.browser/stream_client_common.js" />
       <root url="file://$USER_HOME$/.meteor/packages/ddp-client/1.2.8/web.browser/random_stream.js" />
       <root url="file://$USER_HOME$/.meteor/packages/ddp-client/1.2.8/web.browser/sockjs-0.3.4.js" />
+      <root url="file://$USER_HOME$/.meteor/packages/d3js_d3/3.5.8/web.browser/packages/d3js_d3.js" />
       <root url="file://$USER_HOME$/.meteor/packages/check/1.2.3/web.browser/match_test.js" />
       <root url="file://$USER_HOME$/.meteor/packages/check/1.2.3/web.browser/isPlainObject.js" />
       <root url="file://$USER_HOME$/.meteor/packages/check/1.2.3/web.browser/match.js" />

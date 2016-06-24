@@ -1,3 +1,5 @@
+import "../../imports/bar_chart.js"
+
 var CSV_keys;
 var CSV_Data;
 var editor;
@@ -6,6 +8,12 @@ var headerOrinal = "orinialVal";
 var headerPresent = "presentVal";
 var headerType = "type";
 var headerValCount = "valCount";
+var chartRedrawObj = {
+    data:{},
+    width:0,
+    height:0,
+    type:""
+};
 
 // Return array of string values, or NULL if CSV string not well formed.
 function CSVtoArray(text) {
@@ -89,8 +97,8 @@ function CreatePanel() {
                     "<select id='type_"+CSV_keys[i]+"' headerID='"+CSV_keys[i]+"' index='"+i+"' name='headerType' class='csvHeaderType form-control'>"+
                         "<option value='string'>String</option>"+
                         "<option value='number'>Number</option>"+
-                        "<option value='longitude'>longitude</option>"+
-                        "<option value='latitude'>Latitude</option>"+
+                        "<option value='lon/lat'>Longitude/Latitude</option>"+
+                        // "<option value='latitude'>Latitude</option>"+
                     "</select>" +
                 "</div>" +
                 "<div class='col-md-3'>" +
@@ -127,10 +135,6 @@ function countValues(column) {
         var columnVal = d[column];
         columnVals.push(columnVal);
     });
-    //
-    // for (var i = 0; i < columnVals.length; i++) {
-    //     counts[columnVals[i]] = 1 + (counts[columnVals[i]] || 0);
-    // }
 
     columnVals.forEach(function (v) {
         counts[v] = 1 + (counts[v] || 0);
@@ -259,7 +263,6 @@ Template.tab_csv.events({
         var temp;
         CSV_keys = temp;
         CSV_Data = temp;
-        editor = temp;
         headerValues = [];
 
         var panel = document.getElementById("panel");
@@ -267,6 +270,15 @@ Template.tab_csv.events({
         panel.innerHTML = "";
         var Message = $("#message");
         Message.html("");
+
+        var headerpanel = document.getElementById("headerLabels");
+        headerpanel.innerHTML = "";
+
+        var svg = document.getElementById("svgChar");
+        svg.innerHTML = "";
+
+        var charts = document.getElementById("charts");
+        charts.style.display = "none"
     },
 
     "click .csvHeaderEdit":function (e) {
@@ -326,6 +338,10 @@ Template.tab_csv.events({
             if(checkbox.checked){
                 header[headerValCount] = countValues(h[headerOrinal])
             }
+            else{
+                header[headerValCount] = {}
+
+            }
 
         });
 
@@ -337,13 +353,13 @@ Template.tab_csv.events({
                else if(h[headerType] == "number"){
                    data[h[headerOrinal]] = parseInt(data[h[headerOrinal]]);
                }
-               else if(h[headerType] == "longitude"){
+               else if(h[headerType] == "lon/lat"){
                    data[h[headerOrinal]] = parseFloat(data[h[headerOrinal]]);
                }
 
-               else if(h[headerType] == "latitude"){
-                   data[h[headerOrinal]] = parseFloat(data[h[headerOrinal]]);
-               }
+               // else if(h[headerType] == "latitude"){
+               //     data[h[headerOrinal]] = parseFloat(data[h[headerOrinal]]);
+               // }
 
            })
         });
@@ -378,6 +394,22 @@ Template.tab_csv.events({
 
         console.log(CSV_Data);
         console.log(headerValues);
+
+        var innerhtml = "";
+        var headerLabels = document.getElementById("headerLabels");
+        headerValues.forEach(function (h) {
+            if(h[headerType] == "number"){
+                innerhtml +=
+                    "<button type='button' id='headerLabels' class='btn btn-primary headerLabels' original='"+h[headerOrinal]+"'>"+h[headerPresent]+"</button>";
+            }
+            if(!jQuery.isEmptyObject(h[headerValCount])){
+                innerhtml +=
+                    "<button type='button' id='headerLabels' class='btn btn-primary headerValCount' original='"+h[headerOrinal]+"'>"+h[headerPresent]+" (Count)</button>";
+            }
+        });
+
+        headerLabels.innerHTML=innerhtml;
+
     },
     "click .PanelEdit": function (e) {
         var textElems = document.getElementsByName("headerText");
@@ -404,11 +436,94 @@ Template.tab_csv.events({
             e.style.display = "inline";
         });
 
-        document.getElementById("charts").style.display = "none";
+        var charts = document.getElementById("charts");
+        charts.style.display = "none";
+
+        var headerpanel = document.getElementById("headerLabels");
+        headerpanel.innerHTML = "";
+
+        var svg = document.getElementById("svgChar");
+        svg.innerHTML = "";
+
 
         var elem = e.currentTarget;
         elem.className = "pull-right btn-success btn PanelDone";
         elem.innerHTML = "Done";
-    }
+    },
 
+    "click .headerLabels":function (e) {
+        var elem = e.currentTarget;
+        var headerOrig = elem.getAttribute("original");
+
+        var svg = document.getElementById("svgChar");
+        svg.innerHTML = "";
+
+        var width = document.getElementById("chartBody").offsetWidth;
+        var height = document.getElementById("chartBody").offsetHeight;
+        if(height < 350){
+            height = 350;
+        }
+
+        chartRedrawObj.data = countObjects;
+        chartRedrawObj.type = "normal";
+        barChartHeaders(CSV_Data,headerOrig,"#svgChar",height,width)
+    },
+    
+    "click .headerValCount":function (e) {
+        var elem = e.currentTarget;
+        var headerOrig = elem.getAttribute("original");
+
+        var svg = document.getElementById("svgChar");
+        svg.innerHTML = "";
+
+        var values = [];
+        var counts = [];
+        var countObjects = {
+            "counts":[],
+            "values":[]
+        };
+
+        headerValues.forEach(function (h) {
+            if(!jQuery.isEmptyObject(h[headerValCount])){
+                if(h[headerOrinal] == headerOrig){
+                    values = Object.keys(h[headerValCount]);
+                    values.forEach(function (k) {
+                        counts.push(h[headerValCount][k]);
+                    });
+                    countObjects["counts"] = counts;
+                    countObjects["values"] = values;
+                }
+
+            }
+        });
+
+        var width = document.getElementById("chartBody").offsetWidth;
+        var height = document.getElementById("chartBody").offsetHeight;
+        if(height < 350){
+            height = 350;
+        }
+
+        chartRedrawObj.data = countObjects;
+        chartRedrawObj.type = "counts"
+        // chartRedrawObj.width = width;
+
+        barChartCounts(countObjects,"#svgChar",height,width)
+    }
+});
+
+window.addEventListener('resize',function () {
+    var svg = document.getElementById("svgChar");
+    svg.innerHTML = "";
+
+    var width = document.getElementById("chartBody").offsetWidth;
+    var height = document.getElementById("chartBody").offsetHeight;
+    if(height < 350){
+        height = 350;
+    }
+    if(chartRedrawObj.type == "counts"){
+        barChartCounts(chartRedrawObj.data,"#svgChar",height,width)
+    }
+    else {
+        barChartHeaders(chartRedrawObj.data,headerOrig,"#svgChar",height,width)
+    }
 });
