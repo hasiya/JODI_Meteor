@@ -103,9 +103,9 @@ bar_chart = function (data, width, height, label, dataProp) {
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    data.forEach(function (d) {
-        type(d)
-    });
+    // data.forEach(function (d) {
+    //     type(d)
+    // });
 
     x.domain(data.map(function (d) {
         return d[label];
