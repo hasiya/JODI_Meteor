@@ -1,4 +1,5 @@
-import "../../imports/bar_chart.js"
+import "../../imports/bar_chart.js";
+import "../../imports/bar";
 
 var CSV_keys;
 var CSV_Data;
@@ -8,6 +9,7 @@ var headerOrinal = "orinialVal";
 var headerPresent = "presentVal";
 var headerType = "type";
 var headerValCount = "valCount";
+var selectedXlable;
 var chartRedrawObj = {
     data: {},
     width: 0,
@@ -262,7 +264,6 @@ Template.tab_csv.events({
             }
 
 
-
         }
 
     },
@@ -392,7 +393,7 @@ Template.tab_csv.events({
                     data[h[headerOrinal]] = String(data[h[headerOrinal]]);
                 }
                 else if (h[headerType] == "number") {
-                    data[h[headerOrinal]] = parseInt(data[h[headerOrinal]]);
+                    data[h[headerOrinal]] = +data[h[headerOrinal]];
                 }
                 else if (h[headerType] == "lon/lat") {
                     data[h[headerOrinal]] = parseFloat(data[h[headerOrinal]]);
@@ -436,22 +437,34 @@ Template.tab_csv.events({
         console.log(CSV_Data);
         console.log(headerValues);
 
-        var innerhtml = "";
+        var headerLabelinnerhtml = "";
+        var xAxisInnerhtml = "";
         var headerLabels = document.getElementById("headerLabels");
+        var xAxisLabels = document.getElementById("xAxisLabels");
+
         headerValues.forEach(function (h) {
-            if (h[headerType] != "number") {
-            } else {
-                innerhtml +=
+            if (h[headerType] == "number") {
+                headerLabelinnerhtml +=
                     "<button type='button' id='headerLabels' style='word-wrap: break-word; white-space: normal; position: relative; margin: 5px' count='false' class='btn btn-primary headerLabels' original='" + h[headerOrinal] + "'>" + h[headerPresent] + "</button>";
             }
             if (!jQuery.isEmptyObject(h[headerValCount])) {
-                innerhtml +=
+                headerLabelinnerhtml +=
                     "<button type='button' id='headerLabels' style='word-wrap: break-word; white-space: normal; position: relative; margin: 5px' count='true' class='btn btn-primary headerLabels' original='" + h[headerOrinal] + "'>" + h[headerPresent] + " (Count)</button>";
             }
+            if (h[headerType] == "string") {
+                xAxisInnerhtml += "<div class='radio' original='" + h[headerOrinal] + "'>" +
+                    "<label><input type='radio' class='xAxisLabels' name='optradio' original='" + h[headerOrinal] + "'>" + h[headerPresent] + "</label>" +
+                    "</div>";
+
+                // headerLabelinnerhtml +=
+                //     "<button type='button' id='headerLabels' style='word-wrap: break-word; white-space: normal; position: relative; margin: 5px' count='false' class='btn btn-primary headerLabels' original='" + h[headerOrinal] + "'>" + h[headerPresent] + "</button>";
+            }
+
         });
 
-        headerLabels.innerHTML = innerhtml;
-
+        headerLabels.innerHTML = headerLabelinnerhtml;
+        xAxisLabels.innerHTML = xAxisInnerhtml;
+        document.getElementsByClassName("xAxisLabels")[0].checked = true;
     },
     "click .PanelEdit": function (e) {
         var textElems = document.getElementsByName("headerText");
@@ -507,12 +520,28 @@ Template.tab_csv.events({
             height = 350;
         }
 
-        if(isCount == "false"){
-            barChartHeaders(CSV_Data, headerOrig, "#svgChar", height, width);
+        if (isCount == "false") {
+            var xAxis = document.getElementsByClassName("xAxisLabels");
+            for (var i = 0; i < xAxis.length; i++) {
+                var checked = xAxis[i];
+                if (xAxis[i].checked) {
+                    selectedXlable = checked.getAttribute("original");
 
+                }
+            }
+            // var arrayXacis = Array.from(xAxis);
+            // arrayXacis.forEach(function (e) {
+            //    if(e.checked){
+            //        var a = 1;
+            //        // selectedXlable = e.currentTarget
+            //    }
+            // });
 
+            // bar(CSV_Data,width,height,headerOrig);
+            bar_chart(CSV_Data, width, height, selectedXlable, headerOrig);
+            // barChartHeaders(CSV_Data, headerOrig, "#svgChar", height, width);
         }
-        else if(isCount == "true"){
+        else if (isCount == "true") {
             var values = [];
             var counts = [];
             var countObjects = {
@@ -530,7 +559,6 @@ Template.tab_csv.events({
                         countObjects["counts"] = counts;
                         countObjects["values"] = values;
                     }
-
                 }
             });
 
@@ -540,6 +568,11 @@ Template.tab_csv.events({
 
             barChartCounts(countObjects.counts, "#svgChar", height, width);
         }
+    },
+
+    "change .xAxisLabels": function (e) {
+        console.log(e);
+
     }
 });
 
@@ -556,6 +589,6 @@ window.addEventListener('resize', function () {
         barChartCounts(chartRedrawObj.data.counts, "#svgChar", height, width)
     }
     else {
-        barChartHeaders(chartRedrawObj.data, headerOrig, "#svgChar", height, width)
+        barChartHeaders(chartRedrawObj.data, selectedXlable, "#svgChar", height, width)
     }
 });

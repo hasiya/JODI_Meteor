@@ -1,2 +1,8 @@
-.top-buffer { margin-top:10px; }
-.CodeMirror {border: 1px solid black; font-size:13px}
+.top-buffer {
+    margin-top: 10px;
+}
+
+.CodeMirror {
+    border: 1px solid black;
+    font-size: 13px
+}

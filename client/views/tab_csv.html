@@ -1,19 +1,19 @@
 <template name="tab_csv">
     <!--<form class="editorform">-->
+    <div id="editor">
         <div id="editor">
-            <div id="editor">
-                <textarea id="codemirror_id" name="codemirro_nme"></textarea>
-                <!--{{> CodeMirror id="codemirror_id" name="codemirro_nme" options=editorOptions  placeholder="Paste your CSV file content or drag and drop the file here..."}}-->
-            </div>
-            <!--<textarea cols="60" rows="20" class="form-control" id="CSVarea" spellcheck="false"></textarea>-->
+            <textarea id="codemirror_id" name="codemirro_nme"></textarea>
+            <!--{{> CodeMirror id="codemirror_id" name="codemirro_nme" options=editorOptions  placeholder="Paste your CSV file content or drag and drop the file here..."}}-->
         </div>
-        <br>
-        <div class="pull-right btn-toolbar">
-            <!--<span class="pull-right">  </span>-->
-            <button class="btn-danger btn ClearCSV" >Clear</button>
-            <button class="btn-success btn ProcessCSV" >Process</button>
+        <!--<textarea cols="60" rows="20" class="form-control" id="CSVarea" spellcheck="false"></textarea>-->
+    </div>
+    <br>
+    <div class="pull-right btn-toolbar">
+        <!--<span class="pull-right">  </span>-->
+        <button class="btn-danger btn ClearCSV">Clear</button>
+        <button class="btn-success btn ProcessCSV">Process</button>
 
-        </div>
+    </div>
     <!--</form>-->
     <label id="message"></label>
     <br>
@@ -39,12 +39,19 @@
                     <div class="panel-body">
                         <div class="tab-content">
                             <div class="tab-pane fade in active" id="ChartsTab">
-                                <div id="chartsPanel" class="col-md-4" style="background: lightgray; margin-bottom: 5px; text-align: center" >
-                                    <div id="headerLabels" class="btn-group-vertical" style="margin: 5px" >
+                                <div id="chartsPanel" class="col-md-4"
+                                     style="background: lightgray; margin-bottom: 5px; text-align: center">
+                                    <div>Y Axis</div>
+                                    <div id="headerLabels" class="btn-group-vertical" style="margin: 5px">
+
+                                    </div>
+                                    <div>X Axis ladles</div>
+
+                                    <div id="xAxisLabels" class="" style="margin: 5px; text-align: left">
 
                                     </div>
                                 </div>
-                                <div id="chartBody" class="col-md-7" >
+                                <div id="chartBody" class="col-md-7">
                                     <svg id="svgChar"></svg>
 
                                 </div>
