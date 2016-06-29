@@ -307,6 +307,7 @@
         <item url="file://$USER_HOME$/.meteor/packages/binary-heap/1.0.9/web.browser/max-heap.js" />
         <item url="file://$USER_HOME$/.meteor/packages/binary-heap/1.0.9/web.browser/min-heap.js" />
         <item url="file://$USER_HOME$/.meteor/packages/binary-heap/1.0.9/web.browser/min-max-heap.js" />
+        <item url="file://$USER_HOME$/.meteor/packages/lookback_tooltips/0.5.2/web.browser/packages/lookback_tooltips.js" />
         <item url="file://$USER_HOME$/.meteor/packages/base64/1.0.9/web.browser/base64.js" />
         <item url="file://$USER_HOME$/.meteor/packages/autoupdate/1.2.10/web.browser/autoupdate_client.js" />
         <item url="file://$USER_HOME$/.meteor/packages/webapp-hashing/1.0.9/web.browser/webapp-hashing.js" />
@@ -620,6 +621,7 @@
       <root url="file://$USER_HOME$/.meteor/packages/binary-heap/1.0.9/web.browser/max-heap.js" />
       <root url="file://$USER_HOME$/.meteor/packages/binary-heap/1.0.9/web.browser/min-heap.js" />
       <root url="file://$USER_HOME$/.meteor/packages/binary-heap/1.0.9/web.browser/min-max-heap.js" />
+      <root url="file://$USER_HOME$/.meteor/packages/lookback_tooltips/0.5.2/web.browser/packages/lookback_tooltips.js" />
       <root url="file://$USER_HOME$/.meteor/packages/base64/1.0.9/web.browser/base64.js" />
       <root url="file://$USER_HOME$/.meteor/packages/autoupdate/1.2.10/web.browser/autoupdate_client.js" />
       <root url="file://$USER_HOME$/.meteor/packages/webapp-hashing/1.0.9/web.browser/webapp-hashing.js" />

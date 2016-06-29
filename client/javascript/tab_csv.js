@@ -58,13 +58,13 @@ function linesMatch(lines) {
                 if (colNum.length != headers.length) {
                     lineMatch["lineMatch"] = false;
                     lineMatch["lineNum"] = lineNum;
-                    return;
+
                 }
             }
             else {
                 lineMatch["lineMatch"] = false;
                 lineMatch["lineNum"] = lineNum;
-                return;
+
             }
         }
     });
@@ -76,7 +76,26 @@ function CreatePanel() {
     var panel = document.getElementById("panel");
     panel.style.display = "inline";
 
-    var innerHtml = "";
+    var innerHtml = "<div class='row top-buffer' style='margin-bottom: 10px'>" +
+        "<div class='col-md-1'>" +
+        "</div>" +
+        "<div class='col-md-4' style='text-align: center'>" +
+        "<strong>Column Headers</strong>" +
+        "</div>" +
+        "<div class='col-md-4' style='text-align: center'>" +
+        "<strong>Data Type</strong>" +
+        "</div>" +
+        "<div class='col-md-3'>" +
+        "<div class='col-md-6'>" +
+        "</div>" +
+        "<div class='col-md-6'>" +
+        "</div>" +
+        // "</form> " +
+
+        "</div>" +
+        "</div>";
+
+
     for (i = 0; i < CSV_keys.length; i++) {
         var keyItem = {
             "orinialVal": CSV_keys[i],
@@ -92,7 +111,7 @@ function CreatePanel() {
             "<div class='col-md-4'>" +
             "<form class='form-inline'>" +
             "<input type='text' index='" + i + "' name='headerText' headerID='" + CSV_keys[i] + "' style='width: 80%' readonly id='header_" + CSV_keys[i] + "' class='form-control input' autocomplete='off' value='" + CSV_keys[i] + "'>" +
-            "<button type='button' id='editBtn_" + CSV_keys[i] + "' name='headerEditBtn' headerID='" + CSV_keys[i] + "' style='width: 15%'class='pull-right csvHeaderEdit btn btn-default btn-sm'>" +
+            "<button type='button' id='editBtn_" + CSV_keys[i] + "' name='headerEditBtn' headerID='" + CSV_keys[i] + "' data-toggle='tooltip' data-placement='top' title='Edit the Header Text Field' style='width: 15%' class='tooltipped csvHeaderEdit  btn btn-default btn-sm'>" +
             "<span class='glyphicon glyphicon-edit'></span>" +
             "</button>" +
             "</form>" +
@@ -109,11 +128,11 @@ function CreatePanel() {
             "<div class='col-md-6'>" +
             // "<form class='form-inline'>" +
             "<div class='checkbox' style='width: 50%'>" +
-            "<label for='checkBox_" + CSV_keys[i] + "'><input type='checkbox' name='headerCheck' id='checkBox_" + CSV_keys[i] + "'/>Count</label>" +
+            "<label for='checkBox_" + CSV_keys[i] + "' data-toggle='tooltip' data-placement='top' title='Count Data'><input type='checkbox' name='headerCheck' id='checkBox_" + CSV_keys[i] + "'/>Count</label>" +
             "</div>" +
             "</div>" +
             "<div class='col-md-6'>" +
-            "<button  type='button' id='remvBtn_" + CSV_keys[i] + "' headerID='" + CSV_keys[i] + "' name='headerremvbtn' index='" + i + "' class='pull-left csvHeaderDelete btn btn-danger btn-sm'>" +
+            "<button  type='button' id='remvBtn_" + CSV_keys[i] + "' headerID='" + CSV_keys[i] + "' name='headerremvbtn' index='" + i + " ' data-toggle='tooltip' data-placement='top' title='Delete Header Row'  class='pull-left csvHeaderDelete btn btn-danger btn-sm'>" +
             "<span class='glyphicon glyphicon-remove'></span>" +
             "</button>" +
             "</div>" +
@@ -129,11 +148,13 @@ function CreatePanel() {
         "</div>";
     innerHtml += button;
     panel.innerHTML = innerHtml;
+
 }
 
 function countValues(column) {
     var columnVals = [];
-    var counts = {};
+    var countsObj = {};
+    var counts = [];
 
     CSV_Data.forEach(function (d) {
         var columnVal = d[column];
@@ -141,32 +162,36 @@ function countValues(column) {
     });
 
     columnVals.forEach(function (v) {
-        counts[v] = 1 + (counts[v] || 0);
+        countsObj[v] = 1 + (countsObj[v] || 0);
     });
+
+    for (var prop in countsObj) {
+        if (countsObj.hasOwnProperty(prop)) {
+            var keyVal = {
+                Key: prop,
+                Value: countsObj[prop]
+            };
+            counts.push(keyVal);
+        }
+    }
 
     return counts
 }
 
 
-Template.tab_csv.rendered = function () {
+Template.tab_csv.onRendered(function () {
+    // this.$(".tooltipped").tooltip();
+
     editor = CodeMirror.fromTextArea(this.find("#codemirror_id"), {
         lineNumbers: true,
         lineWrapping: true,
         mode: "Plain Text",
         placeholder: "Paste your CSV file content or drag and drop the file here..."
     });
-}
+});
 
 Template.tab_csv.helpers({
 
-    "editorOptions": function () {
-        return {
-            lineNumbers: true,
-            lineWrapping: true,
-            mode: "Plain Text",
-            placeholder: "Paste your CSV file content or drag and drop the file here..."
-        }
-    },
 
     getKey: function () {
         a = 1;
@@ -331,7 +356,7 @@ Template.tab_csv.events({
         // var selection = document.getElementById("type_"+id);
         if (textbox.readOnly) {
             elem.innerHTML = "<span class='glyphicon glyphicon-ok'></span>";
-            elem.className = "pull-right csvHeaderEdit btn btn-success btn-sm";
+            elem.className = "csvHeaderEdit btn btn-success btn-sm";
             textbox.readOnly = false;
         } else {
             headerIndex = textbox.getAttribute('index');
@@ -342,7 +367,7 @@ Template.tab_csv.events({
             headerValues[headerIndex] = header;
 
             elem.innerHTML = "<span class='glyphicon glyphicon-edit'></span>";
-            elem.className = "pull-right csvHeaderEdit btn btn-default btn-sm";
+            elem.className = "csvHeaderEdit btn btn-default btn-sm";
             textbox.readOnly = true;
         }
     },
@@ -451,20 +476,20 @@ Template.tab_csv.events({
                 headerLabelinnerhtml +=
                     "<button type='button' id='headerLabels' style='word-wrap: break-word; white-space: normal; position: relative; margin: 5px' count='true' class='btn btn-primary headerLabels' original='" + h[headerOrinal] + "'>" + h[headerPresent] + " (Count)</button>";
             }
-            if (h[headerType] == "string") {
-                xAxisInnerhtml += "<div class='radio' original='" + h[headerOrinal] + "'>" +
-                    "<label><input type='radio' class='xAxisLabels' name='optradio' original='" + h[headerOrinal] + "'>" + h[headerPresent] + "</label>" +
-                    "</div>";
-
-                // headerLabelinnerhtml +=
-                //     "<button type='button' id='headerLabels' style='word-wrap: break-word; white-space: normal; position: relative; margin: 5px' count='false' class='btn btn-primary headerLabels' original='" + h[headerOrinal] + "'>" + h[headerPresent] + "</button>";
-            }
+            // if (h[headerType] == "string") {
+            //     xAxisInnerhtml += "<div class='radio' original='" + h[headerOrinal] + "'>" +
+            //         "<label><input type='radio' class='xAxisLabels' name='optradio' original='" + h[headerOrinal] + "'>" + h[headerPresent] + "</label>" +
+            //         "</div>";
+            //
+            //     // headerLabelinnerhtml +=
+            //     //     "<button type='button' id='headerLabels' style='word-wrap: break-word; white-space: normal; position: relative; margin: 5px' count='false' class='btn btn-primary headerLabels' original='" + h[headerOrinal] + "'>" + h[headerPresent] + "</button>";
+            // }
 
         });
 
         headerLabels.innerHTML = headerLabelinnerhtml;
-        xAxisLabels.innerHTML = xAxisInnerhtml;
-        document.getElementsByClassName("xAxisLabels")[0].checked = true;
+        // xAxisLabels.innerHTML = xAxisInnerhtml;
+        // document.getElementsByClassName("xAxisLabels")[0].checked = true;
     },
     "click .PanelEdit": function (e) {
         var textElems = document.getElementsByName("headerText");
@@ -478,7 +503,7 @@ Template.tab_csv.events({
         });
         Array.from(editBtnElems).forEach(function (e) {
             e.innerHTML = "<span class='glyphicon glyphicon-edit'></span>";
-            e.className = "pull-right csvHeaderEdit btn btn-default btn-sm";
+            e.className = "csvHeaderEdit btn btn-default btn-sm";
             e.style.display = "inline";
         });
         Array.from(selectElems).forEach(function (e) {
@@ -516,8 +541,8 @@ Template.tab_csv.events({
 
         var width = document.getElementById("chartBody").offsetWidth;
         var height = document.getElementById("chartBody").offsetHeight - 5;
-        if (height < 350) {
-            height = 350;
+        if (height < 450) {
+            height = 450;
         }
 
         if (isCount == "false") {
@@ -538,8 +563,8 @@ Template.tab_csv.events({
             // });
 
             // bar(CSV_Data,width,height,headerOrig);
-            bar_chart(CSV_Data, width, height, selectedXlable, headerOrig);
-            // barChartHeaders(CSV_Data, headerOrig, "#svgChar", height, width);
+            // bar_chart(CSV_Data, width, height, selectedXlable, headerOrig);
+            barChartHeaders(CSV_Data, headerOrig, "#svgChar", height, width);
         }
         else if (isCount == "true") {
             var values = [];
@@ -548,25 +573,30 @@ Template.tab_csv.events({
                 "counts": [],
                 "values": []
             };
+            //
+            // headerValues.forEach(function (h) {
+            //     if (!jQuery.isEmptyObject(h[headerValCount])) {
+            //         if (h[headerOrinal] == headerOrig) {
+            //             values = Object.keys(h[headerValCount]);
+            //             values.forEach(function (k) {
+            //                 counts.push(h[headerValCount][k]);
+            //             });
+            //             countObjects["counts"] = counts;
+            //             countObjects["values"] = values;
+            //         }
+            //     }
+            // });
 
             headerValues.forEach(function (h) {
-                if (!jQuery.isEmptyObject(h[headerValCount])) {
-                    if (h[headerOrinal] == headerOrig) {
-                        values = Object.keys(h[headerValCount]);
-                        values.forEach(function (k) {
-                            counts.push(h[headerValCount][k]);
-                        });
-                        countObjects["counts"] = counts;
-                        countObjects["values"] = values;
+                if (h[headerOrinal] == headerOrig) {
+                    if (!jQuery.isEmptyObject(h[headerValCount])) {
+                        counts = h[headerValCount]
                     }
                 }
             });
 
-            chartRedrawObj.data = countObjects;
-            chartRedrawObj.type = "counts";
-            // chartRedrawObj.width = width;
 
-            barChartCounts(countObjects.counts, "#svgChar", height, width);
+            barChartCounts(counts, "#svgChar", height, width);
         }
     },
 

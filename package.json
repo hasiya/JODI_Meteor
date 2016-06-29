@@ -6,6 +6,7 @@
   },
   "dependencies": {
     "d3": "^3.5.17",
+    "libs": "^0.1.2",
     "meteor-node-stubs": "~0.2.0"
   }
 }

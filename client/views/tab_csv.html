@@ -3,7 +3,6 @@
     <div id="editor">
         <div id="editor">
             <textarea id="codemirror_id" name="codemirro_nme"></textarea>
-            <!--{{> CodeMirror id="codemirror_id" name="codemirro_nme" options=editorOptions  placeholder="Paste your CSV file content or drag and drop the file here..."}}-->
         </div>
         <!--<textarea cols="60" rows="20" class="form-control" id="CSVarea" spellcheck="false"></textarea>-->
     </div>
@@ -20,6 +19,7 @@
     <br>
 
     <div id="panel" style="display: none">
+
     </div>
     <br>
     <br>
@@ -41,17 +41,15 @@
                             <div class="tab-pane fade in active" id="ChartsTab">
                                 <div id="chartsPanel" class="col-md-4"
                                      style="background: lightgray; margin-bottom: 5px; text-align: center">
-                                    <div>Y Axis</div>
                                     <div id="headerLabels" class="btn-group-vertical" style="margin: 5px">
 
                                     </div>
-                                    <div>X Axis ladles</div>
 
                                     <div id="xAxisLabels" class="" style="margin: 5px; text-align: left">
 
                                     </div>
                                 </div>
-                                <div id="chartBody" class="col-md-7">
+                                <div id="chartBody" class="col-md-7" style="margin-left: 20px">
                                     <svg id="svgChar"></svg>
 
                                 </div>
@@ -71,4 +69,5 @@
 
     <div id="chart" style="display: none">
     </div>
+
 </template>

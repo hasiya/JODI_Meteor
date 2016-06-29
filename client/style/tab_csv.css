@@ -6,3 +6,22 @@
     border: 1px solid black;
     font-size: 13px
 }
+
+.axis > .tick > text {
+    word-wrap: break-word;
+}
+
+/*.tooltip {*/
+/*z-index: 1001;*/
+/*pointer-events: none;*/
+/*transition: opacity .1s ease-out;*/
+/*opacity: 0;*/
+/*}*/
+
+/*.tooltip.hide {*/
+/*opacity: 0;*/
+/*}*/
+
+/*.tooltip.show {*/
+/*opacity: 1;*/
+/*}*/
