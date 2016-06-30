@@ -94,6 +94,34 @@ barChartCounts = function (data, svg, h, w) {
         .orient("left")
         .ticks(10);
 
+    var tooltip = document.getElementById("tooltip");
+
+    if (tooltip) {
+        tooltip = d3.select("#tooltip")
+            .style("position", "absolute")
+            .style("z-index", "10")
+            .style("visibility", "hidden")
+            .style("color", "white")
+            .style("padding", "8px")
+            .style("background-color", "rgba(0, 0, 0, 0.75)")
+            .style("border-radius", "6px")
+            .style("font", "14px sans-serif");
+    }
+    else {
+        tooltip = d3.select("body")
+            .append("div")
+            .attr("id", "tooltip")
+            .style("position", "absolute")
+            .style("z-index", "10")
+            .style("visibility", "hidden")
+            .style("color", "white")
+            .style("padding", "8px")
+            .style("background-color", "rgba(0, 0, 0, 0.75)")
+            .style("border-radius", "6px")
+            .style("font", "14px sans-serif");
+    }
+
+    // tooltip.parentNode.removeChild(tooltip);
 
 
     //Create SVG element
@@ -119,16 +147,6 @@ barChartCounts = function (data, svg, h, w) {
     if (barWidthPadding < 0) {
         barPadding = 0;
     }
-    var tooltip = d3.select("body")
-        .append("div")
-        .style("position", "absolute")
-        .style("z-index", "10")
-        .style("visibility", "hidden")
-        .style("color", "white")
-        .style("padding", "8px")
-        .style("background-color", "rgba(0, 0, 0, 0.75)")
-        .style("border-radius", "6px")
-        .style("font", "14px sans-serif");
 
 
     svg.append("g")

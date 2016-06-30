@@ -5,6 +5,7 @@ var CSV_keys;
 var CSV_Data;
 var editor;
 var headerValues = [];
+var removedHeaderVals = [];
 var headerOrinal = "orinialVal";
 var headerPresent = "presentVal";
 var headerType = "type";
@@ -16,6 +17,18 @@ var chartRedrawObj = {
     height: 0,
     type: ""
 };
+
+
+function headers() {
+    var headersDeleted = true;
+    headerValues.forEach(function (h) {
+        if (!h.deleted) {
+            headersDeleted = false;
+        }
+    });
+    return headersDeleted;
+}
+
 
 // Return array of string values, or NULL if CSV string not well formed.
 function CSVtoArray(text) {
@@ -50,31 +63,36 @@ function linesMatch(lines) {
     var lineNum = 0;
     var headers = CSVtoArray(lines[0]);
 
-    lines.forEach(function (l) {
-        lineNum += 1;
-        if (l) {
-            var colNum = CSVtoArray(l);
-            if (colNum) {
-                if (colNum.length != headers.length) {
+    if (headers) {
+        lines.forEach(function (l) {
+            lineNum += 1;
+            if (l) {
+                var colNum = CSVtoArray(l);
+                if (colNum) {
+                    if (colNum.length != headers.length) {
+                        lineMatch["lineMatch"] = false;
+                        lineMatch["lineNum"] = lineNum;
+
+                    }
+                }
+                else {
                     lineMatch["lineMatch"] = false;
                     lineMatch["lineNum"] = lineNum;
 
                 }
             }
-            else {
-                lineMatch["lineMatch"] = false;
-                lineMatch["lineNum"] = lineNum;
-
-            }
-        }
-    });
+        });
+    }
+    else {
+        lineMatch = null;
+    }
     return lineMatch;
 }
 function CreatePanel() {
     headerValues = [];
 
-    var panel = document.getElementById("panel");
-    panel.style.display = "inline";
+    var HeaderConfigPanel = document.getElementById("HeaderConfig");
+    document.getElementById("panel").style.display = "inline";
 
     var innerHtml = "<div class='row top-buffer' style='margin-bottom: 10px'>" +
         "<div class='col-md-1'>" +
@@ -101,6 +119,7 @@ function CreatePanel() {
             "orinialVal": CSV_keys[i],
             "presentVal": CSV_keys[i],
             "type": "",
+            "deleted": false,
             "valCount": {}
         };
 
@@ -142,12 +161,12 @@ function CreatePanel() {
             "</div>";
         headerValues.push(keyItem);
     }
-    var button =
+    innerHtml +=
         "<div class='pull-right btn-toolbar'>" +
-        "<button class='pull-right btn-success btn PanelDone'>Done</button>" +
+        "<button id='restore' style='display: none' class='btn-warning btn restoreDeleted'>Restore Deleted <span class='glyphicon glyphicon-refresh'></span></button>" +
+        "<button class='btn-success btn PanelDone'>Done</button>" +
         "</div>";
-    innerHtml += button;
-    panel.innerHTML = innerHtml;
+    HeaderConfigPanel.innerHTML = innerHtml;
 
 }
 
@@ -185,6 +204,7 @@ Template.tab_csv.onRendered(function () {
     editor = CodeMirror.fromTextArea(this.find("#codemirror_id"), {
         lineNumbers: true,
         lineWrapping: true,
+        styleSelectedText: true,
         mode: "Plain Text",
         placeholder: "Paste your CSV file content or drag and drop the file here..."
     });
@@ -203,6 +223,7 @@ Template.tab_csv.onRendered(function () {
             clearBtn.style.display = "none";
             var Message = $("#message");
             Message.html("Please only drop one file to process.");
+            cm.setValue("")
 
         }
 
@@ -215,19 +236,22 @@ Template.tab_csv.onRendered(function () {
         var text = cm.getValue();
         // console.log(e);
 
-        if (!text) {
+        var textn = !text;
+        var texte = !/\s/.test(text);
+
+        if (!/\S/.test(text)) {
             processBtn.style.display = "none";
             clearBtn.style.display = "none";
 
             var panel = document.getElementById("panel");
             panel.style.display = "none";
-            panel.innerHTML = "";
+            document.getElementById("HeaderConfig").innerHTML = "";
             Message.html("");
         }
         else {
             processBtn.style.display = "inline";
             clearBtn.style.display = "inline";
-            Message.html("")
+            // Message.html("")
         }
     });
 });
@@ -241,7 +265,8 @@ Template.tab_csv.helpers({
     },
 
     getData: function () {
-        return CSV_Data;
+        var a = 1;
+        return headerValues;
     }
 
 });
@@ -252,33 +277,40 @@ Template.tab_csv.events({
         // var text = t.find("#codemirror_id").value;
         var text = editor.getValue();
         var lines = text.split('\n');
+        var Message = $("#message");
+
 
         if (lines.length > 1) {
             var lineMatch = linesMatch(lines);
-            if (lineMatch["lineMatch"]) {
-                $.ajax({
-                    method: "POST",
-                    url: "http://127.0.0.1:5000/csv_data",
-                    data: {
-                        'data': text
-                    },
-                    success: function (data) {
-                        CSV_Data = data;
-                        console.log(CSV_Data);
-                        CSV_keys = Object.keys(data[0]);
-                        CreatePanel();
-                        var Message = $("#message");
-                        Message.html("");
-                        editor.setOption("readOnly", true);
-                        var elem = e.currentTarget;
-                        elem.className = "btn-primary btn EditCSV";
-                        elem.innerHTML = "Edit";
-                    }
-                });
+            if (lineMatch) {
+                if (lineMatch["lineMatch"]) {
+                    $.ajax({
+                        method: "POST",
+                        url: "http://127.0.0.1:5000/csv_data",
+                        data: {
+                            'data': text
+                        },
+                        success: function (data) {
+                            CSV_Data = data;
+                            console.log(CSV_Data);
+                            CSV_keys = Object.keys(data[0]);
+                            CreatePanel();
+                            var Message = $("#message");
+                            Message.html("");
+                            editor.setOption("readOnly", true);
+                            var elem = e.currentTarget;
+                            elem.className = "btn-primary btn EditCSV";
+                            elem.innerHTML = "Edit";
+                        }
+                    });
+                }
+                else {
+                    Message.html("There is the problem in line: " + lineMatch["lineNum"]);
+                    editor.setSelection({line: lineMatch["lineNum"] - 1, ch: 0}, {line: lineMatch["lineNum"] - 1})
+                }
             }
             else {
-                var Message = $("#message");
-                Message.html("There is the problem in line: " + lineMatch["lineNum"]);
+                Message.html("The Editor content does not look like a CSV. ");
             }
 
 
@@ -299,7 +331,7 @@ Template.tab_csv.events({
 
         var panel = document.getElementById("panel");
         panel.style.display = "none";
-        panel.innerHTML = "";
+        document.getElementById("HeaderConfig").innerHTML = "";
         var Message = $("#message");
         Message.html("");
 
@@ -330,10 +362,9 @@ Template.tab_csv.events({
         headerValues = [];
         var panel = document.getElementById("panel");
         panel.style.display = "none";
-        panel.innerHTML = "";
+        document.getElementById("HeaderConfig").innerHTML = "";
 
         var Message = $("#message");
-
         Message.html("");
 
         var headerpanel = document.getElementById("headerLabels");
@@ -381,13 +412,27 @@ Template.tab_csv.events({
     },
     "click .csvHeaderDelete": function (e) {
         var elem = e.currentTarget;
-        var panel = document.getElementById("panel");
+        var restoreBtn = document.getElementById("restore");
+        var HeaderConfigPanel = document.getElementById("HeaderConfig");
         var rowID = elem.getAttribute("headerID");
         var rowElem = document.getElementById("row_" + rowID);
-        var headerIndex = elem.getAttribute("index");
+        var headerIndex = +elem.getAttribute("index");
+        var delHeaderVal = headerValues[headerIndex];
+        removedHeaderVals.push(delHeaderVal);
 
-        headerValues.splice(headerIndex, 1);
-        panel.removeChild(rowElem);
+        headerValues[headerIndex].deleted = true;
+        HeaderConfigPanel.removeChild(rowElem);
+
+        restoreBtn.style.display = "inline";
+
+        if (headers()) {
+            restoreBtn.style.display = "none";
+            document.getElementById("panel").style.display = "none";
+            var processBtn = document.getElementById("process_edit_btn");
+            processBtn.className = "btn-success btn ProcessCSV";
+            processBtn.innerHTML = "Process";
+            removedHeaderVals = [];
+        }
     },
 
 
