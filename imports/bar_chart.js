@@ -3,6 +3,13 @@ barChartHeaders = function (data, property, svg, h, w) {
 
     var barPadding = 1;
 
+    var x = d3.scale.ordinal()
+        .rangeRoundBands([0, w], .1);
+
+    var xAxis = d3.svg.axis()
+        .scale(x)
+        .orient("bottom");
+    
     var y = d3.scale.linear()
         .range([h, 0]);
 

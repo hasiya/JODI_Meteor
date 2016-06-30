@@ -188,6 +188,48 @@ Template.tab_csv.onRendered(function () {
         mode: "Plain Text",
         placeholder: "Paste your CSV file content or drag and drop the file here..."
     });
+
+    editor.on("drop", function (cm, e) {
+        // e.preventDefault()
+        var processBtn = document.getElementById("process_edit_btn");
+        var clearBtn = document.getElementById("clear_editor");
+        console.log(e);
+        console.log(cm);
+        var files = e.dataTransfer.files;
+
+        if (files.length > 1) {
+            e.preventDefault();
+            processBtn.style.display = "none";
+            clearBtn.style.display = "none";
+            var Message = $("#message");
+            Message.html("Please only drop one file to process.");
+
+        }
+
+    });
+
+    editor.on("update", function (cm) {
+        var processBtn = document.getElementById("process_edit_btn");
+        var clearBtn = document.getElementById("clear_editor");
+        var Message = $("#message");
+        var text = cm.getValue();
+        // console.log(e);
+
+        if (!text) {
+            processBtn.style.display = "none";
+            clearBtn.style.display = "none";
+
+            var panel = document.getElementById("panel");
+            panel.style.display = "none";
+            panel.innerHTML = "";
+            Message.html("");
+        }
+        else {
+            processBtn.style.display = "inline";
+            clearBtn.style.display = "inline";
+            Message.html("")
+        }
+    });
 });
 
 Template.tab_csv.helpers({
@@ -204,56 +246,7 @@ Template.tab_csv.helpers({
 
 });
 
-if (!$("#codemirror_id").val()) {
-    console.log("empty!");
-}
-
 Template.tab_csv.events({
-
-    "keyup .CodeMirror": function (e, t) {
-        console.log(e);
-        var text = editor.getValue();
-        if (!text) {
-            var panel = document.getElementById("panel");
-            panel.style.display = "none";
-            panel.innerHTML = "";
-            var Message = $("#message");
-            Message.html("");
-        }
-
-    },
-
-    "change .CodeMirror": function (e, t) {
-        var text = editor.getValue();
-        if (!text) {
-            var panel = document.getElementById("panel");
-            panel.style.display = "none";
-            panel.innerHTML = "";
-            var Message = $("#message");
-            Message.html("");
-        }
-
-    },
-
-    "drop .CodeMirror": function (e) {
-        console.log(e);
-
-        var panel = document.getElementById("panel");
-        panel.style.display = "none";
-        panel.innerHTML = "";
-        var Message = $("#message");
-        Message.html("");
-    },
-
-    "paste .CodeMirror": function (e) {
-        console.log(e);
-
-        var panel = document.getElementById("panel");
-        panel.style.display = "none";
-        panel.innerHTML = "";
-        var Message = $("#message");
-        Message.html("");
-    },
 
     "click .ProcessCSV": function (e, t) {
         // var text = t.find("#codemirror_id").value;
@@ -323,19 +316,24 @@ Template.tab_csv.events({
     "click .ClearCSV": function (e, t) {
         editor.setOption("readOnly", false);
         editor.setValue("");
-        var ProcessBtn = document.getElementsByClassName("EditCSV")[0];
-        ProcessBtn.className = "btn-success btn ProcessCSV";
-        ProcessBtn.innerHTML = "Process";
+        var processBtn = document.getElementById("process_edit_btn");
+        processBtn.className = "btn-success btn ProcessCSV";
+        processBtn.innerHTML = "Process";
+        processBtn.style.display = "none";
+        var clearBtn = document.getElementById("clear_editor");
+        clearBtn.style.display = "none";
 
         var temp;
         CSV_keys = temp;
+
         CSV_Data = temp;
         headerValues = [];
-
         var panel = document.getElementById("panel");
         panel.style.display = "none";
         panel.innerHTML = "";
+
         var Message = $("#message");
+
         Message.html("");
 
         var headerpanel = document.getElementById("headerLabels");
