@@ -2,7 +2,7 @@
     <!--<form class="editorform">-->
     <div id="editor">
         <div id="editor">
-            <textarea id="codemirror_id" name="codemirro_nme"></textarea>
+            <textarea id="codemirror_id" name="codemirro_nme" placeholder="sad"></textarea>
         </div>
         <!--<textarea cols="60" rows="20" class="form-control" id="CSVarea" spellcheck="false"></textarea>-->
     </div>
@@ -18,22 +18,38 @@
     <br>
     <br>
 
-
     <div id="panel" style="display: none">
         <div id="HeaderConfig">
 
         </div>
+        <div id="HeaderConfigBtns">
 
-        <div id="delHeadersPanel" style="display: none" class="panel panel-default">
-            <div class="panel-heading">Removed Headers</div>
-            <div id="delHeaderPanelBody" class="panel-body">
-
-            </div>
         </div>
+
+        <!--<div id="delHeadersPanel" style="display: none" >-->
+        <div id="restoreHeadersModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="griModalLabel"
+             aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="gridModalLabel">Restore Deleted Labels</h4>
+                    </div>
+                    <div id="restoreModelBody" class="modal-body">
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-success" data-dismiss="modal">Done</button>
+                        <!--<button type="button" class="btn btn-primary">Save changes</button>-->
+                    </div>
+                </div>
+            </div>
+            </div>
+        <!--</div>-->
     </div>
     <br>
     <br>
-
 
     <div id="charts" style="display: none">
         <div class="row">
@@ -50,20 +66,26 @@
                     <div class="panel-body">
                         <div class="tab-content">
                             <div class="tab-pane fade in active" id="ChartsTab">
-                                <div id="chartsPanel" class="col-md-4"
-                                     style="background: lightgray; margin-bottom: 5px; text-align: center">
-                                    <div id="headerLabels" class="btn-group-vertical" style="margin: 5px">
+                                <div id="ChartsMenu">
 
+                                </div>
+                                <div id="ChartsSvg">
+                                    <div id="chartsPanel" class="col-md-4"
+                                         style="background: #d3d3d3; margin-bottom: 5px; text-align: center">
+                                        <div id="headerLabels" class="btn-group-vertical" style="margin: 5px">
+
+                                        </div>
+
+                                        <div id="xAxisLabels" class="" style="margin: 5px; text-align: left">
+
+                                        </div>
                                     </div>
-
-                                    <div id="xAxisLabels" class="" style="margin: 5px; text-align: left">
+                                    <div id="chartBody" class="col-md-7" style="margin-left: 20px">
+                                        <svg id="svgChar"></svg>
 
                                     </div>
                                 </div>
-                                <div id="chartBody" class="col-md-7" style="margin-left: 20px">
-                                    <svg id="svgChar"></svg>
 
-                                </div>
                             </div>
                             <div class="tab-pane fade" id="MapsTab">
                                 Maps
