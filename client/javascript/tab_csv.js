@@ -148,7 +148,7 @@ function CreatePanel() {
             "<select id='type_" + CSV_keys[i] + "' headerID='" + CSV_keys[i] + "' index='" + i + "' name='headerType' class='csvHeaderType form-control'>" +
             "<option value='string'>String</option>" +
             "<option value='number'>Number</option>" +
-            "<option value='lon/lat'>Longitude/Latitude</option>" +
+            "<option value='lon/lat/IP'>Longitude / Latitude / IP</option>" +
             // "<option value='latitude'>Latitude</option>"+
             "</select>" +
             "</div>" +
@@ -356,8 +356,10 @@ Template.tab_csv.events({
         var svg = document.getElementById("svgChar");
         svg.innerHTML = "";
 
-        var charts = document.getElementById("charts");
-        charts.style.display = "none"
+        var visualMenu = document.getElementById("visualMenu");
+        visualMenu.style.display = "none";
+        document.getElementById("charts").style.display = "none";
+
     },
 
     "click .ClearCSV": function (e, t) {
@@ -389,8 +391,10 @@ Template.tab_csv.events({
         var svg = document.getElementById("svgChar");
         svg.innerHTML = "";
 
-        var charts = document.getElementById("charts");
-        charts.style.display = "none"
+        var visualMenu = document.getElementById("visualMenu");
+        visualMenu.style.display = "none";
+        document.getElementById("charts").style.display = "none";
+
     },
 
     "click .csvHeaderEdit": function (e) {
@@ -519,8 +523,8 @@ Template.tab_csv.events({
                     else if (h[headerType] == "number") {
                         data[h[headerOriginal]] = +data[h[headerOriginal]];
                     }
-                    else if (h[headerType] == "lon/lat") {
-                        data[h[headerOriginal]] = parseFloat(data[h[headerOriginal]]);
+                    else if (h[headerType] == "lon/lat/IP") {
+                        // data[h[headerOriginal]] = parseFloat(data[h[headerOriginal]]);
                     }
 
                     // else if(h[headerType] == "latitude"){
@@ -552,7 +556,9 @@ Template.tab_csv.events({
             e.style.display = "none";
         });
 
-        document.getElementById("charts").style.display = "inline";
+        // document.getElementById("charts").style.display = "inline";
+        var visualMenu = document.getElementById("visualMenu");
+        visualMenu.style.display = "inline";
 
         var elem = e.currentTarget;
         elem.className = "pull-right btn-primary btn PanelEdit";
@@ -568,20 +574,80 @@ Template.tab_csv.events({
         var headerLabels = document.getElementById("headerLabels");
         var xAxisLabels = document.getElementById("xAxisLabels");
 
+        var chartsMenu = document.getElementById("ChartsMenuTab");
+        var normalChartsThumb = false;
+        var countChartsThumb = false;
+        var pieChartThumb = false;
+
+        var chartsMenuInner = "";
+
+        var mapsMenu = document.getElementById("MapsMenuTab");
+        var mapsThumb = false;
+        var mapsMenuInner = "";
+
+
         headerValues.forEach(function (h) {
             if (!h.deleted) {
                 if (h[headerType] == "number") {
-                    headerLabelinnerhtml +=
-                        "<button type='button' id='headerLabels' style='word-wrap: break-word; white-space: normal; position: relative; margin: 5px' count='false' class='btn btn-primary headerLabels' original='" + h[headerOriginal] + "'>" + h[headerPresent] + "</button>";
+                    normalChartsThumb = true;
+                    pieChartThumb = true;
+
+                    // headerLabelinnerhtml +=
+                    //     "<button type='button' id='headerLabels' style='word-wrap: break-word; white-space: normal; position: relative; margin: 5px' count='false' class='btn btn-primary headerLabels' original='" + h[headerOriginal] + "'>" + h[headerPresent] + "</button>";
                 }
                 if (!jQuery.isEmptyObject(h[headerValCount])) {
-                    headerLabelinnerhtml +=
-                        "<button type='button' id='headerLabels' style='word-wrap: break-word; white-space: normal; position: relative; margin: 5px' count='true' class='btn btn-primary headerLabels' original='" + h[headerOriginal] + "'>" + h[headerPresent] + " (Count)</button>";
+                    countChartsThumb = true;
+                    pieChartThumb = true;
+                    // headerLabelinnerhtml +=
+                    //     "<button type='button' id='headerLabels' style='word-wrap: break-word; white-space: normal; position: relative; margin: 5px' count='true' class='btn btn-primary headerLabels' original='" + h[headerOriginal] + "'>" + h[headerPresent] + " (Count)</button>";
+                }
+                if (h[headerType] == "lon/lat/IP") {
+                    mapsThumb = true;
                 }
             }
         });
 
-        headerLabels.innerHTML = headerLabelinnerhtml;
+        if (normalChartsThumb) {
+            chartsMenuInner +=
+                "<div class='col-lg-3 col-md-4 col-xs-6 thumb'>" +
+                "<a class='thumbnail visualThumb' visType='NormalBar' href='#' style='text-align: center'>" +
+                "<img class='img-responsive' src='http://placehold.it/400x300' alt=''>" +
+                "Bar Charts" +
+                "</a>" +
+                "</div>";
+        }
+        if (countChartsThumb) {
+            chartsMenuInner +=
+                "<div class='col-lg-3 col-md-4 col-xs-6 thumb'>" +
+                "<a class='thumbnail visualThumb' visType='CountBar' href='#' style='text-align: center'>" +
+                "<img class='img-responsive' src='http://placehold.it/400x300' alt=''>" +
+                "Bar Charts (Counts)" +
+                "</a>" +
+                "</div>";
+        }
+        if (mapsThumb) {
+            mapsMenuInner +=
+                "<div class='col-lg-3 col-md-4 col-xs-6 thumb'>" +
+                "<a class='thumbnail visualThumb' vistype='Map' href='#' style='text-align: center'>" +
+                "<img class='img-responsive' src='http://placehold.it/400x300' alt=''>" +
+                "Maps" +
+                "</a>" +
+                "</div>";
+        }
+        if (pieChartThumb) {
+            chartsMenuInner +=
+                "<div class='col-lg-3 col-md-4 col-xs-6 thumb'>" +
+                "<a class='thumbnail visualThumb' visType='pieChart' href='#' style='text-align: center'>" +
+                "<img class='img-responsive' src='http://placehold.it/400x300' alt=''>" +
+                "Pie Chart" +
+                "</a>" +
+                "</div>";
+        }
+
+        chartsMenu.innerHTML = chartsMenuInner;
+        mapsMenu.innerHTML = mapsMenuInner;
+
+        // headerLabels.innerHTML = headerLabelinnerhtml;
         // xAxisLabels.innerHTML = xAxisInnerhtml;
         // document.getElementsByClassName("xAxisLabels")[0].checked = true;
     },
@@ -610,8 +676,10 @@ Template.tab_csv.events({
             e.style.display = "inline";
         });
 
-        var charts = document.getElementById("charts");
-        charts.style.display = "none";
+        var visualMenu = document.getElementById("visualMenu");
+        visualMenu.style.display = "none";
+        document.getElementById("charts").style.display = "none";
+
 
         var headerpanel = document.getElementById("headerLabels");
         headerpanel.innerHTML = "";
@@ -631,6 +699,89 @@ Template.tab_csv.events({
         }
     },
 
+    "click .visualThumb": function (e) {
+        var elem = e.currentTarget;
+        var visType = elem.getAttribute("vistype");
+
+        var headerLabelinnerhtml = "";
+
+        var xAxisInnerhtml = "";
+        var headerLabels = document.getElementById("headerLabels");
+        var xAxisLabels = document.getElementById("xAxisLabels");
+        var xAxiaLblDiv = document.getElementById("xAxisLblsDiv");
+
+        xAxiaLblDiv.style.display = "none";
+
+        var svg = document.getElementById("svgChar");
+        svg.innerHTML = "";
+
+        if (visType == "NormalBar") {
+            headerValues.forEach(function (h) {
+                if (!h.deleted) {
+                    if (h[headerType] == "number") {
+                        headerLabelinnerhtml +=
+                            "<button type='button' id='headerLabels' style='word-wrap: break-word; white-space: normal; position: relative; margin: 5px' count='false' class='btn btn-primary headerLabels' original='" + h[headerOriginal] + "'>" + h[headerPresent] + "</button>";
+
+                        document.getElementById("charts").style.display = "inline";
+                    }
+                    if (h[headerType] == "string") {
+                        xAxisInnerhtml +=
+                            "<option class='xAxisLabel' name='optradio' original='" + h[headerOriginal] + "'>" + h[headerPresent] + "</option>";
+                        xAxiaLblDiv.style.display = "inline";
+
+                    }
+                }
+            });
+
+
+        }
+        else if (visType == "CountBar") {
+            headerValues.forEach(function (h) {
+                if (!h.deleted) {
+                    if (!jQuery.isEmptyObject(h[headerValCount])) {
+
+                        headerLabelinnerhtml +=
+                            "<button type='button' id='headerLabels' style='word-wrap: break-word; white-space: normal; position: relative; margin: 5px' count='true' class='btn btn-primary headerLabels' original='" + h[headerOriginal] + "'>" + h[headerPresent] + " (Count)</button>";
+
+                        document.getElementById("charts").style.display = "inline";
+
+                    }
+                    // if (h[headerType] == "string") {
+                    //     xAxisInnerhtml +=
+                    //         "<option class='xAxisLabels' name='optradio' original='" + h[headerOriginal] + "'>"+ h[headerPresent] + "</option>";
+                    //
+                    //     // headerLabelinnerhtml +=
+                    //     //     "<button type='button' id='headerLabels' style='word-wrap: break-word; white-space: normal; position: relative; margin: 5px' count='false' class='btn btn-primary headerLabels' original='" + h[headerOrinal] + "'>" + h[headerPresent] + "</button>";
+                    // }
+                }
+            });
+
+        }
+        else if (visType = "pieChart") {
+            headerValues.forEach(function (h) {
+                if (!h.deleted) {
+                    if (!jQuery.isEmptyObject(h[headerValCount])) {
+
+                        headerLabelinnerhtml +=
+                            "<button type='button' id='headerLabels' style='word-wrap: break-word; white-space: normal; position: relative; margin: 5px' count='true' class='btn btn-primary headerLabels' original='" + h[headerOriginal] + "'>" + h[headerPresent] + "</button>";
+
+                        document.getElementById("charts").style.display = "inline";
+
+                    }
+                }
+            });
+        }
+        else if (visType == "Map") {
+
+        }
+
+        headerLabels.innerHTML = headerLabelinnerhtml;
+        xAxisLabels.innerHTML = xAxisInnerhtml;
+        // var xAxis = document.getElementsByClassName("xAxisLabels")
+        // xAxis[0].checked = true;
+
+    },
+
     "click .headerLabels": function (e) {
         var elem = e.currentTarget;
         var headerOrig = elem.getAttribute("original");
@@ -645,16 +796,21 @@ Template.tab_csv.events({
             height = 450;
         }
 
-        if (isCount == "false") {
-            var xAxis = document.getElementsByClassName("xAxisLabels");
-            for (var i = 0; i < xAxis.length; i++) {
-                var checked = xAxis[i];
-                if (xAxis[i].checked) {
-                    selectedXlable = checked.getAttribute("original");
-                }
-            }
+        var selectedXlabel;
 
-            barChartHeaders(CSV_Data, headerOrig, "#svgChar", height, width);
+        if (isCount == "false") {
+            var xAxis = document.getElementById("xAxisLabels");
+            var xAxisOptions = document.getElementsByClassName("xAxisLabel");
+            // for (var i = 0; i < xAxis.length; i++) {
+            //     var checked = xAxis[i];
+            //     if (xAxis[i].checked) {
+            //         selectedXlable = checked.getAttribute("original");
+            //     }
+            // }
+            selectedXlabel = xAxisOptions[xAxis.selectedIndex].getAttribute("original");
+
+
+            barChartHeaders(CSV_Data, headerOrig, selectedXlabel, "#svgChar", height, width);
         }
         else if (isCount == "true") {
             var values = [];
@@ -680,6 +836,10 @@ Template.tab_csv.events({
 
     "change .xAxisLabels": function (e) {
         console.log(e);
+    },
+
+    "click .chartTabs": function (e) {
+        document.getElementById("charts").style.display = "none";
     }
 });
 

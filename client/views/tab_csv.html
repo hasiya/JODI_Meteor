@@ -51,43 +51,25 @@
     <br>
     <br>
 
-    <div id="charts" style="display: none">
+    <div id="visualMenu" style="display: none">
         <div class="row">
             <div class="col-md-12">
                 <div class="panel with-nav-tabs panel-info">
                     <div class="panel-heading">
                         <ul class="nav nav-tabs">
-                            <li class="active"><a href="#ChartsTab" data-toggle="tab">Charts</a></li>
-                            <li><a href="#MapsTab" data-toggle="tab">Maps</a></li>
+                            <li class="active"><a class="chartTabs" href="#ChartsMenuTab" data-toggle="tab">Charts
+                                Menu</a></li>
+                            <li><a class="chartTabs" href="#MapsMenuTab" data-toggle="tab">Maps Menu</a></li>
                             <!--<li><a href="#tab3info" data-toggle="tab">Info 3</a></li>-->
                             <!--<li><a href="#tab4info" data-toggle="tab">info 4</a></li>-->
                         </ul>
                     </div>
                     <div class="panel-body">
                         <div class="tab-content">
-                            <div class="tab-pane fade in active" id="ChartsTab">
-                                <div id="ChartsMenu">
-
-                                </div>
-                                <div id="ChartsSvg">
-                                    <div id="chartsPanel" class="col-md-4"
-                                         style="background: #d3d3d3; margin-bottom: 5px; text-align: center">
-                                        <div id="headerLabels" class="btn-group-vertical" style="margin: 5px">
-
-                                        </div>
-
-                                        <div id="xAxisLabels" class="" style="margin: 5px; text-align: left">
-
-                                        </div>
-                                    </div>
-                                    <div id="chartBody" class="col-md-7" style="margin-left: 20px">
-                                        <svg id="svgChar"></svg>
-
-                                    </div>
-                                </div>
+                            <div class="tab-pane fade in active" id="ChartsMenuTab">
 
                             </div>
-                            <div class="tab-pane fade" id="MapsTab">
+                            <div class="tab-pane fade" id="MapsMenuTab">
                                 Maps
                             </div>
                             <!--<div class="tab-pane fade" id="tab3info">Info 3</div>-->
@@ -100,7 +82,32 @@
         </div>
     </div>
 
-    <div id="chart" style="display: none">
+    <div id="charts" style="display: none; margin-top: 10px">
+        <div id="ChartsSvg">
+            <div id="chartsPanel" class="col-md-4"
+                 style="background: #d3d3d3; margin-bottom: 5px; text-align: center">
+                <div id="headerLabels" class="btn-group-vertical" style="margin: 5px">
+
+                </div>
+
+
+                <br>
+                <div id="xAxisLblsDiv" style="display: none; margin-top: 10px">
+                    Please choose X axis Labels
+                    <label for="xAxisLabels"></label><select id="xAxisLabels" class="col-md-12"
+                                                             style="margin: 5px; text-align: left;">
+
+                </select>
+                </div>
+
+            </div>
+            <div id="chartBody" class="col-md-7" style="margin-left: 20px">
+                <svg id="svgChar"></svg>
+
+            </div>
+        </div>
+
     </div>
+
 
 </template>

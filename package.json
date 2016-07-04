@@ -1,12 +1,25 @@
 {
-  "name": "index",
+  "name": "jodi_meteor",
   "private": true,
   "scripts": {
     "start": "meteor run"
   },
   "dependencies": {
-    "d3": "^3.5.17",
     "libs": "^0.1.2",
     "meteor-node-stubs": "~0.2.0"
-  }
+  },
+  "version": "1.0.0",
+  "description": "DC Thomsons JODI Project",
+  "main": "index.js",
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hasiya/JODI_Meteor.git"
+  },
+  "author": "Rajitha Hasith",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/hasiya/JODI_Meteor/issues"
+  },
+  "homepage": "https://github.com/hasiya/JODI_Meteor#readme"
 }
