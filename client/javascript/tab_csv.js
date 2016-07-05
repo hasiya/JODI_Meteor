@@ -1,5 +1,8 @@
 import "../../imports/bar_chart.js";
 import "../../imports/bar";
+import "../../imports/grouped_bar";
+import "../../imports/pie_chart";
+
 
 var CSV_keys;
 var CSV_Data;
@@ -293,7 +296,6 @@ Template.tab_csv.events({
         document.getElementById("restoreModelBody").innerHTML = "";
 
 
-
         if (lines.length > 1) {
             var lineMatch = linesMatch(lines);
             if (lineMatch) {
@@ -344,7 +346,6 @@ Template.tab_csv.events({
         panel.style.display = "none";
         document.getElementById("HeaderConfig").innerHTML = "";
         document.getElementById("restoreModelBody").innerHTML = "";
-
 
 
         var Message = $("#message");
@@ -578,6 +579,9 @@ Template.tab_csv.events({
         var normalChartsThumb = false;
         var countChartsThumb = false;
         var pieChartThumb = false;
+        /*for now the grouped bar charts set to true.*/
+        var groupBarChartThumb = true;
+
 
         var chartsMenuInner = "";
 
@@ -591,6 +595,7 @@ Template.tab_csv.events({
                 if (h[headerType] == "number") {
                     normalChartsThumb = true;
                     pieChartThumb = true;
+                    // groupBarChartThumb = true;
 
                     // headerLabelinnerhtml +=
                     //     "<button type='button' id='headerLabels' style='word-wrap: break-word; white-space: normal; position: relative; margin: 5px' count='false' class='btn btn-primary headerLabels' original='" + h[headerOriginal] + "'>" + h[headerPresent] + "</button>";
@@ -598,6 +603,7 @@ Template.tab_csv.events({
                 if (!jQuery.isEmptyObject(h[headerValCount])) {
                     countChartsThumb = true;
                     pieChartThumb = true;
+                    // groupBarChartThumb = true;
                     // headerLabelinnerhtml +=
                     //     "<button type='button' id='headerLabels' style='word-wrap: break-word; white-space: normal; position: relative; margin: 5px' count='true' class='btn btn-primary headerLabels' original='" + h[headerOriginal] + "'>" + h[headerPresent] + " (Count)</button>";
                 }
@@ -634,6 +640,15 @@ Template.tab_csv.events({
                 "</a>" +
                 "</div>";
         }
+        if (groupBarChartThumb) {
+            chartsMenuInner +=
+                "<div class='col-lg-3 col-md-4 col-xs-6 thumb'>" +
+                "<a class='thumbnail visualThumb' visType='groupBar' href='#' style='text-align: center'>" +
+                "<img class='img-responsive' src='http://placehold.it/400x300' alt=''>" +
+                "Grouped Bar Chart" +
+                "</a>" +
+                "</div>";
+        }
         if (pieChartThumb) {
             chartsMenuInner +=
                 "<div class='col-lg-3 col-md-4 col-xs-6 thumb'>" +
@@ -643,6 +658,7 @@ Template.tab_csv.events({
                 "</a>" +
                 "</div>";
         }
+
 
         chartsMenu.innerHTML = chartsMenuInner;
         mapsMenu.innerHTML = mapsMenuInner;
@@ -720,13 +736,13 @@ Template.tab_csv.events({
                 if (!h.deleted) {
                     if (h[headerType] == "number") {
                         headerLabelinnerhtml +=
-                            "<button type='button' id='headerLabels' style='word-wrap: break-word; white-space: normal; position: relative; margin: 5px' count='false' class='btn btn-primary headerLabels' original='" + h[headerOriginal] + "'>" + h[headerPresent] + "</button>";
+                            "<button type='button' id='headerLabels' style='word-wrap: break-word; white-space: normal; position: relative; margin: 5px' vistype='bar' count='false' class='btn btn-primary headerLabels' original='" + h[headerOriginal] + "'>" + h[headerPresent] + "</button>";
 
                         document.getElementById("charts").style.display = "inline";
                     }
                     if (h[headerType] == "string") {
                         xAxisInnerhtml +=
-                            "<option class='xAxisLabel' name='optradio' original='" + h[headerOriginal] + "'>" + h[headerPresent] + "</option>";
+                            "<option class='xAxisLabel' original='" + h[headerOriginal] + "'>" + h[headerPresent] + "</option>";
                         xAxiaLblDiv.style.display = "inline";
 
                     }
@@ -741,7 +757,7 @@ Template.tab_csv.events({
                     if (!jQuery.isEmptyObject(h[headerValCount])) {
 
                         headerLabelinnerhtml +=
-                            "<button type='button' id='headerLabels' style='word-wrap: break-word; white-space: normal; position: relative; margin: 5px' count='true' class='btn btn-primary headerLabels' original='" + h[headerOriginal] + "'>" + h[headerPresent] + " (Count)</button>";
+                            "<button type='button' id='headerLabels' style='word-wrap: break-word; white-space: normal; position: relative; margin: 5px' vistype='count' count='true' class='btn btn-primary headerLabels' original='" + h[headerOriginal] + "'>" + h[headerPresent] + " (Count)</button>";
 
                         document.getElementById("charts").style.display = "inline";
 
@@ -757,13 +773,57 @@ Template.tab_csv.events({
             });
 
         }
-        else if (visType = "pieChart") {
+        else if (visType == "groupBar") {
+
+
+            headerLabelinnerhtml +=
+                "<div class='pull-left' style='text-align: left'>" +
+                "Group Each" +
+                "<select id='subGroup' class='form-control'>";
+            headerValues.forEach(function (h) {
+                headerLabelinnerhtml +=
+                    "<option class='subGroup' original='" + h[headerOriginal] + "'>" +
+                    h[headerPresent] +
+                    "</option>"
+            });
+
+            headerLabelinnerhtml += "</select>";
+
+            headerLabelinnerhtml +=
+                "By" +
+                "<select id='mainGroup' class='form-control'>";
+            headerValues.forEach(function (h) {
+                headerLabelinnerhtml +=
+                    "<option class='mainGroup' original='" + h[headerOriginal] + "'>" +
+                    h[headerPresent] +
+                    "</option>"
+            });
+
+            headerLabelinnerhtml += "</select>" +
+                "</div>";
+
+            headerLabelinnerhtml +=
+                "<div class='pull-right'>" +
+                "<button type='button' id='headerLabels' style='word-wrap: break-word; white-space: normal; position: relative; margin: 5px' vistype='group' count='true' class='btn btn-primary headerLabels' > Grouped </button>" +
+                "</div>";
+            document.getElementById("charts").style.display = "inline";
+
+            // var svg = document.getElementById("svgChar");
+            // svg.innerHTML = "";
+            // var width = document.getElementById("chartBody").offsetWidth;
+            // var height = document.getElementById("chartBody").offsetHeight - 5;
+            // if (height < 450) {
+            //     height = 450;
+            // }
+
+        }
+        else if (visType == "pieChart") {
             headerValues.forEach(function (h) {
                 if (!h.deleted) {
                     if (!jQuery.isEmptyObject(h[headerValCount])) {
 
                         headerLabelinnerhtml +=
-                            "<button type='button' id='headerLabels' style='word-wrap: break-word; white-space: normal; position: relative; margin: 5px' count='true' class='btn btn-primary headerLabels' original='" + h[headerOriginal] + "'>" + h[headerPresent] + "</button>";
+                            "<button type='button' id='headerLabels' style='word-wrap: break-word; white-space: normal; position: relative; margin: 5px' vistype='pie' count='true' class='btn btn-primary headerLabels' original='" + h[headerOriginal] + "'>" + h[headerPresent] + "</button>";
 
                         document.getElementById("charts").style.display = "inline";
 
@@ -772,6 +832,7 @@ Template.tab_csv.events({
             });
         }
         else if (visType == "Map") {
+
 
         }
 
@@ -785,7 +846,7 @@ Template.tab_csv.events({
     "click .headerLabels": function (e) {
         var elem = e.currentTarget;
         var headerOrig = elem.getAttribute("original");
-        var isCount = elem.getAttribute("count");
+        var visType = elem.getAttribute("vistype");
 
         var svg = document.getElementById("svgChar");
         svg.innerHTML = "";
@@ -798,21 +859,16 @@ Template.tab_csv.events({
 
         var selectedXlabel;
 
-        if (isCount == "false") {
+        if (visType == "bar") {
             var xAxis = document.getElementById("xAxisLabels");
             var xAxisOptions = document.getElementsByClassName("xAxisLabel");
-            // for (var i = 0; i < xAxis.length; i++) {
-            //     var checked = xAxis[i];
-            //     if (xAxis[i].checked) {
-            //         selectedXlable = checked.getAttribute("original");
-            //     }
-            // }
+
             selectedXlabel = xAxisOptions[xAxis.selectedIndex].getAttribute("original");
 
 
             barChartHeaders(CSV_Data, headerOrig, selectedXlabel, "#svgChar", height, width);
         }
-        else if (isCount == "true") {
+        else if (visType == "count") {
             var values = [];
             var counts = [];
             var countObjects = {
@@ -832,9 +888,26 @@ Template.tab_csv.events({
 
             barChartCounts(counts, "#svgChar", height, width);
         }
+        else if (visType == "group") {
+
+            var subGroup = document.getElementById("subGroup");
+            var subGroupOption = document.getElementsByClassName("subGroup");
+
+            var mainGroup = document.getElementById("mainGroup");
+            var mainGroupOption = document.getElementsByClassName("mainGroup");
+
+            var subCat = subGroupOption[subGroup.selectedIndex].getAttribute("original");
+            var mainCat = mainGroupOption[mainGroup.selectedIndex].getAttribute("original");
+
+            groupedBarChart(CSV_Data, mainCat, subCat, "#svgChar", height, width);
+        }
+        else if (visType == "pie") {
+            pieChart(CSV_Data, headerOrig, "#svgChar", height, width);
+        }
+
     },
 
-    "change .xAxisLabels": function (e) {
+    "change #xAxisLabels": function (e) {
         console.log(e);
     },
 

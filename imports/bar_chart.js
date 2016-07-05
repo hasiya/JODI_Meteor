@@ -18,7 +18,7 @@ barChartHeaders = function (data, property, xLabel, svg, h, w) {
     var xAxis = d3.svg.axis()
         .scale(x)
         .orient("bottom");
-    
+
     var y = d3.scale.linear()
         .range([h, 0]);
 
@@ -69,7 +69,6 @@ barChartHeaders = function (data, property, xLabel, svg, h, w) {
     x.domain(data.map(function (d) {
         return d[xLabel];
     }));
-
 
 
     var barWidthPadding = w / data.length - barPadding;
@@ -145,7 +144,7 @@ barChartCounts = function (data, svg, h, w) {
     };
     w = w - margin.left - margin.right;
     h = h - margin.top - margin.bottom;
-    
+
     var barPadding = 1;
 
     var x = d3.scale.ordinal()
