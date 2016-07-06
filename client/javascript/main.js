@@ -1,5 +1,8 @@
-import "../views/main.html";
-
+// import "../views/main.html";
+// GoogleMaps.load({
+//     key:"AIzaSyB8shH7uf30GbAWTRFAiWPzcIY1grpw9Xc",
+//     libraries: 'geometry,places'
+// });
 // Template.hello.onCreated(function helloOnCreated() {
 //   // counter starts at 0
 //   this.counter = new ReactiveVar(0);

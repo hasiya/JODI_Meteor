@@ -2,6 +2,7 @@ import "../../imports/bar_chart.js";
 import "../../imports/bar";
 import "../../imports/grouped_bar";
 import "../../imports/pie_chart";
+import "../../imports/map";
 
 
 var CSV_keys;
@@ -269,10 +270,23 @@ Template.tab_csv.onRendered(function () {
             // Message.html("")
         }
     });
+
+    // GoogleMaps.load(
+    //     {    key:"AIzaSyB8shH7uf30GbAWTRFAiWPzcIY1grpw9Xc"}
+    // );
 });
 
 Template.tab_csv.helpers({
 
+    // mapOptions: function() {
+    //     if (GoogleMaps.loaded()) {
+    //         var a = 1;
+    //         return {
+    //             center: new google.maps.LatLng(-37.8136, 144.9631),
+    //             zoom: 8
+    //         };
+    //     }
+    // },
 
     getKey: function () {
         a = 1;
@@ -722,7 +736,7 @@ Template.tab_csv.events({
         var headerLabelinnerhtml = "";
 
         var xAxisInnerhtml = "";
-        var headerLabels = document.getElementById("headerLabels");
+        var headerLabels = document.getElementById("headerLabelGroup");
         var xAxisLabels = document.getElementById("xAxisLabels");
         var xAxiaLblDiv = document.getElementById("xAxisLblsDiv");
 
@@ -832,7 +846,8 @@ Template.tab_csv.events({
             });
         }
         else if (visType == "Map") {
-
+            document.getElementById("charts").style.display = "inline";
+            maps();
 
         }
 
@@ -847,6 +862,11 @@ Template.tab_csv.events({
         var elem = e.currentTarget;
         var headerOrig = elem.getAttribute("original");
         var visType = elem.getAttribute("vistype");
+
+        // var siblings = $("#"+elem.id).siblings();
+        var siblings = elem.parentNode.childNodes;
+
+
 
         var svg = document.getElementById("svgChar");
         svg.innerHTML = "";
@@ -903,6 +923,16 @@ Template.tab_csv.events({
         }
         else if (visType == "pie") {
             pieChart(CSV_Data, headerOrig, "#svgChar", height, width);
+        }
+
+        for (var i = 0; i < siblings.length; i++) {
+            var child = siblings[i];
+            if (child.getAttribute("original") == headerOrig) {
+                child.style.backgroundColor = "#00ccff";
+            }
+            else {
+                child.style.backgroundColor = "";
+            }
         }
 
     },

@@ -9,6 +9,6 @@
     <orderEntry type="library" name="JODI_Meteor node_modules" level="project" />
     <orderEntry type="library" name="meteor-packages-auto-import-npm" level="project" />
     <orderEntry type="library" name="meteor-packages-auto-import-browser" level="project" />
-    <orderEntry type="library" name="meteor-packages-auto-import-browser" level="project" />
+    <orderEntry type="library" name="topojson.v1" level="application" />
   </component>
 </module>

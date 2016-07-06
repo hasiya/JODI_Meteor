@@ -11,3 +11,13 @@
 .axis > .tick > text {
     word-wrap: break-word;
 }
+
+.headerActive {
+    background-color: red;
+}
+
+.googleMap {
+    width: 100%;
+    max-width: 100%;
+    height: 500px;
+}

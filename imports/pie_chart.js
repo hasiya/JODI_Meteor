@@ -44,12 +44,6 @@ pieChart = function (data, header, svgElem, h, w) {
             return d[header]
         })
         .entries(data);
-    var pieMap = pieData.map(function (d) {
-        return d.values.length
-    });
-
-
-    var dataset = [5, 10, 20, 45, 6, 25];
 
     var outerRadius = (w / 2) - (h / 3);
     var innerRadius = 0;
@@ -81,8 +75,7 @@ pieChart = function (data, header, svgElem, h, w) {
     //Draw arc paths
     arcs.append("path")
         .attr("fill", function (d) {
-            var a = color(d.data.key);
-            return a;
+            return color(d.data.key);
         })
         .attr("d", arc);
 
@@ -105,13 +98,13 @@ pieChart = function (data, header, svgElem, h, w) {
         });
 
     legend.append("rect")
-        .attr("x", w - 7)
+        .attr("x", w - 8)
         .attr("width", 18)
         .attr("height", 18)
         .style("fill", color);
 
     legend.append("text")
-        .attr("x", w - 13)
+        .attr("x", w - 14)
         .attr("y", 9)
         .attr("dy", ".35em")
         .style("text-anchor", "end")
