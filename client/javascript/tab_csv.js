@@ -22,6 +22,17 @@ var chartRedrawObj = {
     type: ""
 };
 
+function checkIPlist(ip, list) {
+
+    var ipData = null;
+
+    list.forEach(function (d) {
+        if (d.ip == ip) {
+            ipData = d;
+        }
+    });
+    return ipData;
+}
 
 function headersDeleted() {
     var headersDeleted = true;
@@ -152,7 +163,9 @@ function CreatePanel() {
             "<select id='type_" + CSV_keys[i] + "' headerID='" + CSV_keys[i] + "' index='" + i + "' name='headerType' class='csvHeaderType form-control'>" +
             "<option value='string'>String</option>" +
             "<option value='number'>Number</option>" +
-            "<option value='lon/lat/IP'>Longitude / Latitude / IP</option>" +
+            "<option value='lon'>Longitude</option>" +
+            "<option value='lat'>Latitude</option>" +
+            "<option value='ip'>IP Address</option>" +
             // "<option value='latitude'>Latitude</option>"+
             "</select>" +
             "</div>" +
@@ -365,11 +378,15 @@ Template.tab_csv.events({
         var Message = $("#message");
         Message.html("");
 
-        var headerpanel = document.getElementById("headerLabels");
-        headerpanel.innerHTML = "";
+        // var headerpanel = document.getElementById("headerLabels");
+        // headerpanel.innerHTML = "";
 
         var svg = document.getElementById("svgChar");
         svg.innerHTML = "";
+        svg.style.display = "none";
+
+        var mapSvg = document.getElementById("googleMap");
+        mapSvg.innerHTML = "";
 
         var visualMenu = document.getElementById("visualMenu");
         visualMenu.style.display = "none";
@@ -400,11 +417,15 @@ Template.tab_csv.events({
         var Message = $("#message");
         Message.html("");
 
-        var headerpanel = document.getElementById("headerLabels");
-        headerpanel.innerHTML = "";
+        // var headerpanel = document.getElementById("headerLabels");
+        // headerpanel.innerHTML = "";
 
         var svg = document.getElementById("svgChar");
         svg.innerHTML = "";
+        svg.style.display = "none";
+
+        var mapSvg = document.getElementById("googleMap");
+        mapSvg.innerHTML = "";
 
         var visualMenu = document.getElementById("visualMenu");
         visualMenu.style.display = "none";
@@ -586,7 +607,7 @@ Template.tab_csv.events({
 
         var headerLabelinnerhtml = "";
         var xAxisInnerhtml = "";
-        var headerLabels = document.getElementById("headerLabels");
+        // var headerLabels = document.getElementById("headerLabels");
         var xAxisLabels = document.getElementById("xAxisLabels");
 
         var chartsMenu = document.getElementById("ChartsMenuTab");
@@ -621,7 +642,7 @@ Template.tab_csv.events({
                     // headerLabelinnerhtml +=
                     //     "<button type='button' id='headerLabels' style='word-wrap: break-word; white-space: normal; position: relative; margin: 5px' count='true' class='btn btn-primary headerLabels' original='" + h[headerOriginal] + "'>" + h[headerPresent] + " (Count)</button>";
                 }
-                if (h[headerType] == "lon/lat/IP") {
+                if ((h[headerType] == "lon") || (h[headerType] == "lat") || (h[headerType] == "ip")) {
                     mapsThumb = true;
                 }
             }
@@ -711,12 +732,15 @@ Template.tab_csv.events({
         document.getElementById("charts").style.display = "none";
 
 
-        var headerpanel = document.getElementById("headerLabels");
-        headerpanel.innerHTML = "";
+        // var headerpanel = document.getElementById("headerLabels");
+        // headerpanel.innerHTML = "";
 
         var svg = document.getElementById("svgChar");
         svg.innerHTML = "";
+        svg.style.display = "none";
 
+        var mapSvg = document.getElementById("googleMap");
+        mapSvg.innerHTML = "";
 
         var elem = e.currentTarget;
         elem.className = "pull-right btn-success btn PanelDone";
@@ -744,6 +768,10 @@ Template.tab_csv.events({
 
         var svg = document.getElementById("svgChar");
         svg.innerHTML = "";
+        svg.style.display = "none";
+
+        var mapSvg = document.getElementById("googleMap");
+        mapSvg.innerHTML = "";
 
         if (visType == "NormalBar") {
             headerValues.forEach(function (h) {
@@ -846,8 +874,32 @@ Template.tab_csv.events({
             });
         }
         else if (visType == "Map") {
-            document.getElementById("charts").style.display = "inline";
-            maps();
+            headerValues.forEach(function (h) {
+                if (!h.deleted) {
+                    if (h[headerType] == "lon") {
+                        headerLabelinnerhtml +=
+                            "<button type='button' id='headerLabels' style='word-wrap: break-word; white-space: normal; position: relative; margin: 5px' vistype='map' maptype='lon' count='true' class='btn btn-primary headerLabels' original='" + h[headerOriginal] + "'>" + h[headerPresent] + "</button>";
+
+                        document.getElementById("charts").style.display = "inline";
+                        // maps();
+                    }
+                    if (h[headerType] == "lat") {
+                        headerLabelinnerhtml +=
+                            "<button type='button' id='headerLabels' style='word-wrap: break-word; white-space: normal; position: relative; margin: 5px' vistype='map' maptype='lat' count='true' class='btn btn-primary headerLabels' original='" + h[headerOriginal] + "'>" + h[headerPresent] + "</button>";
+
+                        document.getElementById("charts").style.display = "inline";
+                        // maps();
+                    }
+                    if (h[headerType] == "ip") {
+                        headerLabelinnerhtml +=
+                            "<button type='button' id='headerLabels' style='word-wrap: break-word; white-space: normal; position: relative; margin: 5px' vistype='map' maptype='ip' count='true' class='btn btn-primary headerLabels' original='" + h[headerOriginal] + "'>" + h[headerPresent] + "</button>";
+
+                        document.getElementById("charts").style.display = "inline";
+                        // maps();
+                    }
+                }
+            });
+
 
         }
 
@@ -870,6 +922,7 @@ Template.tab_csv.events({
 
         var svg = document.getElementById("svgChar");
         svg.innerHTML = "";
+        // svg.style.display = "none";
 
         var width = document.getElementById("chartBody").offsetWidth;
         var height = document.getElementById("chartBody").offsetHeight - 5;
@@ -885,7 +938,7 @@ Template.tab_csv.events({
 
             selectedXlabel = xAxisOptions[xAxis.selectedIndex].getAttribute("original");
 
-
+            svg.style.display = "inline";
             barChartHeaders(CSV_Data, headerOrig, selectedXlabel, "#svgChar", height, width);
         }
         else if (visType == "count") {
@@ -905,7 +958,7 @@ Template.tab_csv.events({
                     }
                 }
             });
-
+            svg.style.display = "inline";
             barChartCounts(counts, "#svgChar", height, width);
         }
         else if (visType == "group") {
@@ -919,19 +972,72 @@ Template.tab_csv.events({
             var subCat = subGroupOption[subGroup.selectedIndex].getAttribute("original");
             var mainCat = mainGroupOption[mainGroup.selectedIndex].getAttribute("original");
 
+            svg.style.display = "inline";
             groupedBarChart(CSV_Data, mainCat, subCat, "#svgChar", height, width);
         }
         else if (visType == "pie") {
+            svg.style.display = "inline";
             pieChart(CSV_Data, headerOrig, "#svgChar", height, width);
+        }
+        else if (visType == "map") {
+            var mapType = elem.getAttribute("maptype");
+
+            var checkedIPs = [];
+
+            if (mapType == "ip") {
+
+                // if(!CSV_Data[0].location) {
+                //
+                //     CSV_Data.forEach(function (d) {
+                //         var ip = d[headerOrig];
+                //
+                //         var ipDataCheck = checkIPlist(ip, checkedIPs);
+                //
+                //         if (!ipDataCheck) {
+                //             $.getJSON('http://ipinfo.io/' + ip + '/', function (data) {
+                //
+                //                 var location = data.loc.split(",");
+                //                 d.location = location;
+                //                 checkedIPs.push({
+                //                     ip: ip,
+                //                     loc: location
+                //                 });
+                //
+                //                 console.log(data)
+                //             });
+                //         }
+                //         else {
+                //             d.location = ipDataCheck.loc;
+                //         }
+                //     });
+                // }
+                //
+                // console.log(CSV_Data);
+                //
+                // $.getJSON('http://ipinfo.io/81.154.160.244/', function(data){
+                //
+                //     var location = data.loc.split(",");
+                //
+                //     var e = error;
+                //     console.log(data)
+                // });
+
+                maps();
+            }
+
+
         }
 
         for (var i = 0; i < siblings.length; i++) {
             var child = siblings[i];
             if (child.getAttribute("original") == headerOrig) {
                 child.style.backgroundColor = "#00ccff";
+                child.style.color = "black";
             }
             else {
                 child.style.backgroundColor = "";
+                child.style.color = "white";
+
             }
         }
 
@@ -948,17 +1054,20 @@ Template.tab_csv.events({
 
 window.addEventListener('resize', function () {
     var svg = document.getElementById("svgChar");
-    svg.innerHTML = "";
+    if (svg) {
 
-    var width = document.getElementById("chartBody").offsetWidth;
-    var height = document.getElementById("chartBody").offsetHeight;
-    if (height < 350) {
-        height = 350;
-    }
-    if (chartRedrawObj.type == "counts") {
-        barChartCounts(chartRedrawObj.data.counts, "#svgChar", height, width)
-    }
-    else {
-        barChartHeaders(chartRedrawObj.data, selectedXlable, "#svgChar", height, width)
+        svg.innerHTML = "";
+
+        var width = document.getElementById("chartBody").offsetWidth;
+        var height = document.getElementById("chartBody").offsetHeight;
+        if (height < 350) {
+            height = 350;
+        }
+        if (chartRedrawObj.type == "counts") {
+            barChartCounts(chartRedrawObj.data.counts, "#svgChar", height, width)
+        }
+        else {
+            barChartHeaders(chartRedrawObj.data, selectedXlable, "#svgChar", height, width)
+        }
     }
 });

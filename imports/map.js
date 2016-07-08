@@ -1,7 +1,10 @@
-maps = function () {
+maps = function (data) {
 
-    load_data("/uk.json", "subunits");
-
+    load_data(uk, "subunits");
+    // load_data(aberdeen,"S12000033")
+    // load_data(world1,"land");
+    data = data;
+    //
     // if(GoogleMaps.loaded()){
     // var mapDiv = document.getElementById('googleMap');
     // var map = new google.maps.Map(mapDiv, {
@@ -31,7 +34,7 @@ maps = function () {
     // });
 };
 
-
+var data;
 // get the width of the area we're displaying in
 var width;
 // but we're using the full window height
@@ -43,10 +46,15 @@ var boundaries, units;
 
 function compute_size() {
     var margin = 50;
-    var mapDiv = d3.select("#googleMap");
-    width = 500;
+    var mapDiv = document.getElementById("googleMap");
+
+    if (!mapDiv) {
+        width = 500;
+    }
+    else {
+        width = document.getElementById("googleMap").offsetWidth;
+    }
     height = 600;
-    // width = parseInt(d3.select("#googleMap").style("width"));
     // height = window.innerHeight - 2*margin;
 }
 
@@ -75,6 +83,7 @@ function init(width, height) {
 
     // create the svg element for drawing onto
     svg = d3.select("#googleMap").append("svg")
+        .attr("id", "mapSvg")
         .attr("width", width)
         .attr("height", height);
 
@@ -146,7 +155,32 @@ function draw(boundaries) {
         .attr('class', 'boundary');
 }
 
-function mapTraffic() {
+function mapLocations() {
+
+    $.getJSON('http://ipinfo.io/81.154.160.244/', function (data) {
+        var a = data;
+        var e = error;
+        console.log(data)
+    });
+
+    svg.selectAll(".pin")
+        .data(data)
+        .enter().append("circle", ".pin")
+        .attr("r", 4)
+        .attr("transform", function (r) {
+            return "translate(" + projection([
+                    r.Longitude,
+                    r.Latitude
+                ]) + ")";
+
+        })
+        .attr("clicked", false)
+        .style("fill", "red").style("fill-opacity", "2");
+}
+
+/*
+
+ function mapTraffic() {
     var traffic = "http://data.aberdeencity.gov.uk/OpenDataService/TemporaryTrafficOrderReport/json";
 
     // d3.csv("crime.csv", function (error,data) {
@@ -176,6 +210,7 @@ function mapTraffic() {
             .style("fill", "red").style("fill-opacity", "2");
     })
 }
+ */
 
 // called to redraw the map - removes map completely and starts from scratch
 function redraw() {
@@ -183,11 +218,11 @@ function redraw() {
     //width = parseInt(d3.select("#map").style("width"));
     //height = window.innerHeight - margin;
 
-    d3.select("svg").remove();
+    d3.select("#mapSvg").remove();
 
     init(width, height);
     draw(boundaries);
-    mapTraffic()
+    // mapTraffic()
 }
 
 // loads data from the given file and redraws the map
@@ -196,11 +231,12 @@ function load_data(filename, u) {
     deselect();
 
     units = u;
-    d3.json(filename, function (error, b) {
-        if (error) return console.error(error);
-        boundaries = b;
+    boundaries = filename;
+    // d3.json(filename, function (error, b) {
+    //     if (error) return console.error(error);
+    //     boundaries = b;
         redraw();
-    });
+    // });
 }
 
 // when the window is resized, redraw the map
