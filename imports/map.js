@@ -1,3 +1,6 @@
+var data;
+
+
 maps = function (data) {
 
     load_data(uk, "subunits");
@@ -34,7 +37,6 @@ maps = function (data) {
     // });
 };
 
-var data;
 // get the width of the area we're displaying in
 var width;
 // but we're using the full window height
