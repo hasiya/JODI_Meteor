@@ -7,34 +7,7 @@ maps = function (data) {
     // load_data(aberdeen,"S12000033")
     // load_data(world1,"land");
     data = data;
-    //
-    // if(GoogleMaps.loaded()){
-    // var mapDiv = document.getElementById('googleMap');
-    // var map = new google.maps.Map(mapDiv, {
-    //     center: {lat: 44.540, lng: -78.546},
-    //     zoom: 8
-    // });
-    // var map = new google.maps.Map(d3.select("#googleMap").node(), {
-    //     zoom: 8,
-    //     center: new google.maps.LatLng(37.76487, -122.41948),
-    //     mapTypeId: google.maps.MapTypeId.TERRAIN
-    // });
 
-
-    // GoogleMaps.create({
-    //     name: "gMap",
-    //     element: document.getElementById('googleMap'),
-    //     options: {
-    //         center: new google.maps.LatLng(-37.8136, 144.9631),
-    //         zoom: 8
-    //     }
-    // });
-    // }
-
-
-    // GoogleMaps.ready('map', function(map) {
-    //     console.log("I'm ready!");
-    // });
 };
 
 // get the width of the area we're displaying in

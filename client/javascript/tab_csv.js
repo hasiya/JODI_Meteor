@@ -888,14 +888,14 @@ Template.tab_csv.events({
                 if (!h.deleted) {
                     if (h[headerType] == "lon") {
                         headerLabelinnerhtml +=
-                            "<button type='button' id='headerLabels' style='word-wrap: break-word; white-space: normal; position: relative; margin: 5px' vistype='map' maptype='lon' count='true' class='btn btn-primary headerLabels' original='" + h[headerOriginal] + "'>" + h[headerPresent] + "</button>";
+                            "<button type='button' id='headerLabels' style='word-wrap: break-word; white-space: normal; position: relative; margin: 5px' vistype='map' maptype='lon/lat' count='true' class='btn btn-primary headerLabels' original='" + h[headerOriginal] + "'>" + h[headerPresent] + "</button>";
 
                         document.getElementById("charts").style.display = "inline";
                         // maps();
                     }
                     if (h[headerType] == "lat") {
                         headerLabelinnerhtml +=
-                            "<button type='button' id='headerLabels' style='word-wrap: break-word; white-space: normal; position: relative; margin: 5px' vistype='map' maptype='lat' count='true' class='btn btn-primary headerLabels' original='" + h[headerOriginal] + "'>" + h[headerPresent] + "</button>";
+                            "<button type='button' id='headerLabels' style='word-wrap: break-word; white-space: normal; position: relative; margin: 5px' vistype='map' maptype='lon/lat' count='true' class='btn btn-primary headerLabels' original='" + h[headerOriginal] + "'>" + h[headerPresent] + "</button>";
 
                         document.getElementById("charts").style.display = "inline";
                         // maps();
@@ -995,63 +995,25 @@ Template.tab_csv.events({
             var checkedIPs = [];
 
             if (mapType == "ip") {
-
-                /*      if(!CSV_Data[0].location) {
-
-                 CSV_Data.forEach(function (d) {
-                 var ip = d[headerOrig];
-
-                 var ipDataCheck = checkIPlist(ip, checkedIPs);
-
-                 if (!ipDataCheck) {
-                 /!*   Meteor.http.get('http://ipinfo.io/' + ip + '/',function (data, error) {
-
-                 var test = data;
-                 var err = error
-
-                 });*!/
-
-                 $.ajax({
-                 method: "get",
-                 url: 'http://ipinfo.io/' + ip + '/',
-                 dataType: "json",
-                 async : false,
-                 success: function (data) {
-                 var f=1;
-                 var ipLocation = data.loc.split(",");
-                 d.location = ipLocation;
-                 checkedIPs.push({
-                 ip: ip,
-                 loc: ipLocation
-                 });
-                 var a = 1;
-                 console.log(data)
-
-                 }
-                 });
-
-                 /!*$.getJSON('http://ipinfo.io/' + ip + '/', function (data) {
-
-                 var ipLocation = data.loc.split(",");
-                 d.location = ipLocation;
-                 checkedIPs.push({
-                 ip: ip,
-                 loc: ipLocation
-                 });
-                 var a = 1;
-                 console.log(data)
-                 });*!/
-                 }
-                 else {
-                 d.location = ipDataCheck.loc;
-                 }
-                 });
-                 }*/
-                var z = 1;
                 console.log(CSV_Data);
 
+                maps(CSV_Data);
             }
-            maps(CSV_Data);
+            else if (mapType == "lon/lat") {
+                var lonHeader;
+                var latHeader;
+
+                headerValues.forEach(function (h) {
+                    if (h[headerType] == "lon") {
+                        lonHeader = h[headerOriginal];
+                    }
+                    else if (h[headerType] == "lat") {
+                        latHeader = h[headerOriginal];
+                    }
+                });
+
+                
+            }
 
         }
 
