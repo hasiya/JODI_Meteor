@@ -1,14 +1,11 @@
 var data;
+var lat_h;
+var lon_h;
+var count_h;
+var count_data;
+var headerVals;
+var colours;
 
-
-maps = function (data) {
-
-    load_data(uk, "subunits");
-    // load_data(aberdeen,"S12000033")
-    // load_data(world1,"land");
-    data = data;
-
-};
 
 // get the width of the area we're displaying in
 var width;
@@ -19,15 +16,58 @@ var height;
 var projection, svg, path, g;
 var boundaries, units;
 
+var isMap = false;
+
+maps = function (dataObject, countHeader, lonHeader, latHeader) {
+
+    isMap = true;
+
+    data = dataObject;
+    count_h = countHeader;
+    lat_h = latHeader;
+    lon_h = lonHeader;
+    headerVals = unique(data.map(function (d) {
+        return d[count_h];
+    }));
+
+
+    if (lat_h && lon_h) {
+        data.forEach(function (d) {
+            d.location = {
+                lat: d[lat_h],
+                lon: d[lon_h]
+            };
+        });
+    }
+    if (count_h) {
+        count_data = d3.nest()
+            .key(function (d) {
+                return d[count_h]
+            })
+            .entries(data);
+    }
+
+    load_data(uk, "subunits");
+    // load_data(aberdeen,"S12000033")
+    // load_data(world1,"land");
+
+};
+
+function unique(x) {
+    return x.reverse().filter(function (e, i, x) {
+        return x.indexOf(e, i + 1) === -1;
+    }).reverse();
+}
+
 function compute_size() {
     var margin = 50;
-    var mapDiv = document.getElementById("googleMap");
+    var mapDiv = document.getElementById("svgMap");
 
     if (!mapDiv) {
         width = 500;
     }
     else {
-        width = document.getElementById("googleMap").offsetWidth;
+        width = document.getElementById("svgMap").offsetWidth;
     }
     height = 600;
     // height = window.innerHeight - 2*margin;
@@ -36,7 +76,6 @@ function compute_size() {
 compute_size();
 // initialise the map
 init(width, height);
-
 
 // remove any data when we lose selection of a map unit
 function deselect() {
@@ -57,7 +96,7 @@ function init(width, height) {
         .projection(projection);
 
     // create the svg element for drawing onto
-    svg = d3.select("#googleMap").append("svg")
+    svg = d3.select("#svgMap").append("svg")
         .attr("id", "mapSvg")
         .attr("width", width)
         .attr("height", height);
@@ -130,27 +169,40 @@ function draw(boundaries) {
         .attr('class', 'boundary');
 }
 
+// function lat_lon(d) {
+//     d.values
+// }
+
 function mapLocations() {
+    colours = d3.scale.category10();
 
-    $.getJSON('http://ipinfo.io/81.154.160.244/', function (data) {
-        var a = data;
-        var e = error;
-        console.log(data)
-    });
 
-    svg.selectAll(".pin")
-        .data(data)
+    var key = svg.selectAll(".key")
+        .data(count_data)
+        .enter().append("g")
+        .attr("class", "key");
+
+    key.selectAll(".pin")
+        .data(function (d) {
+            return d.values;
+        })
         .enter().append("circle", ".pin")
         .attr("r", 4)
-        .attr("transform", function (r) {
-            return "translate(" + projection([
-                    r.Longitude,
-                    r.Latitude
-                ]) + ")";
+        .attr("transform", function (d) {
+            var a = d;
+            if (d.hasOwnProperty("location")) {
+                return "translate(" + projection([
+                        d.location.lon,
+                        d.location.lat
+                    ]) + ")";
+            }
 
         })
         .attr("clicked", false)
-        .style("fill", "red").style("fill-opacity", "2");
+        .style("fill", function (d) {
+            return colours(d[count_h]);
+        })
+        .style("fill-opacity", "2");
 }
 
 /*
@@ -187,6 +239,32 @@ function mapLocations() {
 }
  */
 
+function legend() {
+    var legend = svg.selectAll(".legend")
+        .data(headerVals.slice().reverse())
+        .enter().append("g")
+        .attr("class", "legend")
+        .attr("transform", function (d, i) {
+            return "translate(0," + i * 20 + ")";
+        });
+
+    legend.append("rect")
+        .attr("x", width - 7)
+        .attr("width", 18)
+        .attr("height", 18)
+        .style("fill", colours);
+
+    legend.append("text")
+        .attr("x", width - 13)
+        .attr("y", 9)
+        .attr("dy", ".35em")
+        .style("text-anchor", "end")
+        .text(function (d) {
+            return d;
+        });
+
+}
+
 // called to redraw the map - removes map completely and starts from scratch
 function redraw() {
     compute_size();
@@ -198,6 +276,8 @@ function redraw() {
     init(width, height);
     draw(boundaries);
     // mapTraffic()
+    mapLocations();
+    legend();
 }
 
 // loads data from the given file and redraws the map
@@ -215,6 +295,10 @@ function load_data(filename, u) {
 }
 
 // when the window is resized, redraw the map
-window.addEventListener('resize', redraw);
+window.addEventListener('resize', function () {
+    if (isMap) {
+        redraw
+    }
+});
 
 

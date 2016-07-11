@@ -385,7 +385,7 @@ Template.tab_csv.events({
         svg.innerHTML = "";
         svg.style.display = "none";
 
-        var mapSvg = document.getElementById("googleMap");
+        var mapSvg = document.getElementById("svgMap");
         mapSvg.innerHTML = "";
 
         var visualMenu = document.getElementById("visualMenu");
@@ -424,7 +424,7 @@ Template.tab_csv.events({
         svg.innerHTML = "";
         svg.style.display = "none";
 
-        var mapSvg = document.getElementById("googleMap");
+        var mapSvg = document.getElementById("svgMap");
         mapSvg.innerHTML = "";
 
         var visualMenu = document.getElementById("visualMenu");
@@ -563,11 +563,15 @@ Template.tab_csv.events({
                         var ip = data[h[headerOriginal]];
                         $.ajax({
                             method: "get",
-                            url: 'http://ipinfo.io/' + ip + '/',
+                            url: 'http://ip-api.com/json/' + ip,
                             dataType: "json",
                             success: function (d) {
-                                data.location = d.loc.split(",");
-                                console.log(data)
+                                // var loc = d.loc.split(",");
+                                data.location = {
+                                    lat: d.lat,
+                                    lon: d.lon
+                                };
+                                // console.log(data)
                             }
                         });
                         // data[h[headerOriginal]] = parseFloat(data[h[headerOriginal]]);
@@ -749,7 +753,7 @@ Template.tab_csv.events({
         svg.innerHTML = "";
         svg.style.display = "none";
 
-        var mapSvg = document.getElementById("googleMap");
+        var mapSvg = document.getElementById("svgMap");
         mapSvg.innerHTML = "";
 
         var elem = e.currentTarget;
@@ -780,7 +784,7 @@ Template.tab_csv.events({
         svg.innerHTML = "";
         svg.style.display = "none";
 
-        var mapSvg = document.getElementById("googleMap");
+        var mapSvg = document.getElementById("svgMap");
         mapSvg.innerHTML = "";
 
         if (visType == "NormalBar") {
@@ -884,39 +888,69 @@ Template.tab_csv.events({
             });
         }
         else if (visType == "Map") {
+            var lon = false, lat = false, ip = false;
+            var lon_h = "", lat_h = "", ip_h = "";
+            var location_radio_inner = "";
+            var headerLbel_tmp = "";
             headerValues.forEach(function (h) {
                 if (!h.deleted) {
                     if (h[headerType] == "lon") {
-                        headerLabelinnerhtml +=
-                            "<button type='button' id='headerLabels' style='word-wrap: break-word; white-space: normal; position: relative; margin: 5px' vistype='map' maptype='lon/lat' count='true' class='btn btn-primary headerLabels' original='" + h[headerOriginal] + "'>" + h[headerPresent] + "</button>";
+                        lon = true;
+                        lon_h = h[headerOriginal];
+                        // headerLabelinnerhtml +=
+                        //     "<button type='button' id='headerLabels' style='word-wrap: break-word; white-space: normal; position: relative; margin: 5px' vistype='map' maptype='lon/lat' count='true' class='btn btn-primary headerLabels' original='" + h[headerOriginal] + "'>" + h[headerPresent] + "</button>";
 
                         document.getElementById("charts").style.display = "inline";
                         // maps();
                     }
                     if (h[headerType] == "lat") {
-                        headerLabelinnerhtml +=
-                            "<button type='button' id='headerLabels' style='word-wrap: break-word; white-space: normal; position: relative; margin: 5px' vistype='map' maptype='lon/lat' count='true' class='btn btn-primary headerLabels' original='" + h[headerOriginal] + "'>" + h[headerPresent] + "</button>";
+                        lat = true;
+                        lat_h = h[headerOriginal];
+                        // headerLabelinnerhtml +=
+                        //     "<button type='button' id='headerLabels' style='word-wrap: break-word; white-space: normal; position: relative; margin: 5px' vistype='map' maptype='lon/lat' count='true' class='btn btn-primary headerLabels' original='" + h[headerOriginal] + "'>" + h[headerPresent] + "</button>";
 
                         document.getElementById("charts").style.display = "inline";
                         // maps();
                     }
                     if (h[headerType] == "ip") {
-                        headerLabelinnerhtml +=
-                            "<button type='button' id='headerLabels' style='word-wrap: break-word; white-space: normal; position: relative; margin: 5px' vistype='map' maptype='ip' count='true' class='btn btn-primary headerLabels' original='" + h[headerOriginal] + "'>" + h[headerPresent] + "</button>";
+                        ip = true;
+                        ip_h = h[headerOriginal];
+                        // headerLabelinnerhtml +=
+                        //     "<button type='button' id='headerLabels' style='word-wrap: break-word; white-space: normal; position: relative; margin: 5px' vistype='map' maptype='ip' count='true' class='btn btn-primary headerLabels' original='" + h[headerOriginal] + "'>" + h[headerPresent] + "</button>";
 
                         document.getElementById("charts").style.display = "inline";
                         // maps();
                     }
+
+                    if (!jQuery.isEmptyObject(h[headerValCount])) {
+                        headerLbel_tmp +=
+                            "<button type='button' id='headerLabels' style='word-wrap: break-word; white-space: normal; position: relative; margin: 5px' vistype='map' count='true' class='btn btn-primary headerLabels' original='" + h[headerOriginal] + "'>" + h[headerPresent] + " (Count)</button>";
+                    }
                 }
             });
 
+            if (lat && lon) {
+                location_radio_inner +=
+                    "<label class='radio-inline'><input type='radio' name='location_type' maptype='lon/lat' lat_h='" + lat_h + "' lon_h='" + lon_h + "'>Longitude / Latitude</label>";
 
+                // document.getElementById("charts").style.display = "inline";
+            }
+            if (ip) {
+                location_radio_inner +=
+                    "<label class='radio-inline'><input type='radio' name='location_type' maptype='ip' ip_h='" + ip_h + "' >IP Location</label>";
+
+                // document.getElementById("charts").style.display = "inline";
+            }
+            headerLabelinnerhtml += location_radio_inner + headerLbel_tmp;
         }
 
         headerLabels.innerHTML = headerLabelinnerhtml;
         xAxisLabels.innerHTML = xAxisInnerhtml;
         // var xAxis = document.getElementsByClassName("xAxisLabels")
         // xAxis[0].checked = true;
+        var mapTypeRadio = document.getElementsByName("location_type");
+        mapTypeRadio[0].checked = true;
+
 
     },
 
@@ -990,14 +1024,23 @@ Template.tab_csv.events({
             pieChart(CSV_Data, headerOrig, "#svgChar", height, width);
         }
         else if (visType == "map") {
-            var mapType = elem.getAttribute("maptype");
+            var parentNodeId = elem.parentElement.getAttribute("id");
+            var mapTypeRadio = document.getElementsByName("location_type");
+            var mapType;
+            mapTypeRadio.forEach(function (map_type) {
+                if (map_type.checked) {
+                    mapType = map_type.getAttribute("maptype")
+                }
+            });
 
-            var checkedIPs = [];
+            // var mapType =$("#"+parentNodeId +" input[name=location_type]:checked");
+
+
 
             if (mapType == "ip") {
                 console.log(CSV_Data);
 
-                maps(CSV_Data);
+                maps(CSV_Data, headerOrig);
             }
             else if (mapType == "lon/lat") {
                 var lonHeader;
@@ -1012,9 +1055,10 @@ Template.tab_csv.events({
                     }
                 });
 
-                
+                if (lonHeader && latHeader) {
+                    maps(CSV_Data, headerOrig, lonHeader, latHeader)
+                }
             }
-
         }
 
         for (var i = 0; i < siblings.length; i++) {
@@ -1023,13 +1067,11 @@ Template.tab_csv.events({
                 child.style.backgroundColor = "#00ccff";
                 child.style.color = "black";
             }
-            else {
+            else if (child.tagName.toLowerCase() == "button") {
                 child.style.backgroundColor = "";
                 child.style.color = "white";
-
             }
         }
-
     },
 
     "change #xAxisLabels": function (e) {
@@ -1041,9 +1083,10 @@ Template.tab_csv.events({
     }
 });
 
+/*
 window.addEventListener('resize', function () {
     var svg = document.getElementById("svgChar");
-    if (svg) {
+ if (svg.style.display != "none" && svg.style.display != "") {
 
         svg.innerHTML = "";
 
@@ -1060,3 +1103,4 @@ window.addEventListener('resize', function () {
         }
     }
 });
+ */
