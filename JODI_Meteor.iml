@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module type="WEB_MODULE" version="4">
+  <component name="FacetManager">
+    <facet type="Python" name="Python">
+      <configuration sdkName="Python 2.7.11 (~/.pyenv/versions/2.7.11/bin/python2.7)" />
+    </facet>
+  </component>
   <component name="NewModuleRootManager" inherit-compiler-output="true">
     <exclude-output />
     <content url="file://$MODULE_DIR$">
@@ -7,8 +12,9 @@
     </content>
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="JODI_Meteor node_modules" level="project" />
-    <orderEntry type="library" name="meteor-packages-auto-import-npm" level="project" />
-    <orderEntry type="library" name="meteor-packages-auto-import-browser" level="project" />
     <orderEntry type="library" name="topojson.v1" level="application" />
+    <orderEntry type="library" name="meteor-packages-auto-import-browser" level="project" />
+    <orderEntry type="library" name="meteor-packages-auto-import-npm" level="project" />
+    <orderEntry type="library" name="Python 2.7.11 (~/.pyenv/versions/2.7.11/bin/python2.7) interpreter library" level="application" />
   </component>
 </module>

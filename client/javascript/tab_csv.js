@@ -3,6 +3,8 @@ import "../../imports/bar";
 import "../../imports/grouped_bar";
 import "../../imports/pie_chart";
 import "../../imports/map";
+import "../../imports/mapbox";
+
 
 
 var CSV_keys;
@@ -254,6 +256,8 @@ Template.tab_csv.onRendered(function () {
             cm.setValue("")
 
         }
+
+        Mapbox.load()
 
     });
 
@@ -561,7 +565,7 @@ Template.tab_csv.events({
                     }
                     else if (h[headerType] == "ip") {
                         var ip = data[h[headerOriginal]];
-                        $.ajax({
+                        /*$.ajax({
                             method: "get",
                             url: 'http://ip-api.com/json/' + ip,
                             dataType: "json",
@@ -573,7 +577,7 @@ Template.tab_csv.events({
                                 };
                                 // console.log(data)
                             }
-                        });
+                         });*/
                         // data[h[headerOriginal]] = parseFloat(data[h[headerOriginal]]);
                     }
 
@@ -1040,7 +1044,8 @@ Template.tab_csv.events({
             if (mapType == "ip") {
                 console.log(CSV_Data);
 
-                maps(CSV_Data, headerOrig);
+                mapbox();
+                // maps(CSV_Data, headerOrig);
             }
             else if (mapType == "lon/lat") {
                 var lonHeader;
@@ -1056,7 +1061,8 @@ Template.tab_csv.events({
                 });
 
                 if (lonHeader && latHeader) {
-                    maps(CSV_Data, headerOrig, lonHeader, latHeader)
+                    mapbox();
+                    // maps(CSV_Data, headerOrig, lonHeader, latHeader)
                 }
             }
         }

@@ -59,6 +59,7 @@ mongo-id@1.0.5
 npm-mongo@1.4.44_1
 observe-sequence@1.0.12
 ordered-dict@1.0.8
+pauloborges:mapbox@2.2.3_2
 perak:codemirror@1.3.1
 pntbr:js-yaml-client@0.0.1
 promise@0.7.2_1

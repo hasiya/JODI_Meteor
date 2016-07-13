@@ -1,5 +1,5 @@
 var colours = d3.scale.category10();
-barChartHeaders = function (data, property, xLabel, svg, h, w) {
+barChartHeaders = function (data, property, xLabel, svgID, h, w) {
 
     var margin = {
         top: 10,
@@ -56,7 +56,7 @@ barChartHeaders = function (data, property, xLabel, svg, h, w) {
 
     //Create SVG element
     //noinspection JSDuplicatedDeclaration
-    var svg = d3.select(svg)
+    var svg = d3.select(svgID)
         .attr("width", w + margin.left + margin.right)
         .attr("height", h + margin.top + margin.bottom)
         .append("g")
@@ -114,6 +114,9 @@ barChartHeaders = function (data, property, xLabel, svg, h, w) {
         .on("mouseout", function () {
             return tooltip.style("visibility", "hidden");
         });
+    d3.select(svgID)
+        .attr("width", w + 100)
+        .attr("height", h + 100)
 
     // svg.selectAll("text")
     //     .data(data)
@@ -134,7 +137,7 @@ barChartHeaders = function (data, property, xLabel, svg, h, w) {
     //     .attr("fill", "white");
 };
 
-barChartCounts = function (data, svg, h, w) {
+barChartCounts = function (data, svgID, h, w) {
 
     var margin = {
         top: 10,
@@ -193,8 +196,7 @@ barChartCounts = function (data, svg, h, w) {
 
 
     //Create SVG element
-    //noinspection JSDuplicatedDeclaration
-    var svg = d3.select(svg)
+    var svg = d3.select(svgID)
         .attr("width", w + margin.left + margin.right)
         .attr("height", h + margin.top + margin.bottom)
         .append("g")
@@ -222,6 +224,11 @@ barChartCounts = function (data, svg, h, w) {
         .attr("transform", "translate(0," + h + ")")
         .call(xAxis)
         .selectAll(".tick text")
+        // .attr("y", 0)
+        // .attr("x", 9)
+        // .attr("dy", ".35em")
+        // .attr("transform", "rotate(90)")
+        // .style("text-anchor", "start");
         .call(wrap, x.rangeBand());
 
     svg.append("g")
@@ -261,6 +268,10 @@ barChartCounts = function (data, svg, h, w) {
         .on("mouseout", function () {
             return tooltip.style("visibility", "hidden");
         });
+
+    d3.select(svgID)
+        .attr("width", w + 100)
+        .attr("height", h + 100)
 
 
     // svg.selectAll("text")
