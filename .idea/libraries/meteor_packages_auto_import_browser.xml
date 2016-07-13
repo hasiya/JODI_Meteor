@@ -252,9 +252,7 @@
         <item url="file://$USER_HOME$/.meteor/packages/perak_codemirror/1.3.1/web.browser/lib/codemirror/mode/apl/apl.js" />
         <item url="file://$USER_HOME$/.meteor/packages/perak_codemirror/1.3.1/web.browser/lib/codemirror/mode/ecl/ecl.js" />
         <item url="file://$USER_HOME$/.meteor/packages/perak_codemirror/1.3.1/web.browser/lib/codemirror/mode/dtd/dtd.js" />
-        <item url="file://$USER_HOME$/.meteor/packages/pauloborges_mapbox/2.2.3_2/web.browser/mapbox.js" />
         <item url="file://$USER_HOME$/.meteor/packages/perak_codemirror/1.3.1/web.browser/lib/codemirror/mode/gfm/gfm.js" />
-        <item url="file://$USER_HOME$/.meteor/packages/pauloborges_mapbox/2.2.3_2/web.browser/mapbox.css" />
         <item url="file://$USER_HOME$/.meteor/packages/perak_codemirror/1.3.1/web.browser/lib/codemirror/mode/gas/gas.js" />
         <item url="file://$USER_HOME$/.meteor/packages/perak_codemirror/1.3.1/web.browser/lib/codemirror/mode/lua/lua.js" />
         <item url="file://$USER_HOME$/.meteor/packages/perak_codemirror/1.3.1/web.browser/lib/codemirror/mode/idl/idl.js" />
@@ -568,9 +566,7 @@
       <root url="file://$USER_HOME$/.meteor/packages/perak_codemirror/1.3.1/web.browser/lib/codemirror/mode/apl/apl.js" />
       <root url="file://$USER_HOME$/.meteor/packages/perak_codemirror/1.3.1/web.browser/lib/codemirror/mode/ecl/ecl.js" />
       <root url="file://$USER_HOME$/.meteor/packages/perak_codemirror/1.3.1/web.browser/lib/codemirror/mode/dtd/dtd.js" />
-      <root url="file://$USER_HOME$/.meteor/packages/pauloborges_mapbox/2.2.3_2/web.browser/mapbox.js" />
       <root url="file://$USER_HOME$/.meteor/packages/perak_codemirror/1.3.1/web.browser/lib/codemirror/mode/gfm/gfm.js" />
-      <root url="file://$USER_HOME$/.meteor/packages/pauloborges_mapbox/2.2.3_2/web.browser/mapbox.css" />
       <root url="file://$USER_HOME$/.meteor/packages/perak_codemirror/1.3.1/web.browser/lib/codemirror/mode/gas/gas.js" />
       <root url="file://$USER_HOME$/.meteor/packages/perak_codemirror/1.3.1/web.browser/lib/codemirror/mode/lua/lua.js" />
       <root url="file://$USER_HOME$/.meteor/packages/perak_codemirror/1.3.1/web.browser/lib/codemirror/mode/idl/idl.js" />

@@ -257,7 +257,7 @@ Template.tab_csv.onRendered(function () {
 
         }
 
-        Mapbox.load()
+        // Mapbox.load()
 
     });
 
@@ -565,7 +565,7 @@ Template.tab_csv.events({
                     }
                     else if (h[headerType] == "ip") {
                         var ip = data[h[headerOriginal]];
-                        /*$.ajax({
+                        $.ajax({
                             method: "get",
                             url: 'http://ip-api.com/json/' + ip,
                             dataType: "json",
@@ -577,7 +577,7 @@ Template.tab_csv.events({
                                 };
                                 // console.log(data)
                             }
-                         });*/
+                        });
                         // data[h[headerOriginal]] = parseFloat(data[h[headerOriginal]]);
                     }
 
@@ -1044,7 +1044,7 @@ Template.tab_csv.events({
             if (mapType == "ip") {
                 console.log(CSV_Data);
 
-                mapbox();
+                mapbox(CSV_Data, headerOrig);
                 // maps(CSV_Data, headerOrig);
             }
             else if (mapType == "lon/lat") {
@@ -1061,7 +1061,7 @@ Template.tab_csv.events({
                 });
 
                 if (lonHeader && latHeader) {
-                    mapbox();
+                    mapbox(CSV_Data, headerOrig, lonHeader, latHeader);
                     // maps(CSV_Data, headerOrig, lonHeader, latHeader)
                 }
             }

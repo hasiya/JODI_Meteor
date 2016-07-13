@@ -189,7 +189,6 @@ function mapLocations() {
         .enter().append("circle", ".pin")
         .attr("r", 4)
         .attr("transform", function (d) {
-            var a = d;
             if (d.hasOwnProperty("location")) {
                 return "translate(" + projection([
                         d.location.lon,
@@ -198,7 +197,6 @@ function mapLocations() {
             }
 
         })
-        .attr("clicked", false)
         .style("fill", function (d) {
             return colours(d[count_h]);
         })

@@ -32,3 +32,19 @@
     stroke: #777;
 
 }
+
+.map {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+#svgMap {
+    width: 100%;
+    height: 100%;
+}
+
+.svgmap {
+    margin-left: 10px;
+    margin-bottom: 10px;
+}
