@@ -1,4 +1,5 @@
 var colours = d3.scale.category10();
+var svg_g;
 barChartHeaders = function (data, property, xLabel, svgID, h, w) {
 
     var margin = {
@@ -55,7 +56,6 @@ barChartHeaders = function (data, property, xLabel, svgID, h, w) {
     }
 
     //Create SVG element
-    //noinspection JSDuplicatedDeclaration
     var svg = d3.select(svgID)
         .attr("width", w + margin.left + margin.right)
         .attr("height", h + margin.top + margin.bottom)
@@ -116,7 +116,7 @@ barChartHeaders = function (data, property, xLabel, svgID, h, w) {
         });
     d3.select(svgID)
         .attr("width", w + 100)
-        .attr("height", h + 100)
+        .attr("height", h + 100);
 
     // svg.selectAll("text")
     //     .data(data)
@@ -142,7 +142,7 @@ barChartCounts = function (data, svgID, h, w) {
     var margin = {
         top: 10,
         right: 10,
-        bottom: 60,
+        bottom: 50,
         left: 50
     };
     w = w - margin.left - margin.right;
@@ -202,6 +202,7 @@ barChartCounts = function (data, svgID, h, w) {
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+    svg_g = svg;
     // svg.call(tip)
 
     y.domain([0, d3.max(data, function (d) {
@@ -212,6 +213,11 @@ barChartCounts = function (data, svgID, h, w) {
         return d.Key;
     }));
 
+    var xDomain = x.domain();
+    var longestXval = d3.max(xDomain, function (d) {
+        return d.length;
+    });
+
 
     var barWidthPadding = w / data.length - barPadding;
     if (barWidthPadding < 0) {
@@ -220,7 +226,7 @@ barChartCounts = function (data, svgID, h, w) {
 
 
     svg.append("g")
-        .attr("class", "x axis")
+        .attr("class", "xaxis")
         .attr("transform", "translate(0," + h + ")")
         .call(xAxis)
         .selectAll(".tick text")
@@ -271,7 +277,7 @@ barChartCounts = function (data, svgID, h, w) {
 
     d3.select(svgID)
         .attr("width", w + 100)
-        .attr("height", h + 100)
+        .attr("height", h + 100 + (longestXval * 5));
 
 
     // svg.selectAll("text")
@@ -291,6 +297,25 @@ barChartCounts = function (data, svgID, h, w) {
     //     .attr("font-family", "sans-serif")
     //     .attr("font-size", "11px")
     //     .attr("fill", "black");
+};
+
+rotate_X_labels = function (checked, svgID) {
+    var svg = d3.select(svgID);
+    if (checked) {
+        svg.selectAll("g .xaxis .tick text")
+            .attr("y", 0)
+            .attr("x", 9)
+            .attr("dy", ".35em")
+            .attr("transform", "rotate(45)")
+            .style("text-anchor", "start");
+    } else {
+        svg.selectAll("g .xaxis .tick text")
+            .attr("y", 0)
+            .attr("x", 9)
+            .attr("dy", ".35em")
+            .attr("transform", "rotate(45)")
+            .style("text-anchor", "start");
+    }
 };
 
 function wrap(text, width) {

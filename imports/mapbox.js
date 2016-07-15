@@ -18,11 +18,16 @@ var map, dots;
 var headers_colors = [];
 
 
-mapbox = function (dataObj, countHeader, lon, lat) {
+mapbox = function (dataObj, countHeader, isVisOn, lon, lat) {
 
     // Mapbox.load();
 
+    if (svg) {
+        var tmpSvg;
+        svg.html("");
+        svg = tmpSvg;
 
+    }
     data = dataObj;
     count_h = countHeader;
     lon_h = lon;
@@ -53,33 +58,34 @@ mapbox = function (dataObj, countHeader, lon, lat) {
         });
     }
 
-    // if (count_h) {
-    //     count_data = d3.nest()
-    //         .key(function (d) {
-    //             return d[count_h]
-    //         })
-    //         .entries(data);
-    // }
-
     compute_size();
 
     var svgDiv = document.getElementById('svgMap');
     // svgDiv.style.width = width;
     svgDiv.style.height = height;
 
-    mapboxgl.accessToken = "pk.eyJ1IjoiaGFzaXlhIiwiYSI6ImNpcWprZHphODBhbGhmbm5lZDJ4cXM0aDQifQ.QGJsxbUoJ_puG6JliOILiQ";
+    if (!isVisOn) {
+        mapboxgl.accessToken = "pk.eyJ1IjoiaGFzaXlhIiwiYSI6ImNpcWprZHphODBhbGhmbm5lZDJ4cXM0aDQifQ.QGJsxbUoJ_puG6JliOILiQ";
 
-    map = new mapboxgl.Map({
-        container: 'svgMap', // container id
-        style: 'mapbox://styles/mapbox/streets-v9' //stylesheet location
-    });
+        map = new mapboxgl.Map({
+            container: 'svgMap', // container id
+            style: 'mapbox://styles/mapbox/streets-v9' //stylesheet location
+        });
 
-    // map.scrollZoom.disable()
-    map.dragRotate.disable();
+        // map.scrollZoom.disable()
+        map.dragRotate.disable();
+    }
 
-    var container = map.getCanvasContainer();
-    svg = d3.select(container).append('svg');
-    svg.attr('class', 'map');
+
+    if (!svg) {
+        var container = map.getCanvasContainer();
+        svg = d3.select(container).append('svg');
+        svg.attr('class', 'map');
+    }
+    else {
+        svg.html("")
+    }
+
 
     var locationList = [];
 
@@ -88,8 +94,8 @@ mapbox = function (dataObj, countHeader, lon, lat) {
     });
 
     // var dataLocMidpoint = getLocationMidpoint(locationList);
-    var dataLocMidpoint = avgLoc(locationList);
-    map.setCenter([dataLocMidpoint.lon, dataLocMidpoint.lat]);
+    // var dataLocMidpoint = avgLoc(locationList);
+    // map.setCenter([dataLocMidpoint.lon, dataLocMidpoint.lat]);
     var mapBounds = getBounds(locationList);
     map.fitBounds(mapBounds);
 

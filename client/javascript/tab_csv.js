@@ -24,6 +24,8 @@ var chartRedrawObj = {
     type: ""
 };
 
+var isVisOn;
+
 function checkIPlist(ip, list) {
 
     var ipData = null;
@@ -388,6 +390,7 @@ Template.tab_csv.events({
         var svg = document.getElementById("svgChar");
         svg.innerHTML = "";
         svg.style.display = "none";
+
 
         var mapSvg = document.getElementById("svgMap");
         mapSvg.innerHTML = "";
@@ -772,6 +775,7 @@ Template.tab_csv.events({
     },
 
     "click .visualThumb": function (e) {
+        isVisOn = false;
         var elem = e.currentTarget;
         var visType = elem.getAttribute("vistype");
 
@@ -831,7 +835,8 @@ Template.tab_csv.events({
                     // }
                 }
             });
-
+            // headerLabelinnerhtml += "<hr>" +
+            //     "<label for='xLabelRot' >Rotate X axis Labels <input id='xLabelRot' type='checkbox' class='xLabelRot'></label>"
         }
         else if (visType == "groupBar") {
 
@@ -952,8 +957,10 @@ Template.tab_csv.events({
         xAxisLabels.innerHTML = xAxisInnerhtml;
         // var xAxis = document.getElementsByClassName("xAxisLabels")
         // xAxis[0].checked = true;
-        var mapTypeRadio = document.getElementsByName("location_type");
-        mapTypeRadio[0].checked = true;
+        if (visType == "Map") {
+            var mapTypeRadio = document.getElementsByName("location_type");
+            mapTypeRadio[0].checked = true;
+        }
 
 
     },
@@ -973,7 +980,7 @@ Template.tab_csv.events({
         // svg.style.display = "none";
 
         var width = document.getElementById("chartBody").offsetWidth;
-        var height = document.getElementById("chartBody").offsetHeight - 5;
+        var height = 0;
         if (height < 450) {
             height = 450;
         }
@@ -1044,7 +1051,8 @@ Template.tab_csv.events({
             if (mapType == "ip") {
                 console.log(CSV_Data);
 
-                mapbox(CSV_Data, headerOrig);
+                mapbox(CSV_Data, headerOrig, isVisOn);
+
                 // maps(CSV_Data, headerOrig);
             }
             else if (mapType == "lon/lat") {
@@ -1061,10 +1069,14 @@ Template.tab_csv.events({
                 });
 
                 if (lonHeader && latHeader) {
-                    mapbox(CSV_Data, headerOrig, lonHeader, latHeader);
+
+                    mapbox(CSV_Data, headerOrig, isVisOn, lonHeader, latHeader);
+
                     // maps(CSV_Data, headerOrig, lonHeader, latHeader)
                 }
             }
+
+            isVisOn = true;
         }
 
         for (var i = 0; i < siblings.length; i++) {
@@ -1080,6 +1092,12 @@ Template.tab_csv.events({
         }
     },
 
+    "click .xLabelRot": function (e) {
+        var elem = e.currentTarget;
+        console.log(e);
+        rotate_X_labels(elem.checked, "#svgChar");
+    },
+
     "change #xAxisLabels": function (e) {
         console.log(e);
     },
@@ -1089,7 +1107,6 @@ Template.tab_csv.events({
     }
 });
 
-/*
 window.addEventListener('resize', function () {
     var svg = document.getElementById("svgChar");
  if (svg.style.display != "none" && svg.style.display != "") {
@@ -1109,4 +1126,3 @@ window.addEventListener('resize', function () {
         }
     }
 });
- */

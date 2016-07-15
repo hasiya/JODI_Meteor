@@ -45,7 +45,16 @@ pieChart = function (data, header, svgElem, h, w) {
         })
         .entries(data);
 
-    var outerRadius = (w / 2) - (h / 3);
+
+    if (h < w) {
+        outerRadius = (h / 2) - 2
+    }
+    else {
+
+        var outerRadius = (w / 2) - 2;
+    }
+
+    // h = outerRadius *2 +10
     var innerRadius = 0;
     var arc = d3.svg.arc()
         .innerRadius(innerRadius)

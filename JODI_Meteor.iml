@@ -13,12 +13,11 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="JODI_Meteor node_modules" level="project" />
     <orderEntry type="library" name="topojson.v1" level="application" />
-    <orderEntry type="library" name="meteor-packages-auto-import-npm" level="project" />
     <orderEntry type="library" name="Python 2.7.11 (~/.pyenv/versions/2.7.11/bin/python2.7) interpreter library" level="application" />
-    <orderEntry type="library" name="meteor-packages-auto-import-browser" level="project" />
     <orderEntry type="library" name="mapbox-gl" level="application" />
     <orderEntry type="library" name="topojson.v1" level="application" />
-    <orderEntry type="library" name="meteor-packages-auto-import-browser" level="project" />
     <orderEntry type="library" name="randomColor" level="application" />
+    <orderEntry type="library" name="meteor-packages-auto-import-npm" level="project" />
+    <orderEntry type="library" name="meteor-packages-auto-import-browser" level="project" />
   </component>
 </module>
