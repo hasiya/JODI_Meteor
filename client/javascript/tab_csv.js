@@ -12,10 +12,10 @@ var CSV_Data;
 var editor;
 var headerValues = [];
 var removedHeaderVals = [];
-var headerOriginal = "originalVal";
-var headerPresent = "presentVal";
-var headerType = "type";
-var headerValCount = "valCount";
+headerOriginal = "originalVal";
+headerPresent = "presentVal";
+headerType = "type";
+headerValCount = "valCount";
 var selectedXlable;
 var chartRedrawObj = {
     data: {},
@@ -36,6 +36,23 @@ function checkIPlist(ip, list) {
         }
     });
     return ipData;
+}
+
+function lon_lat_check() {
+    var lon = false;
+    var lat = false;
+    headerValues.forEach(function (h) {
+        if (!h.deleted) {
+            if (h[headerType] == "lon") {
+                lon = true;
+            }
+            else if ((h[headerType] == "lat")) {
+                lat = true;
+            }
+        }
+    });
+
+    return (lon && lat);
 }
 
 function headersDeleted() {
@@ -90,6 +107,7 @@ function linesMatch(lines) {
     // var linesMatch = true;
     var lineNum = 0;
     var headers = CSVtoArray(lines[0]);
+    CSV_keys = headers;
 
     if (headers) {
         lines.forEach(function (l) {
@@ -199,6 +217,16 @@ function CreatePanel() {
 
     HeaderConfigPanel.innerHTML = HeaderConfigInnerHtml;
     document.getElementById("HeaderConfigBtns").innerHTML = HeaderConfigBtnsInnerHtml;
+
+    CSV_keys.forEach(function (k) {
+        if (k.toLowerCase() == "longitude") {
+            document.getElementById("type_" + k).value = "lon";
+        }
+        if (k.toLowerCase() == "latitude") {
+            document.getElementById("type_" + k).value = "lat";
+        }
+    })
+
 
 }
 
@@ -325,6 +353,7 @@ Template.tab_csv.events({
         // var text = t.find("#codemirror_id").value;
         var text = editor.getValue();
         var lines = text.split('\n');
+        var headerList = lines[0].split;
         var Message = $("#message");
         document.getElementById("restoreModelBody").innerHTML = "";
 
@@ -342,7 +371,7 @@ Template.tab_csv.events({
                         success: function (data) {
                             CSV_Data = data;
                             console.log(CSV_Data);
-                            CSV_keys = Object.keys(data[0]);
+                            // CSV_keys = Object.keys(data[0]);
                             CreatePanel();
                             var Message = $("#message");
                             Message.html("");
@@ -646,6 +675,7 @@ Template.tab_csv.events({
         var mapsMenuInner = "";
 
 
+
         headerValues.forEach(function (h) {
             if (!h.deleted) {
                 if (h[headerType] == "number") {
@@ -664,7 +694,14 @@ Template.tab_csv.events({
                     //     "<button type='button' id='headerLabels' style='word-wrap: break-word; white-space: normal; position: relative; margin: 5px' count='true' class='btn btn-primary headerLabels' original='" + h[headerOriginal] + "'>" + h[headerPresent] + " (Count)</button>";
                 }
                 if ((h[headerType] == "lon") || (h[headerType] == "lat") || (h[headerType] == "ip")) {
-                    mapsThumb = true;
+
+                    if (h[headerType] == "ip") {
+                        mapsThumb = true;
+                    }
+                    else if (lon_lat_check()) {
+                        mapsThumb = true;
+                    }
+
                 }
             }
         });
@@ -846,10 +883,12 @@ Template.tab_csv.events({
                 "Group Each" +
                 "<select id='subGroup' class='form-control'>";
             headerValues.forEach(function (h) {
-                headerLabelinnerhtml +=
-                    "<option class='subGroup' original='" + h[headerOriginal] + "'>" +
-                    h[headerPresent] +
-                    "</option>"
+                if (!h.deleted) {
+                    headerLabelinnerhtml +=
+                        "<option class='subGroup' original='" + h[headerOriginal] + "'>" +
+                        h[headerPresent] +
+                        "</option>"
+                }
             });
 
             headerLabelinnerhtml += "</select>";
@@ -858,10 +897,12 @@ Template.tab_csv.events({
                 "By" +
                 "<select id='mainGroup' class='form-control'>";
             headerValues.forEach(function (h) {
-                headerLabelinnerhtml +=
-                    "<option class='mainGroup' original='" + h[headerOriginal] + "'>" +
-                    h[headerPresent] +
-                    "</option>"
+                if (!h.deleted) {
+                    headerLabelinnerhtml +=
+                        "<option class='mainGroup' original='" + h[headerOriginal] + "'>" +
+                        h[headerPresent] +
+                        "</option>"
+                }
             });
 
             headerLabelinnerhtml += "</select>" +
@@ -890,9 +931,15 @@ Template.tab_csv.events({
                         headerLabelinnerhtml +=
                             "<button type='button' id='headerLabels' style='word-wrap: break-word; white-space: normal; position: relative; margin: 5px' vistype='pie' count='true' class='btn btn-primary headerLabels' original='" + h[headerOriginal] + "'>" + h[headerPresent] + "</button>";
 
-                        document.getElementById("charts").style.display = "inline";
 
                     }
+
+                    if (h[headerType] == "number") {
+                        headerLabelinnerhtml +=
+                            "<button type='button' id='headerLabels' style='word-wrap: break-word; white-space: normal; position: relative; margin: 5px' vistype='pie' count='false' class='btn btn-primary headerLabels' original='" + h[headerOriginal] + "'>" + h[headerPresent] + "</button>";
+                    }
+
+                    document.getElementById("charts").style.display = "inline";
                 }
             });
         }
@@ -969,6 +1016,7 @@ Template.tab_csv.events({
         var elem = e.currentTarget;
         var headerOrig = elem.getAttribute("original");
         var visType = elem.getAttribute("vistype");
+        var count = elem.getAttribute("count");
 
         // var siblings = $("#"+elem.id).siblings();
         var siblings = elem.parentNode.childNodes;
@@ -981,8 +1029,8 @@ Template.tab_csv.events({
 
         var width = document.getElementById("chartBody").offsetWidth;
         var height = 0;
-        if (height < 450) {
-            height = 450;
+        if (height < 500) {
+            height = 500;
         }
 
         var selectedXlabel;
@@ -1032,7 +1080,17 @@ Template.tab_csv.events({
         }
         else if (visType == "pie") {
             svg.style.display = "inline";
-            pieChart(CSV_Data, headerOrig, "#svgChar", height, width);
+            if (width > 900) {
+                width = width - 200;
+            }
+            if (count == "true") {
+                pieChart(CSV_Data, headerOrig, true, "#svgChar", height, width);
+
+            }
+            else if (count == "false") {
+                pieChart(CSV_Data, headerOrig, false, "#svgChar", height, width);
+
+            }
         }
         else if (visType == "map") {
             var parentNodeId = elem.parentElement.getAttribute("id");
@@ -1107,22 +1165,22 @@ Template.tab_csv.events({
     }
 });
 
-window.addEventListener('resize', function () {
-    var svg = document.getElementById("svgChar");
- if (svg.style.display != "none" && svg.style.display != "") {
-
-        svg.innerHTML = "";
-
-        var width = document.getElementById("chartBody").offsetWidth;
-        var height = document.getElementById("chartBody").offsetHeight;
-        if (height < 350) {
-            height = 350;
-        }
-        if (chartRedrawObj.type == "counts") {
-            barChartCounts(chartRedrawObj.data.counts, "#svgChar", height, width)
-        }
-        else {
-            barChartHeaders(chartRedrawObj.data, selectedXlable, "#svgChar", height, width)
-        }
-    }
-});
+// window.addEventListener('resize', function () {
+//     var svg = document.getElementById("svgChar");
+//  if (svg.style.display != "none" && svg.style.display != "") {
+//
+//         svg.innerHTML = "";
+//
+//         var width = document.getElementById("chartBody").offsetWidth;
+//         var height = document.getElementById("chartBody").offsetHeight;
+//         if (height < 350) {
+//             height = 350;
+//         }
+//         if (chartRedrawObj.type == "counts") {
+//             barChartCounts(chartRedrawObj.data.counts, "#svgChar", height, width)
+//         }
+//         else {
+//             barChartHeaders(chartRedrawObj.data, selectedXlable, "#svgChar", height, width)
+//         }
+//     }
+// });

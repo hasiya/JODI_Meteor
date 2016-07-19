@@ -11,6 +11,19 @@ barChartHeaders = function (data, property, xLabel, svgID, h, w) {
     w = w - margin.left - margin.right;
     h = h - margin.top - margin.bottom;
 
+    var updatedData = d3.nest()
+        .key(function (d) {
+            return d[xLabel];
+        })
+        .rollup(function (u_data) {
+            return {
+                total: d3.sum(u_data, function (d) {
+                    return parseFloat(d[property]);
+                })
+            }
+        })
+        .entries(data);
+
     var barPadding = 1;
 
     var x = d3.scale.ordinal()
@@ -23,10 +36,23 @@ barChartHeaders = function (data, property, xLabel, svgID, h, w) {
     var y = d3.scale.linear()
         .range([h, 0]);
 
-    var yAxis = d3.svg.axis()
+    var yAxis;
+
+    if (updatedData[0].values.total < 1) {
+        yAxis = d3.svg.axis()
         .scale(y)
         .orient("left")
-        .ticks(10);
+            .ticks(10)
+    }
+    else {
+        yAxis = d3.svg.axis()
+            .scale(y)
+            .orient("left")
+            .ticks(10)
+            .tickFormat(d3.format(".2s"));
+
+    }
+
 
     var tooltip = document.getElementById("tooltip");
 
@@ -62,12 +88,12 @@ barChartHeaders = function (data, property, xLabel, svgID, h, w) {
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    y.domain([0, d3.max(data, function (d) {
-        return d[property] + 100;
+    y.domain([0, d3.max(updatedData, function (d) {
+        return d.values.total;
     })]);
 
-    x.domain(data.map(function (d) {
-        return d[xLabel];
+    x.domain(updatedData.map(function (d) {
+        return d.key;
     }));
 
 
@@ -88,24 +114,24 @@ barChartHeaders = function (data, property, xLabel, svgID, h, w) {
         .call(yAxis);
 
     svg.selectAll("rect")
-        .data(data)
+        .data(updatedData)
         .enter()
         .append("rect")
         .attr("x", function (d, i) {
-            return i * (w / data.length);
+            return i * (w / updatedData.length);
         })
         .attr("y", function (d) {
-            return y(d[property]);
+            return y(d.values.total);
         })
-        .attr("width", w / data.length - barPadding)
+        .attr("width", w / updatedData.length - barPadding)
         .attr("height", function (d) {
-            return (h - y(d[property]));
+            return (h - y(d.values.total));
         })
         .attr("fill", function (d, i) {
             return colours(i);
         })
         .on("mouseover", function (d) {
-            tooltip.html("<span style='color:red'>" + d[property] + "</span>");
+            tooltip.html("<span style='color:red'>" + d.values.total + "</span>");
             tooltip.style("visibility", "visible");
         })
         .on("mousemove", function () {

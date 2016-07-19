@@ -28,7 +28,7 @@ else {
         .style("font", "14px sans-serif");
 }
 
-pieChart = function (data, header, svgElem, h, w) {
+pieChart = function (data, header, count, svgElem, h, w) {
 
     var margin = {
         top: 10,
@@ -38,12 +38,29 @@ pieChart = function (data, header, svgElem, h, w) {
     };
     w = w - margin.left - margin.right;
     h = h - margin.top - margin.bottom;
+    var pieData;
+    var pie;
 
-    var pieData = d3.nest()
-        .key(function (d) {
-            return d[header]
-        })
-        .entries(data);
+    if (count) {
+        pieData = d3.nest()
+            .key(function (d) {
+                return d[header]
+            })
+            .entries(data);
+
+        pie = d3.layout.pie()
+            .value(function (d) {
+                return d.values.length;
+            });
+    }
+    else {
+        pieData = data;
+
+        pie = d3.layout.pie()
+            .value(function (d) {
+                return d[header];
+            });
+    }
 
 
     if (h < w) {
@@ -60,10 +77,10 @@ pieChart = function (data, header, svgElem, h, w) {
         .innerRadius(innerRadius)
         .outerRadius(outerRadius);
 
-    var pie = d3.layout.pie()
-        .value(function (d) {
-            return d.values.length;
-        });
+    var labelArc = d3.svg.arc()
+        .innerRadius(outerRadius - 50)
+        .outerRadius(outerRadius);
+
 
     //Easy colors accessible via a 10-step ordinal scale
     var color = d3.scale.category10();
@@ -84,14 +101,19 @@ pieChart = function (data, header, svgElem, h, w) {
     //Draw arc paths
     arcs.append("path")
         .attr("fill", function (d) {
-            return color(d.data.key);
+            if (count) {
+                return color(d.data.key);
+            }
+            else {
+                return color(d.data[header])
+            }
         })
         .attr("d", arc);
 
     //Labels
     arcs.append("text")
         .attr("transform", function (d) {
-            return "translate(" + arc.centroid(d) + ")";
+            return "translate(" + labelArc.centroid(d) + ")";
         })
         .attr("text-anchor", "middle")
         .text(function (d) {
