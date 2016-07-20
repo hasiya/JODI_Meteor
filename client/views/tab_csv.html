@@ -1,9 +1,9 @@
 <template name="tab_csv">
     <!--<form class="editorform">-->
     <div id="editor">
-        <div id="editor">
-            <textarea id="codemirror_id" name="codemirro_nme" placeholder="sad"></textarea>
-        </div>
+        <!--<div id="editor">-->
+        <textarea id="codemirror_id" name="codemirror_nme" placeholder="sad"></textarea>
+        <!--</div>-->
         <!--<textarea cols="60" rows="20" class="form-control" id="CSVarea" spellcheck="false"></textarea>-->
     </div>
     <br>
@@ -13,6 +13,30 @@
         <button id="process_edit_btn" class="btn-success btn ProcessCSV" style="display: none">Process</button>
 
     </div>
+
+    <div id="fileUpload">
+        <div class="col-lg-5 col-sm-6 col-12">
+            <div class="input-group">
+                <label class="input-group-btn">
+                    <span id="innerFileUpload" class="btn btn-primary">
+                        Browse&hellip; <input class="csv_upload" type="file" style="display: none;">
+                    </span>
+                </label>
+                <input id="csvFileName" type="text" class="form-control" readonly>
+            </div>
+        </div>
+
+        <!--<div style="margin-bottom: 5px">-->
+        <!--<input class="btn btn-primary" id="fileupload" type="file" accept="text/csv">-->
+        <!--</div>-->
+
+        <!--<div class="progress progress-striped active">-->
+        <!--<div class="progress-bar"  role="progressbar" style="width: 10%"></div>-->
+        <!--</div>-->
+        <!--{{> upload_bootstrap }}-->
+
+    </div>
+
     <!--</form>-->
     <label id="message"></label>
     <br>

@@ -62,6 +62,8 @@ pieChart = function (data, header, count, svgElem, h, w) {
             });
     }
 
+    var dimpleCount = dimple.getUniqueValues(data, header);
+
 
     if (h < w) {
         outerRadius = (h / 2) - 2

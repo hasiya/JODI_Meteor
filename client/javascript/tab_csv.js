@@ -356,6 +356,7 @@ Template.tab_csv.events({
         var headerList = lines[0].split;
         var Message = $("#message");
         document.getElementById("restoreModelBody").innerHTML = "";
+        var test = document.getElementById("fileUpload");
 
 
         if (lines.length > 1) {
@@ -364,7 +365,7 @@ Template.tab_csv.events({
                 if (lineMatch["lineMatch"]) {
                     $.ajax({
                         method: "POST",
-                        url: "http://127.0.0.1:5000/csv_data",
+                        url: "http://139.59.186.138/csv_data",
                         data: {
                             'data': text
                         },
@@ -391,6 +392,9 @@ Template.tab_csv.events({
                 Message.html("The Editor content does not look like a CSV. ");
             }
         }
+
+        var fileUploader = document.getElementById("fileUpload");
+        fileUploader.style.display = "none";
     },
 
     "click .EditCSV": function (e) {
@@ -427,6 +431,10 @@ Template.tab_csv.events({
         var visualMenu = document.getElementById("visualMenu");
         visualMenu.style.display = "none";
         document.getElementById("charts").style.display = "none";
+
+        var fileUploader = document.getElementById("fileUpload");
+        fileUploader.style.display = "inline";
+        // var fileUploadInner = document.getElementById("innerFileUpload");
 
     },
 
@@ -466,6 +474,33 @@ Template.tab_csv.events({
         var visualMenu = document.getElementById("visualMenu");
         visualMenu.style.display = "none";
         document.getElementById("charts").style.display = "none";
+
+        var fileUploader = document.getElementById("fileUpload");
+        fileUploader.style.display = "inline";
+        document.getElementById("csvFileName").value = "";
+        // var fileUploadInner = document.getElementById("innerFileUpload");
+        // fileUploadInner.innerHTML = "Browse&hellip; <input class='csv_upload' type='file' style='display: none;'>"
+    },
+
+    "change .csv_upload": function (e) {
+        var elem = e.currentTarget;
+        var file = elem.files[0];
+        var fileName = file.name;
+        var fileNameTxt = document.getElementById("csvFileName");
+        fileNameTxt.value = fileName;
+
+
+        var reader = new FileReader();
+        reader.onload = function (fileLoadEvent) {
+            // console.log(fileLoadEvent.target.result)
+            var text = fileLoadEvent.target.result;
+            editor.setValue(text);
+        };
+
+        reader.readAsText(file);
+
+        var fileUploadInner = document.getElementById("innerFileUpload");
+        fileUploadInner.innerHTML = "Browse&hellip; <input class='csv_upload' type='file' style='display: none;'>"
 
     },
 
@@ -679,7 +714,11 @@ Template.tab_csv.events({
         headerValues.forEach(function (h) {
             if (!h.deleted) {
                 if (h[headerType] == "number") {
-                    normalChartsThumb = true;
+                    headerValues.forEach(function (hs) {
+                        if (hs[headerType] == "string") {
+                            normalChartsThumb = true;
+                        }
+                    });
                     pieChartThumb = true;
                     // groupBarChartThumb = true;
 
@@ -755,6 +794,7 @@ Template.tab_csv.events({
 
         chartsMenu.innerHTML = chartsMenuInner;
         mapsMenu.innerHTML = mapsMenuInner;
+
 
         // headerLabels.innerHTML = headerLabelinnerhtml;
         // xAxisLabels.innerHTML = xAxisInnerhtml;
@@ -1162,8 +1202,48 @@ Template.tab_csv.events({
 
     "click .chartTabs": function (e) {
         document.getElementById("charts").style.display = "none";
-    }
+    },
 });
+
+$(function () {
+    $('#fileupload').fileupload({
+        dataType: 'json',
+        done: function (e, data) {
+            $.each(data.result.files, function (index, file) {
+                $('<p/>').text(file.name).appendTo(document.body);
+            });
+        }
+    });
+});
+
+// $(function() {
+//
+//     // We can attach the `fileselect` event to all file inputs on the page
+//     $(document).on('change', ':file', function() {
+//         var input = $(this),
+//             numFiles = input.get(0).files ? input.get(0).files.length : 1,
+//             label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
+//         input.trigger('fileselect', [numFiles, label]);
+//     });
+//
+//     // We can watch for our custom `fileselect` event like this
+//     $(document).ready( function() {
+//         $(':file').on('fileselect', function(event, numFiles, label) {
+//
+//             var input = $(this).parents('.input-group').find(':text'),
+//                 log = numFiles > 1 ? numFiles + ' files selected' : label;
+//
+//             if( input.length ) {
+//                 input.val(log);
+//             } else {
+//                 if( log ) alert(log);
+//             }
+//
+//         });
+//     });
+//
+// });
+
 
 // window.addEventListener('resize', function () {
 //     var svg = document.getElementById("svgChar");
