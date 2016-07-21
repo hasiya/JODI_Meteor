@@ -1,7 +1,10 @@
-import "../../imports/bar_chart.js";
+// import "../../imports/bar_chart.js";
+import "../../imports/dimple_bar";
 import "../../imports/bar";
-import "../../imports/grouped_bar";
-import "../../imports/pie_chart";
+// import "../../imports/grouped_bar";
+import "../../imports/dimple_grouped";
+// import "../../imports/pie_chart";
+import "../../imports/dimple_pie";
 import "../../imports/map";
 import "../../imports/mapbox";
 
@@ -133,6 +136,12 @@ function linesMatch(lines) {
         lineMatch = null;
     }
     return lineMatch;
+}
+
+function SetUpCount() {
+    CSV_Data.forEach(function (c) {
+        c.Count = 1;
+    });
 }
 function CreatePanel() {
     headerValues = [];
@@ -371,6 +380,7 @@ Template.tab_csv.events({
                         },
                         success: function (data) {
                             CSV_Data = data;
+                            SetUpCount();
                             console.log(CSV_Data);
                             // CSV_keys = Object.keys(data[0]);
                             CreatePanel();
@@ -698,8 +708,8 @@ Template.tab_csv.events({
         var chartsMenu = document.getElementById("ChartsMenuTab");
         var normalChartsThumb = false;
         var countChartsThumb = false;
-        var pieChartThumb = false;
-        /*for now the grouped bar charts set to true.*/
+        /*for now the grouped bar and pie charts set to true.*/
+        var pieChartThumb = true;
         var groupBarChartThumb = true;
 
 
@@ -945,12 +955,35 @@ Template.tab_csv.events({
                 }
             });
 
+            headerLabelinnerhtml += "</select>";
+
+            headerLabelinnerhtml +=
+                "Y Axis Measure" +
+                "<select id='yAxisMeasure' class='form-control'>" +
+                "<option class='yAxisMeasure' original='count'>" +
+                "Count Distinct" +
+                "</option>" +
+                "<option class='yAxisMeasure' disabled >" +
+                "-----------------" +
+                "</option>";
+            headerValues.forEach(function (h) {
+                if (!h.deleted) {
+                    if (h[headerType] == "number") {
+                        headerLabelinnerhtml +=
+                            "<option class='yAxisMeasure' original='" + h[headerOriginal] + "'>" +
+                            h[headerPresent] +
+                            "</option>"
+                    }
+
+                }
+            });
+
             headerLabelinnerhtml += "</select>" +
                 "</div>";
 
             headerLabelinnerhtml +=
                 "<div class='pull-right'>" +
-                "<button type='button' id='headerLabels' style='word-wrap: break-word; white-space: normal; position: relative; margin: 5px' vistype='group' count='true' class='btn btn-primary headerLabels' > Grouped </button>" +
+                "<button type='button' id='headerLabels' style='word-wrap: break-word; white-space: normal; position: relative; margin: 5px' vistype='group' count='true' class='btn btn-primary headerLabels' > Create </button>" +
                 "</div>";
             document.getElementById("charts").style.display = "inline";
 
@@ -964,7 +997,7 @@ Template.tab_csv.events({
 
         }
         else if (visType == "pieChart") {
-            headerValues.forEach(function (h) {
+            /*headerValues.forEach(function (h) {
                 if (!h.deleted) {
                     if (!jQuery.isEmptyObject(h[headerValCount])) {
 
@@ -981,7 +1014,52 @@ Template.tab_csv.events({
 
                     document.getElementById("charts").style.display = "inline";
                 }
+             });*/
+
+            headerLabelinnerhtml +=
+                "<div class='pull-left' style='text-align: left'>" +
+                "Pie Chart of" +
+                "<select id='pieHeader' class='form-control'>";
+            headerValues.forEach(function (h) {
+                if (!h.deleted) {
+                    headerLabelinnerhtml +=
+                        "<option class='pieHeader' original='" + h[headerOriginal] + "'>" +
+                        h[headerPresent] +
+                        "</option>"
+                }
             });
+
+            headerLabelinnerhtml += "</select>";
+
+            headerLabelinnerhtml +=
+                "Chart Measure" +
+                "<select id='pieMeasure' class='form-control'>" +
+                "<option class='pieMeasure' original='Count'>" +
+                "Count Distinct" +
+                "</option>" +
+                "<option class='pieMeasure' disabled >" +
+                "-----------------" +
+                "</option>";
+            headerValues.forEach(function (h) {
+                if (!h.deleted) {
+                    if (h[headerType] == "number") {
+                        headerLabelinnerhtml +=
+                            "<option class='pieMeasure' original='" + h[headerOriginal] + "'>" +
+                            h[headerPresent] +
+                            "</option>"
+                    }
+
+                }
+            });
+
+            headerLabelinnerhtml += "</select>" +
+                "</div>";
+
+            headerLabelinnerhtml +=
+                "<div class='pull-right'>" +
+                "<button type='button' id='headerLabels' style='word-wrap: break-word; white-space: normal; position: relative; margin: 5px' vistype='pie' count='true' class='btn btn-primary headerLabels' > Create </button>" +
+                "</div>";
+            document.getElementById("charts").style.display = "inline";
         }
         else if (visType == "Map") {
             var lon = false, lat = false, ip = false;
@@ -1102,7 +1180,9 @@ Template.tab_csv.events({
                 }
             });
             svg.style.display = "inline";
-            barChartCounts(counts, "#svgChar", height, width);
+
+
+            barChartCounts(CSV_Data, headerOrig, "#svgChar", height, width);
         }
         else if (visType == "group") {
 
@@ -1112,14 +1192,18 @@ Template.tab_csv.events({
             var mainGroup = document.getElementById("mainGroup");
             var mainGroupOption = document.getElementsByClassName("mainGroup");
 
+            var yAxisMeasure = document.getElementById("yAxisMeasure");
+            var yAxisMeasureOption = document.getElementsByClassName("yAxisMeasure");
+
             var subCat = subGroupOption[subGroup.selectedIndex].getAttribute("original");
             var mainCat = mainGroupOption[mainGroup.selectedIndex].getAttribute("original");
+            var yAxisMes = yAxisMeasureOption[yAxisMeasure.selectedIndex].getAttribute("original");
 
             svg.style.display = "inline";
-            groupedBarChart(CSV_Data, mainCat, subCat, "#svgChar", height, width);
+            groupedBarChart(CSV_Data, mainCat, subCat, yAxisMes, "#svgChar", height, width);
         }
         else if (visType == "pie") {
-            svg.style.display = "inline";
+            /*svg.style.display = "inline";
             if (width > 900) {
                 width = width - 200;
             }
@@ -1130,7 +1214,20 @@ Template.tab_csv.events({
             else if (count == "false") {
                 pieChart(CSV_Data, headerOrig, false, "#svgChar", height, width);
 
-            }
+             }*/
+
+            var pieHeader = document.getElementById("pieHeader");
+            var pieHeaderOption = document.getElementsByClassName("pieHeader");
+
+            var pieMeasure = document.getElementById("pieMeasure");
+            var pieMeasureOption = document.getElementsByClassName("pieMeasure");
+
+            var header = pieHeaderOption[pieHeader.selectedIndex].getAttribute("original");
+            var measure = pieMeasureOption[pieMeasure.selectedIndex].getAttribute("original");
+
+            svg.style.display = "inline";
+            pieChart(CSV_Data, header, measure, false, "#svgChar", height, width);
+
         }
         else if (visType == "map") {
             var parentNodeId = elem.parentElement.getAttribute("id");
