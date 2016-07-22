@@ -119,7 +119,7 @@
 
                 <br>
                 <div id="xAxisLblsDiv" style="display: none; margin-top: 10px">
-                    Please choose X axis Labels
+                    Please choose X axis Label
                     <label for="xAxisLabels"></label><select id="xAxisLabels" class="form-control"
                                                              style="margin: 5px; text-align: left;">
 
@@ -135,6 +135,42 @@
             </div>
         </div>
 
+    </div>
+
+    <div id="exportChart" class="col-md-12"
+         style="background: #F5F5F5; padding-bottom:30px; display: none; margin-top: 10px">
+        <div class="col-md-4" style="padding: 10px;">
+            <h3>
+                <i class="fa fa-download fa-fw"></i>
+                Download Chart
+            </h3>
+            <input id="downloadFileName" placeholder="File Name" type="text"
+                   class="downloadFileName form-control col-sm-6 col-xs-12 col-md-7"
+                   style="border: 1px solid lightgray; border-radius: 4px; padding: 6px; color: grey; ">
+            <button id="downloadCharBtn" class="downloadCharBtn form-control btn bt col-sm-4 col-xs-7 col-md-5" disabled
+                    style="border: 1px solid lightgray; border-radius: 3px; padding: 6px; color: grey; background: #5ae860; margin:10px 0; cursor: auto">
+                Download as Image
+            </button>
+        </div>
+        <div class="col-md-8" style="padding: 10px;">
+            <h3>
+                <i class="fa fa-code fa-fw"></i>
+                Embed Code
+            </h3>
+            <textarea id="chartEmbedTxt" class="col-md-12 col-sm-12 col-xs-12 " readonly
+                      style="border: 1px solid lightgray; border-radius: 8px; padding: 6px 10px; height: 150px; color: #999999;"></textarea>
+            <!--<div style="margin: 30px; padding-top: 10px">-->
+            <p style="padding-top: 5px; color: lightslategrey; " class="pull-left">Copy the above svg code to your HTML
+                code to embed the chart. </p>
+            <button class="clipboardBtn btn pull-right"
+                    style="background: transparent; border: 2px solid grey; border-radius: 8px; margin: 5px"
+                    data-clipboard-target="#chartEmbedTxt" data-toggle='tooltip' data-placement='top'
+                    title='Copy to Clipboard'>
+                <i class="fa fa-clipboard"></i>
+                <!--<img src="assets/clippy.svg" alt="Copy to clipboard">-->
+            </button>
+            <!--</div>-->
+        </div>
     </div>
 
 

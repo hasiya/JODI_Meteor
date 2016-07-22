@@ -7,6 +7,7 @@ import "../../imports/dimple_grouped";
 import "../../imports/dimple_pie";
 import "../../imports/map";
 import "../../imports/mapbox";
+import Clipboard from 'clipboard';
 
 
 
@@ -28,6 +29,14 @@ var chartRedrawObj = {
 };
 
 var isVisOn;
+
+
+function isNull(inputArray) {
+    for (var i = 0, len = inputArray.length; i < len; i += 1)
+        if (inputArray[i] !== null)
+            return false;
+    return true;
+}
 
 function checkIPlist(ip, list) {
 
@@ -227,14 +236,53 @@ function CreatePanel() {
     HeaderConfigPanel.innerHTML = HeaderConfigInnerHtml;
     document.getElementById("HeaderConfigBtns").innerHTML = HeaderConfigBtnsInnerHtml;
 
+    // CSV_keys.forEach(function (k) {
+    //     if (k.toLowerCase() == "longitude") {
+    //         document.getElementById("type_" + k).value = "lon";
+    //     }
+    //     if (k.toLowerCase() == "latitude") {
+    //         document.getElementById("type_" + k).value = "lat";
+    //     }
+    // });
+
+    // CSV_Data.forEach(function (d) {
     CSV_keys.forEach(function (k) {
+
         if (k.toLowerCase() == "longitude") {
             document.getElementById("type_" + k).value = "lon";
         }
-        if (k.toLowerCase() == "latitude") {
+        else if (k.toLowerCase() == "latitude") {
             document.getElementById("type_" + k).value = "lat";
         }
-    })
+        else {
+            var propertiesArray = CSV_Data.map(function (d) {
+                return d[k];
+            });
+
+            var testEmptyArray = [];
+
+            propertiesArray.forEach(function (p) {
+                if (p === "") {
+                    testEmptyArray.push(null);
+                }
+                else {
+                    testEmptyArray.push(p);
+                }
+            });
+
+
+            if (!isNull(testEmptyArray)) {
+                var isNumbers = (!propertiesArray.some(isNaN));
+
+                if (isNumbers) {
+                    document.getElementById("type_" + k).value = "number";
+                }
+            }
+        }
+
+
+    });
+    // })
 
 
 }
@@ -327,6 +375,7 @@ Template.tab_csv.onRendered(function () {
         }
     });
 
+    var clipboard = new Clipboard('.clipboardBtn');
     // GoogleMaps.load(
     //     {    key:"AIzaSyB8shH7uf30GbAWTRFAiWPzcIY1grpw9Xc"}
     // );
@@ -360,6 +409,11 @@ Template.tab_csv.events({
 
     "click .ProcessCSV": function (e, t) {
         // var text = t.find("#codemirror_id").value;
+        var elem = e.currentTarget;
+        // elem.className +=' disabled';
+        elem.disabled = true;
+        elem.style.cursor = 'auto';
+
         var text = editor.getValue();
         var lines = text.split('\n');
         var headerList = lines[0].split;
@@ -387,7 +441,9 @@ Template.tab_csv.events({
                             var Message = $("#message");
                             Message.html("");
                             editor.setOption("readOnly", true);
-                            var elem = e.currentTarget;
+
+                            elem.disabled = false;
+                            elem.style.cursor = 'pointer';
                             elem.className = "btn-primary btn EditCSV";
                             elem.innerHTML = "Edit";
                         }
@@ -438,6 +494,9 @@ Template.tab_csv.events({
         var mapSvg = document.getElementById("svgMap");
         mapSvg.innerHTML = "";
 
+        document.getElementById("exportChart").style.display = 'none';
+        resetOutputEmbed();
+
         var visualMenu = document.getElementById("visualMenu");
         visualMenu.style.display = "none";
         document.getElementById("charts").style.display = "none";
@@ -480,6 +539,9 @@ Template.tab_csv.events({
 
         var mapSvg = document.getElementById("svgMap");
         mapSvg.innerHTML = "";
+
+        document.getElementById("exportChart").style.display = 'none';
+        resetOutputEmbed();
 
         var visualMenu = document.getElementById("visualMenu");
         visualMenu.style.display = "none";
@@ -711,7 +773,7 @@ Template.tab_csv.events({
         /*for now the grouped bar and pie charts set to true.*/
         var pieChartThumb = true;
         var groupBarChartThumb = true;
-
+        var lineChartThumb = true;
 
         var chartsMenuInner = "";
 
@@ -800,6 +862,15 @@ Template.tab_csv.events({
                 "</a>" +
                 "</div>";
         }
+        if (lineChartThumb) {
+            chartsMenuInner +=
+                "<div class='col-lg-3 col-md-4 col-xs-6 thumb'>" +
+                "<a class='thumbnail visualThumb' visType='lineChart' href='#' style='text-align: center'>" +
+                "<img class='img-responsive' src='http://placehold.it/400x300' alt=''>" +
+                "Line Chart" +
+                "</a>" +
+                "</div>";
+        }
 
 
         chartsMenu.innerHTML = chartsMenuInner;
@@ -850,6 +921,9 @@ Template.tab_csv.events({
         var mapSvg = document.getElementById("svgMap");
         mapSvg.innerHTML = "";
 
+        document.getElementById("exportChart").style.display = 'none';
+        resetOutputEmbed();
+
         var elem = e.currentTarget;
         elem.className = "pull-right btn-success btn PanelDone";
         elem.innerHTML = "Done";
@@ -881,6 +955,9 @@ Template.tab_csv.events({
 
         var mapSvg = document.getElementById("svgMap");
         mapSvg.innerHTML = "";
+
+        document.getElementById("exportChart").style.display = 'none';
+        resetOutputEmbed();
 
         if (visType == "NormalBar") {
             headerValues.forEach(function (h) {
@@ -1061,6 +1138,9 @@ Template.tab_csv.events({
                 "</div>";
             document.getElementById("charts").style.display = "inline";
         }
+        else if (visType == "lineChart") {
+
+        }
         else if (visType == "Map") {
             var lon = false, lat = false, ip = false;
             var lon_h = "", lat_h = "", ip_h = "";
@@ -1127,11 +1207,11 @@ Template.tab_csv.events({
             mapTypeRadio[0].checked = true;
         }
 
-
     },
 
     "click .headerLabels": function (e) {
         var elem = e.currentTarget;
+        elem.className += ' disabled';
         var headerOrig = elem.getAttribute("original");
         var visType = elem.getAttribute("vistype");
         var count = elem.getAttribute("count");
@@ -1285,6 +1365,53 @@ Template.tab_csv.events({
                 child.style.color = "white";
             }
         }
+        var className = elem.getAttribute('class');
+        className = className.replace(' disabled', '');
+        elem.className = className;
+        document.getElementById("exportChart").style.display = 'inline';
+    },
+    "keyup .downloadFileName": function (e) {
+        var elem = e.currentTarget;
+        var downloadBtn = document.getElementById('downloadCharBtn');
+        if (elem.value.length > 0) {
+            downloadBtn.disabled = false;
+            downloadBtn.style.cursor = 'pointer';
+        }
+        else {
+            downloadBtn.disabled = true;
+            downloadBtn.style.cursor = 'auto';
+        }
+    },
+    "click .downloadCharBtn": function (e) {
+
+        var fileName = document.getElementById('downloadFileName').value;
+
+        var svg = document.getElementById('svgChar');
+        var svgWidth = svg.clientWidth;
+        var svgHeight = svg.clientHeight;
+        var svgData = new XMLSerializer().serializeToString(svg);
+
+        var canvas = document.createElement("canvas");
+        canvas.width = svgWidth;
+        canvas.height = svgHeight;
+        var ctx = canvas.getContext("2d");
+
+        var img = document.createElement("img");
+        img.setAttribute("src", "data:image/svg+xml;base64," + btoa(svgData));
+
+        img.onload = function () {
+            ctx.drawImage(img, 0, 0);
+
+            // Now is done
+            console.log(canvas.toDataURL("image/png"));
+
+            var a = document.createElement("a");
+            a.download = fileName;
+            a.href = canvas.toDataURL("image/png");
+            a.click();
+
+        };
+
     },
 
     "click .xLabelRot": function (e) {
@@ -1313,35 +1440,18 @@ $(function () {
     });
 });
 
-// $(function() {
-//
-//     // We can attach the `fileselect` event to all file inputs on the page
-//     $(document).on('change', ':file', function() {
-//         var input = $(this),
-//             numFiles = input.get(0).files ? input.get(0).files.length : 1,
-//             label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
-//         input.trigger('fileselect', [numFiles, label]);
-//     });
-//
-//     // We can watch for our custom `fileselect` event like this
-//     $(document).ready( function() {
-//         $(':file').on('fileselect', function(event, numFiles, label) {
-//
-//             var input = $(this).parents('.input-group').find(':text'),
-//                 log = numFiles > 1 ? numFiles + ' files selected' : label;
-//
-//             if( input.length ) {
-//                 input.val(log);
-//             } else {
-//                 if( log ) alert(log);
-//             }
-//
-//         });
-//     });
-//
-// });
+function resetOutputEmbed() {
+    var downloadBtn = document.getElementById('downloadCharBtn');
+    var fileNameTxt = document.getElementById('downloadFileName');
+    var svgTextArea = document.getElementById('chartEmbedTxt');
+
+    downloadBtn.disabled = true;
+    downloadBtn.style.cursor = 'auto';
+    fileNameTxt.value = "";
+    svgTextArea.value = "";
 
 
+}
 // window.addEventListener('resize', function () {
 //     var svg = document.getElementById("svgChar");
 //  if (svg.style.display != "none" && svg.style.display != "") {

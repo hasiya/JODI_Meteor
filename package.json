@@ -5,6 +5,7 @@
     "start": "meteor run"
   },
   "dependencies": {
+    "clipboard": "^1.5.12",
     "libs": "^0.1.2",
     "meteor-node-stubs": "~0.2.0"
   },

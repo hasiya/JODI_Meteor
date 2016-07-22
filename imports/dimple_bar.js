@@ -1,18 +1,18 @@
 barChartHeaders = function (data, property, xLabel, svgID, h, w) {
 
     var margin = {
-        top: 10,
+        top: 50,
         right: 70,
         bottom: 100,
-        left: 50
+        left: 100
     };
 
     $(svgID).width(w);
     $(svgID).height(h);
 
-    var svg = dimple.newSvg(svgID, w, h);
+    var svg = dimple.newSvg(svgID, '100%', '100%');
     var myChart = new dimple.chart(svg, data);
-    myChart.setBounds(margin.left, margin.top, w - margin.right, h - margin.bottom);
+    myChart.setMargins(margin.left, margin.top, margin.right, margin.bottom);
     var x = myChart.addCategoryAxis("x", xLabel);
     myChart.addMeasureAxis("y", property);
     myChart.addSeries(null, dimple.plot.bar);
@@ -25,23 +25,24 @@ barChartHeaders = function (data, property, xLabel, svgID, h, w) {
         var svgHeight = $(svgID).height();
         $(svgID).height(svgHeight + labelSizeApprx);
     }
+
+    var chartSvg = myChart.svg[0][0];
+    document.getElementById('chartEmbedTxt').value = chartSvg.outerHTML;
 };
 
 barChartCounts = function (data, property, svgID, h, w) {
 
     var margin = {
-        top: 10,
+        top: 50,
         right: 70,
         bottom: 100,
-        left: 50
+        left: 100
     };
     $(svgID).width(w);
     $(svgID).height(h);
 
     var svg = dimple.newSvg(svgID, '100%', '100%');
     var myChart = new dimple.chart(svg, data);
-    // myChart.setBounds(60, 30, 510, 305)
-    // myChart.setBounds(margin.left, margin.top, w - margin.right, h - margin.bottom);
     myChart.setMargins(margin.left, margin.top, margin.right, margin.bottom);
     var x = myChart.addCategoryAxis("x", property);
     x.title = property;
@@ -56,6 +57,9 @@ barChartCounts = function (data, property, svgID, h, w) {
         var svgHeight = $(svgID).height();
         $(svgID).height(svgHeight + labelSizeApprx);
     }
+
+    var chartSvg = myChart.svg[0][0];
+    document.getElementById('chartEmbedTxt').value = chartSvg.outerHTML;
 
 };
 
