@@ -7,7 +7,12 @@ import "../../imports/dimple_grouped";
 import "../../imports/dimple_pie";
 import "../../imports/map";
 import "../../imports/mapbox";
+import "../../imports/dimple_line";
+
 import Clipboard from 'clipboard';
+
+// var pythonServer = "139.59.186.138/";
+var pythonServer = "localhost:5000";
 
 
 
@@ -314,6 +319,25 @@ function countValues(column) {
     return counts
 }
 
+function createDataCollection(datasetName, dataset) {
+    var requestObject = {
+        collectionName: datasetName,
+        collectionData: dataset
+    };
+
+    // $.post("http://" + pythonServer + "/create_dataset",requestObject);
+    $.ajax({
+        method: "POST",
+        url: "http://" + pythonServer + "/create_dataset",
+        data: JSON.stringify(requestObject),
+        dataType: "json",
+        // contentType: 'application/json; charset=utf-8',
+        success: function (data) {
+            console.log(data);
+        }
+    });
+
+}
 
 Template.tab_csv.onRendered(function () {
     // this.$(".tooltipped").tooltip();
@@ -428,7 +452,7 @@ Template.tab_csv.events({
                 if (lineMatch["lineMatch"]) {
                     $.ajax({
                         method: "POST",
-                        url: "http://139.59.186.138/csv_data",
+                        url: "http://" + pythonServer + "/csv_data",
                         data: {
                             'data': text
                         },
@@ -441,6 +465,7 @@ Template.tab_csv.events({
                             var Message = $("#message");
                             Message.html("");
                             editor.setOption("readOnly", true);
+                            createDataCollection("newTest", CSV_Data);
 
                             elem.disabled = false;
                             elem.style.cursor = 'pointer';
@@ -1139,7 +1164,22 @@ Template.tab_csv.events({
             document.getElementById("charts").style.display = "inline";
         }
         else if (visType == "lineChart") {
+            headerValues.forEach(function (h) {
+                if (!h.deleted) {
+                    if (h[headerType] == "number") {
+                        headerLabelinnerhtml +=
+                            "<button type='button' id='headerLabels' style='word-wrap: break-word; white-space: normal; position: relative; margin: 5px' vistype='line' count='false' class='btn btn-primary headerLabels' original='" + h[headerOriginal] + "'>" + h[headerPresent] + "</button>";
 
+                        document.getElementById("charts").style.display = "inline";
+                    }
+                    if (h[headerType] == "string") {
+                        xAxisInnerhtml +=
+                            "<option class='xAxisLabel' original='" + h[headerOriginal] + "'>" + h[headerPresent] + "</option>";
+                        xAxiaLblDiv.style.display = "inline";
+
+                    }
+                }
+            });
         }
         else if (visType == "Map") {
             var lon = false, lat = false, ip = false;
@@ -1211,7 +1251,9 @@ Template.tab_csv.events({
 
     "click .headerLabels": function (e) {
         var elem = e.currentTarget;
-        elem.className += ' disabled';
+        elem.disabled = true;
+        elem.style.cursor = 'auto';
+        // elem.className += ' disabled';
         var headerOrig = elem.getAttribute("original");
         var visType = elem.getAttribute("vistype");
         var count = elem.getAttribute("count");
@@ -1240,6 +1282,15 @@ Template.tab_csv.events({
             selectedXlabel = xAxisOptions[xAxis.selectedIndex].getAttribute("original");
 
             svg.style.display = "inline";
+
+            // var createBar = function (callback) {
+            //     // var future = new Future;
+            //     // future.return()
+            //     callback(null, barChartHeaders(CSV_Data, headerOrig, selectedXlabel, "#svgChar", height, width))
+            // };
+            // var createBarAsyc = Meteor.wrapAsync(createBar);
+            // elem.disabled = false;
+            // elem.style.cursor = 'pointer';
             barChartHeaders(CSV_Data, headerOrig, selectedXlabel, "#svgChar", height, width);
         }
         else if (visType == "count") {
@@ -1280,6 +1331,8 @@ Template.tab_csv.events({
             var yAxisMes = yAxisMeasureOption[yAxisMeasure.selectedIndex].getAttribute("original");
 
             svg.style.display = "inline";
+
+
             groupedBarChart(CSV_Data, mainCat, subCat, yAxisMes, "#svgChar", height, width);
         }
         else if (visType == "pie") {
@@ -1308,6 +1361,24 @@ Template.tab_csv.events({
             svg.style.display = "inline";
             pieChart(CSV_Data, header, measure, false, "#svgChar", height, width);
 
+        }
+        else if (visType = 'line') {
+            var LinexAxis = document.getElementById("xAxisLabels");
+            var LinexAxisOptions = document.getElementsByClassName("xAxisLabel");
+
+            selectedXlabel = LinexAxisOptions[LinexAxis.selectedIndex].getAttribute("original");
+
+            svg.style.display = "inline";
+
+            // var createBar = function (callback) {
+            //     // var future = new Future;
+            //     // future.return()
+            //     callback(null, barChartHeaders(CSV_Data, headerOrig, selectedXlabel, "#svgChar", height, width))
+            // };
+            // var createBarAsyc = Meteor.wrapAsync(createBar);
+            // elem.disabled = false;
+            // elem.style.cursor = 'pointer';
+            lineChart(CSV_Data, headerOrig, selectedXlabel, "#svgChar", height, width);
         }
         else if (visType == "map") {
             var parentNodeId = elem.parentElement.getAttribute("id");
@@ -1365,9 +1436,11 @@ Template.tab_csv.events({
                 child.style.color = "white";
             }
         }
-        var className = elem.getAttribute('class');
-        className = className.replace(' disabled', '');
-        elem.className = className;
+        elem.disabled = false;
+        elem.style.cursor = 'pointer';
+        // var className = elem.getAttribute('class');
+        // className = className.replace(' disabled', '');
+        // elem.className = className;
         document.getElementById("exportChart").style.display = 'inline';
     },
     "keyup .downloadFileName": function (e) {

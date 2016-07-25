@@ -19,7 +19,7 @@ barChartHeaders = function (data, property, xLabel, svgID, h, w) {
     myChart.draw();
 
     var xAxisLabels = x.shapes.selectAll('text');
-    var longestLabel = longetsLabel(xAxisLabels[0]);
+    var longestLabel = longest_label(xAxisLabels[0]);
     if (longestLabel >= 10) {
         var labelSizeApprx = longestLabel * 5;
         var svgHeight = $(svgID).height();
@@ -51,7 +51,7 @@ barChartCounts = function (data, property, svgID, h, w) {
     myChart.draw();
 
     var xAxisLabels = x.shapes.selectAll('text');
-    var longestLabel = longetsLabel(xAxisLabels[0]);
+    var longestLabel = longest_label(xAxisLabels[0]);
     if (longestLabel > 10) {
         var labelSizeApprx = longestLabel * 5;
         var svgHeight = $(svgID).height();
@@ -59,11 +59,15 @@ barChartCounts = function (data, property, svgID, h, w) {
     }
 
     var chartSvg = myChart.svg[0][0];
+
     document.getElementById('chartEmbedTxt').value = chartSvg.outerHTML;
 
 };
 
-var longetsLabel = function (nodeList) {
+/**
+ * @return {number}
+ */
+var longest_label = function (nodeList) {
     var longest = 0;
     nodeList.forEach(function (n) {
         if (n.innerHTML.length > longest) {

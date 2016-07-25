@@ -5,7 +5,9 @@
     "start": "meteor run"
   },
   "dependencies": {
+    "async": "^2.0.1",
     "clipboard": "^1.5.12",
+    "fibers": "^1.0.13",
     "libs": "^0.1.2",
     "meteor-node-stubs": "~0.2.0"
   },
