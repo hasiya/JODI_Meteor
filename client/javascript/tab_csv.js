@@ -324,14 +324,21 @@ function createDataCollection(datasetName, dataset) {
         collectionName: datasetName,
         collectionData: dataset
     };
+    var formData = new FormData();
 
+    // formData.append('collectionName',datasetName);
+    // formData.append('collectionData',dataset);
+    // var request = new XMLHttpRequest();
+    // request.open("POST", "http://" + pythonServer + "/create_dataset");
+    // request.send(formData);
+    //
     // $.post("http://" + pythonServer + "/create_dataset",requestObject);
     $.ajax({
         method: "POST",
         url: "http://" + pythonServer + "/create_dataset",
         data: JSON.stringify(requestObject),
         dataType: "json",
-        // contentType: 'application/json; charset=utf-8',
+        // contentType: 'application/json',
         success: function (data) {
             console.log(data);
         }
