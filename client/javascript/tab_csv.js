@@ -25,6 +25,12 @@ headerOriginal = "originalVal";
 headerPresent = "presentVal";
 headerType = "type";
 headerValCount = "valCount";
+
+dataAlreadyExist = "Data set already exist";
+dataNameAlreadyExist = "Data set name already exist";
+dataStored = "Successfully data added to mongo";
+newDataset = "New data set";
+
 var selectedXlable;
 var chartRedrawObj = {
     data: {},
@@ -161,7 +167,7 @@ function CreatePanel() {
     headerValues = [];
 
     var HeaderConfigPanel = document.getElementById("HeaderConfig");
-    document.getElementById("panel").style.display = "inline";
+
 
     var HeaderConfigInnerHtml = "<div class='row top-buffer' style='margin-bottom: 10px'>" +
         "<div class='col-md-1'>" +
@@ -241,15 +247,6 @@ function CreatePanel() {
     HeaderConfigPanel.innerHTML = HeaderConfigInnerHtml;
     document.getElementById("HeaderConfigBtns").innerHTML = HeaderConfigBtnsInnerHtml;
 
-    // CSV_keys.forEach(function (k) {
-    //     if (k.toLowerCase() == "longitude") {
-    //         document.getElementById("type_" + k).value = "lon";
-    //     }
-    //     if (k.toLowerCase() == "latitude") {
-    //         document.getElementById("type_" + k).value = "lat";
-    //     }
-    // });
-
     // CSV_Data.forEach(function (d) {
     CSV_keys.forEach(function (k) {
 
@@ -319,27 +316,74 @@ function countValues(column) {
     return counts
 }
 
+function checkDataset(dataset) {
+    var Message = $("#message");
+    Message.html("");
+
+    var elem = document.getElementById("process_edit_btn");
+    $.ajax({
+        method: "POST",
+        url: "http://" + pythonServer + "/check_dataset",
+        data: JSON.stringify(dataset),
+        dataType: "json",
+        // contentType: 'application/json',
+        success: function (data) {
+            if (data.message == dataAlreadyExist) {
+                Message.html("The CSV data already exist in the database. Data set name: '" + data.data_set_name + "'");
+                document.getElementById("datasetName").style.display = "none";
+                document.getElementById("panel").style.display = "inline";
+            }
+            else if (data.message == newDataset) {
+                document.getElementById("datasetName").style.display = "inline";
+
+            }
+            elem.disabled = false;
+            elem.style.cursor = 'pointer';
+            elem.className = "btn-primary btn EditCSV";
+            elem.innerHTML = "Edit";
+            // else if(data.massage == newDataset){
+            //
+            // }
+        }
+    });
+}
+
 function createDataCollection(datasetName, dataset) {
     var requestObject = {
         collectionName: datasetName,
         collectionData: dataset
     };
-    var formData = new FormData();
 
-    // formData.append('collectionName',datasetName);
-    // formData.append('collectionData',dataset);
-    // var request = new XMLHttpRequest();
-    // request.open("POST", "http://" + pythonServer + "/create_dataset");
-    // request.send(formData);
-    //
-    // $.post("http://" + pythonServer + "/create_dataset",requestObject);
+    var elem = document.getElementById("storeDataBtn");
+    var Message = $("#message");
+    Message.html("");
+
+
     $.ajax({
         method: "POST",
-        url: "http://" + pythonServer + "/create_dataset",
+        url: "http://" + pythonServer + "/insert_dataset",
         data: JSON.stringify(requestObject),
         dataType: "json",
         // contentType: 'application/json',
         success: function (data) {
+
+            // if(data.message == dataAlreadyExist){
+            //     Message.html("The CSV data already exist in the database. Data set name: '"+data.data_set_name+"'");
+            //     document.getElementById("datasetName").style.display = "none";
+            //     document.getElementById("panel").style.display = "inline";
+            // }
+            if (data.message == dataNameAlreadyExist) {
+                Message.html("There is another CSV data set under this name. Please change the data set name. ");
+                elem.disabled = false;
+            }
+            else if (data.message == dataStored) {
+                document.getElementById("datasetName").style.display = "none";
+                document.getElementById("panel").style.display = "inline";
+                // elem.disabled = false;
+                var csvDataName = document.getElementById("csvDataName").value = "";
+                Message.html("")
+            }
+
             console.log(data);
         }
     });
@@ -472,27 +516,53 @@ Template.tab_csv.events({
                             var Message = $("#message");
                             Message.html("");
                             editor.setOption("readOnly", true);
-                            createDataCollection("newTest", CSV_Data);
+                            checkDataset(CSV_Data);
 
-                            elem.disabled = false;
-                            elem.style.cursor = 'pointer';
-                            elem.className = "btn-primary btn EditCSV";
-                            elem.innerHTML = "Edit";
+                            // elem.disabled = false;
+                            // elem.style.cursor = 'pointer';
+                            // elem.className = "btn-primary btn EditCSV";
+                            // elem.innerHTML = "Edit";
                         }
                     });
                 }
                 else {
                     Message.html("There is the problem in line: " + lineMatch["lineNum"]);
-                    editor.setSelection({line: lineMatch["lineNum"] - 1, ch: 0}, {line: lineMatch["lineNum"] - 1})
+                    editor.setSelection({line: lineMatch["lineNum"] - 1, ch: 0}, {line: lineMatch["lineNum"] - 1});
+                    elem.disabled = false;
+                    elem.style.cursor = 'pointer';
+
                 }
             }
             else {
-                Message.html("The Editor content does not look like a CSV. ");
+                Message.html("The Editor content does not look like a CSV... ");
+                elem.disabled = false;
+                elem.style.cursor = 'pointer';
             }
+        }
+        else {
+            Message.html("CSV files should have multiple lines... ");
+            elem.disabled = false;
+            elem.style.cursor = 'pointer';
         }
 
         var fileUploader = document.getElementById("fileUpload");
         fileUploader.style.display = "none";
+    },
+
+    "click .storeDataBtn": function (e) {
+        var elem = e.currentTarget;
+        var csvDataName = document.getElementById("csvDataName");
+
+        elem.disabled = true;
+        createDataCollection(csvDataName.value, CSV_Data);
+
+
+    },
+
+    "keyup .csvDataName": function (e) {
+        var elem = e.currentTarget;
+        var storeBtn = document.getElementById("storeDataBtn");
+        storeBtn.disabled = elem.value <= 0;
     },
 
     "click .EditCSV": function (e) {

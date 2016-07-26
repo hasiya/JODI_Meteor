@@ -1,4 +1,4 @@
-<template name="tab_csv">
+<template name="tab_csv" xmlns="http://www.w3.org/1999/html">
     <!--<form class="editorform">-->
     <div id="editor">
         <!--<div id="editor">-->
@@ -14,6 +14,7 @@
 
     </div>
 
+
     <div id="fileUpload">
         <div class="col-lg-5 col-sm-6 col-12">
             <div class="input-group">
@@ -25,21 +26,24 @@
                 <input id="csvFileName" type="text" class="form-control" readonly>
             </div>
         </div>
-
-        <!--<div style="margin-bottom: 5px">-->
-        <!--<input class="btn btn-primary" id="fileupload" type="file" accept="text/csv">-->
-        <!--</div>-->
-
-        <!--<div class="progress progress-striped active">-->
-        <!--<div class="progress-bar"  role="progressbar" style="width: 10%"></div>-->
-        <!--</div>-->
-        <!--{{> upload_bootstrap }}-->
-
     </div>
 
     <!--</form>-->
-    <label id="message"></label>
+    <label id="message" class="pull-left"></label>
     <br>
+    <br>
+    <!--<div>-->
+    <!--<form>-->
+    <div id="datasetName" class="col-md-5 col-sm-12 col-xs-12 pull-right" style="display: none">
+        <label for="recipient-name" class="pull-left">Please enter CSV data name...</label>
+        <input type="text" class="pull-left col-md-10 col-sm-10 col-xs-10 csvDataName" id="csvDataName"
+               style="border: 1px solid lightgray; border-radius: 4px; padding: 6px; color: grey; ">
+        <button id="storeDataBtn" class="btn btn-success pull-right col-md-2 col-sm-2 col-xs-2 storeDataBtn" disabled>
+            Store
+        </button>
+    </div>
+    <!--</form>-->
+    <!--</div>-->
     <br>
 
     <div id="panel" style="display: none">
