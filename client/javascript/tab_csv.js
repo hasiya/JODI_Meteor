@@ -1442,7 +1442,7 @@ Template.tab_csv.events({
             pieChart(CSV_Data, header, measure, false, "#svgChar", height, width);
 
         }
-        else if (visType = 'line') {
+        else if (visType == 'line') {
             var LinexAxis = document.getElementById("xAxisLabels");
             var LinexAxisOptions = document.getElementsByClassName("xAxisLabel");
 
