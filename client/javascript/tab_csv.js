@@ -348,7 +348,7 @@ function checkDataset(dataset) {
     });
 }
 
-function createDataCollection(datasetName, dataset) {
+function insertData(datasetName, dataset) {
     var requestObject = {
         collectionName: datasetName,
         collectionData: dataset
@@ -517,11 +517,13 @@ Template.tab_csv.events({
                             Message.html("");
                             editor.setOption("readOnly", true);
                             checkDataset(CSV_Data);
+                            // document.getElementById("datasetName").style.display = "inline";
 
-                            // elem.disabled = false;
-                            // elem.style.cursor = 'pointer';
-                            // elem.className = "btn-primary btn EditCSV";
-                            // elem.innerHTML = "Edit";
+
+                            elem.disabled = false;
+                            elem.style.cursor = 'pointer';
+                            elem.className = "btn-primary btn EditCSV";
+                            elem.innerHTML = "Edit";
                         }
                     });
                 }
@@ -552,9 +554,10 @@ Template.tab_csv.events({
     "click .storeDataBtn": function (e) {
         var elem = e.currentTarget;
         var csvDataName = document.getElementById("csvDataName");
+        var text = editor.getValue();
 
         elem.disabled = true;
-        createDataCollection(csvDataName.value, CSV_Data);
+        insertData(csvDataName.value, CSV_Data);
 
 
     },
