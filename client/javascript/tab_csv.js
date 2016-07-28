@@ -352,7 +352,7 @@ function insertData(datasetName, dataset) {
     var headersObj = [];
     CSV_keys.forEach(function (key) {
         headersObj.push({
-            value: key
+            header_val: key
         });
     });
     var requestObject = {

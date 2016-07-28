@@ -6,13 +6,14 @@ var hit_sourceDep = new Tracker.Dependency();
 
 Template.load_data.helpers({
     getSearchData: function () {
+        hit_sourceDep.depend();
         return hit_source;
     }
 });
-Template.load_data.Test = function () {
-    hit_sourceDep.depend();
-    return hit_source
-};
+// Template.load_data.Test = function () {
+//     hit_sourceDep.depend();
+//     return hit_source
+// };
 
 Template.load_data.events({
     "keyup .inputSearch": function (e) {
@@ -30,6 +31,7 @@ Template.load_data.events({
                     console.log(hits);
 
                     if (hits.length > 0) {
+                        hit_source = [];
                         hits.forEach(function (hit) {
                             hit_source.push(hit['_source']);
                             hit_sourceDep.changed();
