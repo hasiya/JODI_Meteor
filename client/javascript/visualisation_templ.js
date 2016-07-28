@@ -1,53 +1,6 @@
-// import "../../imports/bar_chart.js";
-import "../../imports/dimple_bar";
-import "../../imports/bar";
-// import "../../imports/grouped_bar";
-import "../../imports/dimple_grouped";
-// import "../../imports/pie_chart";
-import "../../imports/dimple_pie";
-import "../../imports/map";
-import "../../imports/mapbox";
-import "../../imports/dimple_line";
-
-import Clipboard from 'clipboard';
-
-// var pythonServer = "139.59.186.138/";
-pythonServer = "localhost:5000";
-
-
-CSV_keys = [];
-CSV_Data = [];
-
-Code_Editor = [];
-headerValues = [];
-var removedHeaderVals = [];
-headerOriginal = "originalVal";
-headerPresent = "presentVal";
-headerType = "type";
-headerValCount = "valCount";
-
-dataAlreadyExist = "Data set already exist";
-dataNameAlreadyExist = "Data set name already exist";
-dataStored = "Successfully data added to elasticsearch";
-newDataset = "New data set";
-
-var selectedXlable;
-var chartRedrawObj = {
-    data: {},
-    width: 0,
-    height: 0,
-    type: ""
-};
-
-var isVisOn;
-
-
-function isNull(inputArray) {
-    for (var i = 0, len = inputArray.length; i < len; i += 1)
-        if (inputArray[i] !== null)
-            return false;
-    return true;
-}
+/**
+ * Created by RajithaHasith on 28/07/2016.
+ */
 
 function checkIPlist(ip, list) {
 
@@ -98,197 +51,6 @@ function headersNotDeleted() {
     return headersNotDeleted;
 }
 
-// Return array of string values, or NULL if CSV string not well formed.
-function CSVtoArray(text) {
-    var re_valid;
-    re_valid = /^\s*(?:'[^'\\]*(?:\\[\S\s][^'\\]*)*'|"[^"\\]*(?:\\[\S\s][^"\\]*)*"|[^,'"\s\\]*(?:\s+[^,'"\s\\]+)*)\s*(?:,\s*(?:'[^'\\]*(?:\\[\S\s][^'\\]*)*'|"[^"\\]*(?:\\[\S\s][^"\\]*)*"|[^,'"\s\\]*(?:\s+[^,'"\s\\]+)*)\s*)*$/;
-    var re_value;
-    re_value = /(?!\s*$)\s*(?:'([^'\\]*(?:\\[\S\s][^'\\]*)*)'|"([^"\\]*(?:\\[\S\s][^"\\]*)*)"|([^,'"\s\\]*(?:\s+[^,'"\s\\]+)*))\s*(?:,|$)/g;
-    // Return NULL if input string is not well formed CSV string.
-    if (!re_valid.test(text)) return null;
-    var a = [];                     // Initialize array to receive values.
-    text.replace(re_value, // "Walk" the string using replace with callback.
-        function (m0, m1, m2, m3) {
-            // Remove backslash from \' in single quoted values.
-            if (m1 !== undefined) a.push(m1.replace(/\\'/g, "'"));
-            // Remove backslash from \" in double quoted values.
-            else if (m2 !== undefined) a.push(m2.replace(/\\"/g, '"'));
-            else if (m3 !== undefined) a.push(m3);
-            return ''; // Return empty string.
-        });
-    // Handle special case of empty last value.
-    if (/,\s*$/.test(text)) a.push('');
-    return a;
-}
-
-function linesMatch(lines) {
-
-    var lineMatch = {
-        "lineMatch": true,
-        "lineNum": 0
-    };
-    // var linesMatch = true;
-    var lineNum = 0;
-    var headers = CSVtoArray(lines[0]);
-    CSV_keys = headers;
-
-    if (headers) {
-        lines.forEach(function (l) {
-            lineNum += 1;
-            if (l) {
-                var colNum = CSVtoArray(l);
-                if (colNum) {
-                    if (colNum.length != headers.length) {
-                        lineMatch["lineMatch"] = false;
-                        lineMatch["lineNum"] = lineNum;
-
-                    }
-                }
-                else {
-                    lineMatch["lineMatch"] = false;
-                    lineMatch["lineNum"] = lineNum;
-
-                }
-            }
-        });
-    }
-    else {
-        lineMatch = null;
-    }
-    return lineMatch;
-}
-
-function SetUpCount() {
-    CSV_Data.forEach(function (c) {
-        c.Count = 1;
-    });
-}
-function CreatePanel() {
-    headerValues = [];
-
-    var HeaderConfigPanel = document.getElementById("HeaderConfig");
-
-
-    var HeaderConfigInnerHtml = "<div class='row top-buffer' style='margin-bottom: 10px'>" +
-        "<div class='col-md-1'>" +
-        "</div>" +
-        "<div class='col-md-4' style='text-align: center'>" +
-        "<strong>Column Headers</strong>" +
-        "</div>" +
-        "<div class='col-md-4' style='text-align: center'>" +
-        "<strong>Data Type</strong>" +
-        "</div>" +
-        "<div class='col-md-3'>" +
-        "<div class='col-md-6'>" +
-        "</div>" +
-        "<div class='col-md-6'>" +
-        "</div>" +
-        // "</form> " +
-
-        "</div>" +
-        "</div>";
-
-
-    for (i = 0; i < CSV_keys.length; i++) {
-        var keyItem = {
-            "originalVal": CSV_keys[i],
-            "presentVal": CSV_keys[i],
-            "type": "",
-            "deleted": false,
-            "valCount": {}
-        };
-
-        HeaderConfigInnerHtml +=
-            "<div class='row top-buffer' id='row_" + CSV_keys[i] + "' style='display: inherit'>" +
-            "<div class='col-md-1'>" +
-            "</div>" +
-            "<div class='col-md-4'>" +
-            "<form class='form-inline'>" +
-            "<input type='text' index='" + i + "' name='headerText' headerID='" + CSV_keys[i] + "' style='width: 80%' readonly id='header_" + CSV_keys[i] + "' class='form-control input' autocomplete='off' value='" + CSV_keys[i] + "'>" +
-            "<button type='button' id='editBtn_" + CSV_keys[i] + "' name='headerEditBtn' headerID='" + CSV_keys[i] + "' data-toggle='tooltip' data-placement='top' title='Edit the Header Text Field' style='width: 15%' class='tooltipped csvHeaderEdit  btn btn-default btn-sm'>" +
-            "<span class='glyphicon glyphicon-edit'></span>" +
-            "</button>" +
-            "</form>" +
-            "</div>" +
-            "<div class='col-md-4'>" +
-            "<select id='type_" + CSV_keys[i] + "' headerID='" + CSV_keys[i] + "' index='" + i + "' name='headerType' class='csvHeaderType form-control'>" +
-            "<option value='string'>String</option>" +
-            "<option value='number'>Number</option>" +
-            "<option value='lon'>Longitude</option>" +
-            "<option value='lat'>Latitude</option>" +
-            "<option value='ip'>IP Address</option>" +
-            // "<option value='latitude'>Latitude</option>"+
-            "</select>" +
-            "</div>" +
-            "<div class='col-md-3'>" +
-            "<div class='col-md-6'>" +
-            // "<form class='form-inline'>" +
-            "<div class='checkbox' style='width: 50%'>" +
-            "<label for='checkBox_" + CSV_keys[i] + "' data-toggle='tooltip' data-placement='top' title='Count Data'><input type='checkbox' name='headerCheck' id='checkBox_" + CSV_keys[i] + "'/>Count</label>" +
-            "</div>" +
-            "</div>" +
-            "<div class='col-md-6'>" +
-            "<button  type='button' id='remvBtn_" + CSV_keys[i] + "' headerID='" + CSV_keys[i] + "' name='headerremvbtn' index='" + i + " ' data-toggle='tooltip' data-placement='top' title='Delete Header Row'  class='pull-left csvHeaderDelete btn btn-danger btn-sm'>" +
-            "<span class='glyphicon glyphicon-remove'></span>" +
-            "</button>" +
-            "</div>" +
-            // "</form> " +
-
-            "</div>" +
-            "</div>";
-        headerValues.push(keyItem);
-    }
-    var HeaderConfigBtnsInnerHtml =
-        "<div class='pull-right btn-toolbar'>" +
-        "<button id='restore' style='display: none' data-toggle='modal' data-target='#restoreHeadersModal' class='btn-warning btn restoreDeleted'>Restore Deleted <span class='glyphicon glyphicon-refresh'></span></button>" +
-        "<button class='btn-success btn PanelDone'>Done</button>" +
-        "</div>";
-
-    HeaderConfigPanel.innerHTML = HeaderConfigInnerHtml;
-    document.getElementById("HeaderConfigBtns").innerHTML = HeaderConfigBtnsInnerHtml;
-
-    // CSV_Data.forEach(function (d) {
-    CSV_keys.forEach(function (k) {
-
-        if (k.toLowerCase() == "longitude") {
-            document.getElementById("type_" + k).value = "lon";
-        }
-        else if (k.toLowerCase() == "latitude") {
-            document.getElementById("type_" + k).value = "lat";
-        }
-        else {
-            var propertiesArray = CSV_Data.map(function (d) {
-                return d[k];
-            });
-
-            var testEmptyArray = [];
-
-            propertiesArray.forEach(function (p) {
-                if (p === "") {
-                    testEmptyArray.push(null);
-                }
-                else {
-                    testEmptyArray.push(p);
-                }
-            });
-
-
-            if (!isNull(testEmptyArray)) {
-                var isNumbers = (!propertiesArray.some(isNaN));
-
-                if (isNumbers) {
-                    document.getElementById("type_" + k).value = "number";
-                }
-            }
-        }
-
-
-    });
-    // })
-
-
-}
-
 function countValues(column) {
     var columnVals = [];
     var countsObj = {};
@@ -314,6 +76,19 @@ function countValues(column) {
     }
 
     return counts
+}
+
+function resetOutputEmbed() {
+    var downloadBtn = document.getElementById('downloadCharBtn');
+    var fileNameTxt = document.getElementById('downloadFileName');
+    var svgTextArea = document.getElementById('chartEmbedTxt');
+
+    downloadBtn.disabled = true;
+    downloadBtn.style.cursor = 'auto';
+    fileNameTxt.value = "";
+    svgTextArea.value = "";
+
+
 }
 
 function checkDataset(dataset) {
@@ -348,349 +123,9 @@ function checkDataset(dataset) {
     });
 }
 
-function insertData(datasetName, dataset) {
-    var headersObj = [];
-    CSV_keys.forEach(function (key) {
-        headersObj.push({
-            value: key
-        });
-    });
-    var requestObject = {
-        collectionName: datasetName,
-        collectionData: dataset,
-        headers: headersObj
-    };
+Template.visualisation_all.events({
 
-    var elem = document.getElementById("storeDataBtn");
-    var Message = $("#message");
-    Message.html("");
-
-
-    $.ajax({
-        method: "POST",
-        url: "http://" + pythonServer + "/insert_dataset",
-        data: JSON.stringify(requestObject),
-        dataType: "json",
-        // contentType: 'application/json',
-        success: function (data) {
-
-            // if(data.message == dataAlreadyExist){
-            //     Message.html("The CSV data already exist in the database. Data set name: '"+data.data_set_name+"'");
-            //     document.getElementById("datasetName").style.display = "none";
-            //     document.getElementById("panel").style.display = "inline";
-            // }
-            if (data.message == dataNameAlreadyExist) {
-                Message.html("There is another CSV data set under this name. Please change the data set name. ");
-                elem.disabled = false;
-            }
-            else if (data.message == dataStored) {
-                document.getElementById("datasetName").style.display = "none";
-                document.getElementById("panel").style.display = "inline";
-                // elem.disabled = false;
-                var csvDataName = document.getElementById("csvDataName").value = "";
-                Message.html("")
-            }
-
-            console.log(data);
-        }
-    });
-
-}
-
-Template.tab_csv.onRendered(function () {
-    // this.$(".tooltipped").tooltip();
-
-    Code_Editor = CodeMirror.fromTextArea(this.find("#codemirror_id"), {
-        lineNumbers: true,
-        lineWrapping: true,
-        styleSelectedText: true,
-        mode: "Plain Text",
-        placeholder: "Paste your CSV file content or drag and drop the file here..."
-    });
-
-    Code_Editor.on("drop", function (cm, e) {
-        // e.preventDefault()
-        var processBtn = document.getElementById("process_edit_btn");
-        var clearBtn = document.getElementById("clear_editor");
-        console.log(e);
-        console.log(cm);
-        var files = e.dataTransfer.files;
-
-        if (files.length > 1) {
-            e.preventDefault();
-            processBtn.style.display = "none";
-            clearBtn.style.display = "none";
-            var Message = $("#message");
-            Message.html("Please only drop one file to process.");
-            cm.setValue("")
-
-        }
-
-        // Mapbox.load()
-
-    });
-
-    Code_Editor.on("update", function (cm) {
-        var processBtn = document.getElementById("process_edit_btn");
-        var clearBtn = document.getElementById("clear_editor");
-        var Message = $("#message");
-        var text = cm.getValue();
-        // console.log(e);
-
-        var textn = !text;
-        var texte = !/\s/.test(text);
-
-        if (!/\S/.test(text)) {
-            processBtn.style.display = "none";
-            clearBtn.style.display = "none";
-
-            var panel = document.getElementById("panel");
-            panel.style.display = "none";
-            document.getElementById("HeaderConfig").innerHTML = "";
-            document.getElementById("restoreModelBody").innerHTML = "";
-            Message.html("");
-        }
-        else {
-            processBtn.style.display = "inline";
-            clearBtn.style.display = "inline";
-            // Message.html("")
-        }
-    });
-
-    var clipboard = new Clipboard('.clipboardBtn');
-    // GoogleMaps.load(
-    //     {    key:"AIzaSyB8shH7uf30GbAWTRFAiWPzcIY1grpw9Xc"}
-    // );
-});
-
-Template.tab_csv.helpers({
-
-    // mapOptions: function() {
-    //     if (GoogleMaps.loaded()) {
-    //         var a = 1;
-    //         return {
-    //             center: new google.maps.LatLng(-37.8136, 144.9631),
-    //             zoom: 8
-    //         };
-    //     }
-    // },
-
-    getKey: function () {
-        a = 1;
-        return CSV_keys
-    },
-
-    getData: function () {
-        var a = 1;
-        return headerValues;
-    }
-
-});
-
-Template.tab_csv.events({
-
-    "click .ProcessCSV": function (e, t) {
-        // var text = t.find("#codemirror_id").value;
-        var elem = e.currentTarget;
-        // elem.className +=' disabled';
-        elem.disabled = true;
-        elem.style.cursor = 'auto';
-
-        var text = Code_Editor.getValue();
-        var lines = text.split('\n');
-        var headerList = lines[0].split;
-        var Message = $("#message");
-        document.getElementById("restoreModelBody").innerHTML = "";
-        var test = document.getElementById("fileUpload");
-
-
-        if (lines.length > 1) {
-            var lineMatch = linesMatch(lines);
-            if (lineMatch) {
-                if (lineMatch["lineMatch"]) {
-                    $.ajax({
-                        method: "POST",
-                        url: "http://" + pythonServer + "/csv_data",
-                        data: {
-                            'data': text
-                        },
-                        success: function (data) {
-                            CSV_Data = data;
-                            SetUpCount();
-                            console.log(CSV_Data);
-                            // CSV_keys = Object.keys(data[0]);
-                            CreatePanel();
-                            var Message = $("#message");
-                            Message.html("");
-                            Code_Editor.setOption("readOnly", true);
-                            // checkDataset(CSV_Data);
-                            document.getElementById("datasetName").style.display = "inline";
-
-
-                            elem.disabled = false;
-                            elem.style.cursor = 'pointer';
-                            elem.className = "btn-primary btn EditCSV";
-                            elem.innerHTML = "Edit";
-                        }
-                    });
-                }
-                else {
-                    Message.html("There is the problem in line: " + lineMatch["lineNum"]);
-                    Code_Editor.setSelection({line: lineMatch["lineNum"] - 1, ch: 0}, {line: lineMatch["lineNum"] - 1});
-                    elem.disabled = false;
-                    elem.style.cursor = 'pointer';
-
-                }
-            }
-            else {
-                Message.html("The Editor content does not look like a CSV... ");
-                elem.disabled = false;
-                elem.style.cursor = 'pointer';
-            }
-        }
-        else {
-            Message.html("CSV files should have multiple lines... ");
-            elem.disabled = false;
-            elem.style.cursor = 'pointer';
-        }
-
-        var fileUploader = document.getElementById("fileUpload");
-        fileUploader.style.display = "none";
-    },
-
-    "click .storeDataBtn": function (e) {
-        var elem = e.currentTarget;
-        var csvDataName = document.getElementById("csvDataName");
-        var text = Code_Editor.getValue();
-
-        elem.disabled = true;
-        insertData(csvDataName.value, CSV_Data);
-
-
-    },
-
-    "keyup .csvDataName": function (e) {
-        var elem = e.currentTarget;
-        var storeBtn = document.getElementById("storeDataBtn");
-        storeBtn.disabled = elem.value <= 0;
-    },
-
-    "click .EditCSV": function (e) {
-        Code_Editor.setOption("readOnly", false);
-        var elem = e.currentTarget;
-        elem.className = "btn-success btn ProcessCSV";
-        elem.innerHTML = "Process";
-
-        var temp;
-        CSV_keys = temp;
-        CSV_Data = temp;
-        headerValues = [];
-
-        var panel = document.getElementById("panel");
-        panel.style.display = "none";
-        document.getElementById("HeaderConfig").innerHTML = "";
-        document.getElementById("restoreModelBody").innerHTML = "";
-
-
-        var Message = $("#message");
-        Message.html("");
-
-        // var headerpanel = document.getElementById("headerLabels");
-        // headerpanel.innerHTML = "";
-
-        var svg = document.getElementById("svgChar");
-        svg.innerHTML = "";
-        svg.style.display = "none";
-
-
-        var mapSvg = document.getElementById("svgMap");
-        mapSvg.innerHTML = "";
-
-        document.getElementById("exportChart").style.display = 'none';
-        resetOutputEmbed();
-
-        var visualMenu = document.getElementById("visualMenu");
-        visualMenu.style.display = "none";
-        document.getElementById("charts").style.display = "none";
-
-        var fileUploader = document.getElementById("fileUpload");
-        fileUploader.style.display = "inline";
-        // var fileUploadInner = document.getElementById("innerFileUpload");
-
-    },
-
-    "click .ClearCSV": function (e, t) {
-        Code_Editor.setOption("readOnly", false);
-        Code_Editor.setValue("");
-        var processBtn = document.getElementById("process_edit_btn");
-        processBtn.className = "btn-success btn ProcessCSV";
-        processBtn.innerHTML = "Process";
-        processBtn.style.display = "none";
-        var clearBtn = document.getElementById("clear_editor");
-        clearBtn.style.display = "none";
-
-        var temp;
-        CSV_keys = temp;
-        CSV_Data = temp;
-        headerValues = [];
-
-        var panel = document.getElementById("panel");
-        panel.style.display = "none";
-        document.getElementById("HeaderConfig").innerHTML = "";
-        document.getElementById("restoreModelBody").innerHTML = "";
-
-        var Message = $("#message");
-        Message.html("");
-
-        // var headerpanel = document.getElementById("headerLabels");
-        // headerpanel.innerHTML = "";
-
-        var svg = document.getElementById("svgChar");
-        svg.innerHTML = "";
-        svg.style.display = "none";
-
-        var mapSvg = document.getElementById("svgMap");
-        mapSvg.innerHTML = "";
-
-        document.getElementById("exportChart").style.display = 'none';
-        resetOutputEmbed();
-
-        var visualMenu = document.getElementById("visualMenu");
-        visualMenu.style.display = "none";
-        document.getElementById("charts").style.display = "none";
-
-        var fileUploader = document.getElementById("fileUpload");
-        fileUploader.style.display = "inline";
-        document.getElementById("csvFileName").value = "";
-        // var fileUploadInner = document.getElementById("innerFileUpload");
-        // fileUploadInner.innerHTML = "Browse&hellip; <input class='csv_upload' type='file' style='display: none;'>"
-    },
-
-    "change .csv_upload": function (e) {
-        var elem = e.currentTarget;
-        var file = elem.files[0];
-        var fileName = file.name;
-        var fileNameTxt = document.getElementById("csvFileName");
-        fileNameTxt.value = fileName;
-
-
-        var reader = new FileReader();
-        reader.onload = function (fileLoadEvent) {
-            // console.log(fileLoadEvent.target.result)
-            var text = fileLoadEvent.target.result;
-            Code_Editor.setValue(text);
-        };
-
-        reader.readAsText(file);
-
-        var fileUploadInner = document.getElementById("innerFileUpload");
-        fileUploadInner.innerHTML = "Browse&hellip; <input class='csv_upload' type='file' style='display: none;'>"
-
-    },
-
-    /*
-
-     "click .csvHeaderEdit": function (e) {
+    "click .csvHeaderEdit": function (e) {
         var headerIndex;
         var elem = e.currentTarget;
         var id = elem.getAttribute("headerID");
@@ -885,7 +320,7 @@ Template.tab_csv.events({
         var chartsMenu = document.getElementById("ChartsMenuTab");
         var normalChartsThumb = false;
         var countChartsThumb = false;
-     /!*for now the grouped bar and pie charts set to true.*!/
+        /*for now the grouped bar and pie charts set to true.*/
         var pieChartThumb = true;
         var groupBarChartThumb = true;
         var lineChartThumb = true;
@@ -895,7 +330,6 @@ Template.tab_csv.events({
         var mapsMenu = document.getElementById("MapsMenuTab");
         var mapsThumb = false;
         var mapsMenuInner = "";
-
 
 
         headerValues.forEach(function (h) {
@@ -1190,24 +624,24 @@ Template.tab_csv.events({
 
         }
         else if (visType == "pieChart") {
-     /!*headerValues.forEach(function (h) {
-                if (!h.deleted) {
-                    if (!jQuery.isEmptyObject(h[headerValCount])) {
+            /*headerValues.forEach(function (h) {
+             if (!h.deleted) {
+             if (!jQuery.isEmptyObject(h[headerValCount])) {
 
-                        headerLabelinnerhtml +=
-                            "<button type='button' id='headerLabels' style='word-wrap: break-word; white-space: normal; position: relative; margin: 5px' vistype='pie' count='true' class='btn btn-primary headerLabels' original='" + h[headerOriginal] + "'>" + h[headerPresent] + "</button>";
+             headerLabelinnerhtml +=
+             "<button type='button' id='headerLabels' style='word-wrap: break-word; white-space: normal; position: relative; margin: 5px' vistype='pie' count='true' class='btn btn-primary headerLabels' original='" + h[headerOriginal] + "'>" + h[headerPresent] + "</button>";
 
 
-                    }
+             }
 
-                    if (h[headerType] == "number") {
-                        headerLabelinnerhtml +=
-                            "<button type='button' id='headerLabels' style='word-wrap: break-word; white-space: normal; position: relative; margin: 5px' vistype='pie' count='false' class='btn btn-primary headerLabels' original='" + h[headerOriginal] + "'>" + h[headerPresent] + "</button>";
-                    }
+             if (h[headerType] == "number") {
+             headerLabelinnerhtml +=
+             "<button type='button' id='headerLabels' style='word-wrap: break-word; white-space: normal; position: relative; margin: 5px' vistype='pie' count='false' class='btn btn-primary headerLabels' original='" + h[headerOriginal] + "'>" + h[headerPresent] + "</button>";
+             }
 
-                    document.getElementById("charts").style.display = "inline";
-                }
-     });*!/
+             document.getElementById("charts").style.display = "inline";
+             }
+             });*/
 
             headerLabelinnerhtml +=
                 "<div class='pull-left' style='text-align: left'>" +
@@ -1353,7 +787,6 @@ Template.tab_csv.events({
         var siblings = elem.parentNode.childNodes;
 
 
-
         var svg = document.getElementById("svgChar");
         svg.innerHTML = "";
         // svg.style.display = "none";
@@ -1427,18 +860,18 @@ Template.tab_csv.events({
             groupedBarChart(CSV_Data, mainCat, subCat, yAxisMes, "#svgChar", height, width);
         }
         else if (visType == "pie") {
-     /!*svg.style.display = "inline";
-            if (width > 900) {
-                width = width - 200;
-            }
-            if (count == "true") {
-                pieChart(CSV_Data, headerOrig, true, "#svgChar", height, width);
+            /*svg.style.display = "inline";
+             if (width > 900) {
+             width = width - 200;
+             }
+             if (count == "true") {
+             pieChart(CSV_Data, headerOrig, true, "#svgChar", height, width);
 
-            }
-            else if (count == "false") {
-                pieChart(CSV_Data, headerOrig, false, "#svgChar", height, width);
+             }
+             else if (count == "false") {
+             pieChart(CSV_Data, headerOrig, false, "#svgChar", height, width);
 
-     }*!/
+             }*/
 
             var pieHeader = document.getElementById("pieHeader");
             var pieHeaderOption = document.getElementsByClassName("pieHeader");
@@ -1482,7 +915,6 @@ Template.tab_csv.events({
             });
 
             // var mapType =$("#"+parentNodeId +" input[name=location_type]:checked");
-
 
 
             if (mapType == "ip") {
@@ -1548,7 +980,7 @@ Template.tab_csv.events({
         }
     },
 
-     "click .downloadCharBtn": function (e) {
+    "click .downloadCharBtn": function (e) {
 
         var fileName = document.getElementById('downloadFileName').value;
 
@@ -1593,51 +1025,5 @@ Template.tab_csv.events({
     "click .chartTabs": function (e) {
         document.getElementById("charts").style.display = "none";
     },
-     */
 
 });
-
-/*
-$(function () {
-    $('#fileupload').fileupload({
-        dataType: 'json',
-        done: function (e, data) {
-            $.each(data.result.files, function (index, file) {
-                $('<p/>').text(file.name).appendTo(document.body);
-            });
-        }
-    });
-});
- */
-
-function resetOutputEmbed() {
-    var downloadBtn = document.getElementById('downloadCharBtn');
-    var fileNameTxt = document.getElementById('downloadFileName');
-    var svgTextArea = document.getElementById('chartEmbedTxt');
-
-    downloadBtn.disabled = true;
-    downloadBtn.style.cursor = 'auto';
-    fileNameTxt.value = "";
-    svgTextArea.value = "";
-
-
-}
-// window.addEventListener('resize', function () {
-//     var svg = document.getElementById("svgChar");
-//  if (svg.style.display != "none" && svg.style.display != "") {
-//
-//         svg.innerHTML = "";
-//
-//         var width = document.getElementById("chartBody").offsetWidth;
-//         var height = document.getElementById("chartBody").offsetHeight;
-//         if (height < 350) {
-//             height = 350;
-//         }
-//         if (chartRedrawObj.type == "counts") {
-//             barChartCounts(chartRedrawObj.data.counts, "#svgChar", height, width)
-//         }
-//         else {
-//             barChartHeaders(chartRedrawObj.data, selectedXlable, "#svgChar", height, width)
-//         }
-//     }
-// });

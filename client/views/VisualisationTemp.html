@@ -1,53 +1,5 @@
-<template name="tab_csv" xmlns="http://www.w3.org/1999/html">
-    <!--<form class="editorform">-->
-    <div id="editor">
-        <!--<div id="editor">-->
-        <textarea id="codemirror_id" name="codemirror_nme" placeholder="sad"></textarea>
-        <!--</div>-->
-        <!--<textarea cols="60" rows="20" class="form-control" id="CSVarea" spellcheck="false"></textarea>-->
-    </div>
-    <br>
-    <div class="pull-right btn-toolbar">
-        <!--<span class="pull-right">  </span>-->
-        <button id="clear_editor" class="btn-danger btn ClearCSV" style="display: none">Clear</button>
-        <button id="process_edit_btn" class="btn-success btn ProcessCSV" style="display: none">Process</button>
-
-    </div>
-
-
-    <div id="fileUpload">
-        <div class="col-lg-5 col-sm-6 col-12">
-            <div class="input-group">
-                <label class="input-group-btn">
-                    <span id="innerFileUpload" class="btn btn-primary">
-                        Browse&hellip; <input class="csv_upload" type="file" style="display: none;">
-                    </span>
-                </label>
-                <input id="csvFileName" type="text" class="form-control" readonly>
-            </div>
-        </div>
-    </div>
-
-    <!--</form>-->
-    <label id="message" class="pull-left"></label>
-    <br>
-    <br>
-    <!--<div>-->
-    <!--<form>-->
-    <div id="datasetName" class="col-md-5 col-sm-12 col-xs-12 pull-right" style="display: none">
-        <label for="recipient-name" class="pull-left">Please enter CSV data name...</label>
-        <input type="text" class="pull-left col-md-10 col-sm-10 col-xs-10 csvDataName" id="csvDataName"
-               style="border: 1px solid lightgray; border-radius: 4px; padding: 6px; color: grey; ">
-        <button id="storeDataBtn" class="btn btn-success pull-right col-md-2 col-sm-2 col-xs-2 storeDataBtn" disabled>
-            Store
-        </button>
-    </div>
-    <!--</form>-->
-    <!--</div>-->
-    <br>
-
-    {{>visualisation_all}}
-    <!--<div id="panel" style="display: none">
+<template name="visualisation_all">
+    <div id="panel" style="display: none">
         <div id="HeaderConfig">
 
         </div>
@@ -55,7 +7,7 @@
 
         </div>
 
-        &lt;!&ndash;<div id="delHeadersPanel" style="display: none" >&ndash;&gt;
+        <!--<div id="delHeadersPanel" style="display: none" >-->
         <div id="restoreHeadersModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="griModalLabel"
              aria-hidden="true">
             <div class="modal-dialog" role="document">
@@ -70,12 +22,12 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-success" data-dismiss="modal">Done</button>
-                        &lt;!&ndash;<button type="button" class="btn btn-primary">Save changes</button>&ndash;&gt;
+                        <!--<button type="button" class="btn btn-primary">Save changes</button>-->
                     </div>
                 </div>
             </div>
         </div>
-        &lt;!&ndash;</div>&ndash;&gt;
+        <!--</div>-->
     </div>
     <br>
     <br>
@@ -89,8 +41,8 @@
                             <li class="active"><a class="chartTabs" href="#ChartsMenuTab" data-toggle="tab">Charts
                                 Menu</a></li>
                             <li><a class="chartTabs" href="#MapsMenuTab" data-toggle="tab">Maps Menu</a></li>
-                            &lt;!&ndash;<li><a href="#tab3info" data-toggle="tab">Info 3</a></li>&ndash;&gt;
-                            &lt;!&ndash;<li><a href="#tab4info" data-toggle="tab">info 4</a></li>&ndash;&gt;
+                            <!--<li><a href="#tab3info" data-toggle="tab">Info 3</a></li>-->
+                            <!--<li><a href="#tab4info" data-toggle="tab">info 4</a></li>-->
                         </ul>
                     </div>
                     <div class="panel-body">
@@ -101,8 +53,8 @@
                             <div class="tab-pane fade" id="MapsMenuTab">
                                 Maps
                             </div>
-                            &lt;!&ndash;<div class="tab-pane fade" id="tab3info">Info 3</div>&ndash;&gt;
-                            &lt;!&ndash;<div class="tab-pane fade" id="tab4info">Info 4</div>&ndash;&gt;
+                            <!--<div class="tab-pane fade" id="tab3info">Info 3</div>-->
+                            <!--<div class="tab-pane fade" id="tab4info">Info 4</div>-->
                         </div>
                     </div>
                 </div>
@@ -118,8 +70,8 @@
                 <div id="headerLabelGroup" class="btn-group-vertical col-md-12" style="margin: 5px">
 
                 </div>
-                &lt;!&ndash;<button type="button" id="pers_chart" class="btn btn-primary"></button>&ndash;&gt;
-                &lt;!&ndash;<button id='pers_chart' style='display: none' data-toggle='modal' data-target='#restoreHeadersModal' class='btn-warning btn restoreDeleted'>Restore Deleted <span class='glyphicon glyphicon-refresh'></span></button>&ndash;&gt;
+                <!--<button type="button" id="pers_chart" class="btn btn-primary"></button>-->
+                <!--<button id='pers_chart' style='display: none' data-toggle='modal' data-target='#restoreHeadersModal' class='btn-warning btn restoreDeleted'>Restore Deleted <span class='glyphicon glyphicon-refresh'></span></button>-->
 
 
                 <br>
@@ -164,7 +116,7 @@
             </h3>
             <textarea id="chartEmbedTxt" class="col-md-12 col-sm-12 col-xs-12 " readonly
                       style="border: 1px solid lightgray; border-radius: 8px; padding: 6px 10px; height: 150px; color: #999999;"></textarea>
-            &lt;!&ndash;<div style="margin: 30px; padding-top: 10px">&ndash;&gt;
+            <!--<div style="margin: 30px; padding-top: 10px">-->
             <p style="padding-top: 5px; color: lightslategrey; " class="pull-left">Copy the above svg code to your HTML
                 code to embed the chart. </p>
             <button class="clipboardBtn btn pull-right"
@@ -172,11 +124,9 @@
                     data-clipboard-target="#chartEmbedTxt" data-toggle='tooltip' data-placement='top'
                     title='Copy to Clipboard'>
                 <i class="fa fa-clipboard"></i>
-                &lt;!&ndash;<img src="assets/clippy.svg" alt="Copy to clipboard">&ndash;&gt;
+                <!--<img src="assets/clippy.svg" alt="Copy to clipboard">-->
             </button>
-            &lt;!&ndash;</div>&ndash;&gt;
+            <!--</div>-->
         </div>
-    </div>-->
-
-
+    </div>
 </template>
