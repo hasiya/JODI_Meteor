@@ -2,6 +2,9 @@
  * Created by RajithaHasith on 28/07/2016.
  */
 
+var removedHeaderVals = [];
+
+
 function checkIPlist(ip, list) {
 
     var ipData = null;
@@ -122,6 +125,13 @@ function checkDataset(dataset) {
         }
     });
 }
+
+Template.visualisation_all.helpers({
+    get_keys: function () {
+        csv_key_dep.depend();
+        return CSV_keys;
+    }
+});
 
 Template.visualisation_all.events({
 
@@ -624,24 +634,6 @@ Template.visualisation_all.events({
 
         }
         else if (visType == "pieChart") {
-            /*headerValues.forEach(function (h) {
-             if (!h.deleted) {
-             if (!jQuery.isEmptyObject(h[headerValCount])) {
-
-             headerLabelinnerhtml +=
-             "<button type='button' id='headerLabels' style='word-wrap: break-word; white-space: normal; position: relative; margin: 5px' vistype='pie' count='true' class='btn btn-primary headerLabels' original='" + h[headerOriginal] + "'>" + h[headerPresent] + "</button>";
-
-
-             }
-
-             if (h[headerType] == "number") {
-             headerLabelinnerhtml +=
-             "<button type='button' id='headerLabels' style='word-wrap: break-word; white-space: normal; position: relative; margin: 5px' vistype='pie' count='false' class='btn btn-primary headerLabels' original='" + h[headerOriginal] + "'>" + h[headerPresent] + "</button>";
-             }
-
-             document.getElementById("charts").style.display = "inline";
-             }
-             });*/
 
             headerLabelinnerhtml +=
                 "<div class='pull-left' style='text-align: left'>" +
@@ -705,6 +697,8 @@ Template.visualisation_all.events({
                     }
                 }
             });
+            document.getElementById("charts").style.display = "inline";
+
         }
         else if (visType == "Map") {
             var lon = false, lat = false, ip = false;

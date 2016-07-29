@@ -8,6 +8,7 @@ import "../../imports/dimple_pie";
 import "../../imports/map";
 import "../../imports/mapbox";
 import "../../imports/dimple_line";
+import "../../imports/functions";
 
 import Clipboard from 'clipboard';
 
@@ -16,7 +17,11 @@ pythonServer = "localhost:5000";
 
 
 CSV_keys = [];
+csv_key_dep = new Tracker.Dependency();
 CSV_Data = [];
+
+var showPanel = false;
+var showPanel_dep = new Tracker.Dependency();
 
 Code_Editor = [];
 headerValues = [];
@@ -42,12 +47,12 @@ var chartRedrawObj = {
 var isVisOn;
 
 
-function isNull(inputArray) {
-    for (var i = 0, len = inputArray.length; i < len; i += 1)
-        if (inputArray[i] !== null)
-            return false;
-    return true;
-}
+// function isNull(inputArray) {
+//     for (var i = 0, len = inputArray.length; i < len; i += 1)
+//         if (inputArray[i] !== null)
+//             return false;
+//     return true;
+// }
 
 function checkIPlist(ip, list) {
 
@@ -123,6 +128,9 @@ function CSVtoArray(text) {
 
 function linesMatch(lines) {
 
+    CSV_keys = [];
+    // csv_key_dep.changed();
+
     var lineMatch = {
         "lineMatch": true,
         "lineNum": 0
@@ -130,7 +138,13 @@ function linesMatch(lines) {
     // var linesMatch = true;
     var lineNum = 0;
     var headers = CSVtoArray(lines[0]);
-    CSV_keys = headers;
+    // CSV_keys = headers;
+    headers.forEach(function (h) {
+        CSV_keys.push(h);
+        csv_key_dep.changed();
+    });
+    // csv_key_dep.changed();
+
 
     if (headers) {
         lines.forEach(function (l) {
@@ -163,42 +177,46 @@ function SetUpCount() {
         c.Count = 1;
     });
 }
-function CreatePanel() {
+function setUpPanel() {
     headerValues = [];
 
-    var HeaderConfigPanel = document.getElementById("HeaderConfig");
+    // var HeaderConfigPanel = document.getElementById("HeaderConfig");
 
 
-    var HeaderConfigInnerHtml = "<div class='row top-buffer' style='margin-bottom: 10px'>" +
-        "<div class='col-md-1'>" +
-        "</div>" +
-        "<div class='col-md-4' style='text-align: center'>" +
-        "<strong>Column Headers</strong>" +
-        "</div>" +
-        "<div class='col-md-4' style='text-align: center'>" +
-        "<strong>Data Type</strong>" +
-        "</div>" +
-        "<div class='col-md-3'>" +
-        "<div class='col-md-6'>" +
-        "</div>" +
-        "<div class='col-md-6'>" +
-        "</div>" +
-        // "</form> " +
+    // var HeaderConfigInnerHtml = "<div class='row top-buffer' style='margin-bottom: 10px'>" +
+    //     "<div class='col-md-1'>" +
+    //     "</div>" +
+    //     "<div class='col-md-4' style='text-align: center'>" +
+    //     "<strong>Column Headers</strong>" +
+    //     "</div>" +
+    //     "<div class='col-md-4' style='text-align: center'>" +
+    //     "<strong>Data Type</strong>" +
+    //     "</div>" +
+    //     "<div class='col-md-3'>" +
+    //     "<div class='col-md-6'>" +
+    //     "</div>" +
+    //     "<div class='col-md-6'>" +
+    //     "</div>" +
+    //     // "</form> " +
+    //
+    //     "</div>" +
+    //     "</div>";
 
-        "</div>" +
-        "</div>";
 
-
-    for (i = 0; i < CSV_keys.length; i++) {
+    CSV_keys.forEach(function (key) {
         var keyItem = {
-            "originalVal": CSV_keys[i],
-            "presentVal": CSV_keys[i],
+            "originalVal": key,
+            "presentVal": key,
             "type": "",
             "deleted": false,
             "valCount": {}
         };
+        headerValues.push(keyItem);
 
-        HeaderConfigInnerHtml +=
+    });
+
+
+    /* HeaderConfigInnerHtml +=
             "<div class='row top-buffer' id='row_" + CSV_keys[i] + "' style='display: inherit'>" +
             "<div class='col-md-1'>" +
             "</div>" +
@@ -235,22 +253,21 @@ function CreatePanel() {
             // "</form> " +
 
             "</div>" +
-            "</div>";
-        headerValues.push(keyItem);
-    }
-    var HeaderConfigBtnsInnerHtml =
+     "</div>";*/
+
+    /*  var HeaderConfigBtnsInnerHtml =
         "<div class='pull-right btn-toolbar'>" +
         "<button id='restore' style='display: none' data-toggle='modal' data-target='#restoreHeadersModal' class='btn-warning btn restoreDeleted'>Restore Deleted <span class='glyphicon glyphicon-refresh'></span></button>" +
         "<button class='btn-success btn PanelDone'>Done</button>" +
-        "</div>";
+     "</div>";*/
 
-    HeaderConfigPanel.innerHTML = HeaderConfigInnerHtml;
-    document.getElementById("HeaderConfigBtns").innerHTML = HeaderConfigBtnsInnerHtml;
+    /*HeaderConfigPanel.innerHTML += HeaderConfigInnerHtml;
+     document.getElementById("HeaderConfigBtns").innerHTML = HeaderConfigBtnsInnerHtml;*/
 
-    // CSV_Data.forEach(function (d) {
     CSV_keys.forEach(function (k) {
 
         if (k.toLowerCase() == "longitude") {
+            var test = document.getElementById("type_" + k);
             document.getElementById("type_" + k).value = "lon";
         }
         else if (k.toLowerCase() == "latitude") {
@@ -273,7 +290,7 @@ function CreatePanel() {
             });
 
 
-            if (!isNull(testEmptyArray)) {
+            if (!isArrayNull(testEmptyArray)) {
                 var isNumbers = (!propertiesArray.some(isNaN));
 
                 if (isNumbers) {
@@ -281,12 +298,7 @@ function CreatePanel() {
                 }
             }
         }
-
-
     });
-    // })
-
-
 }
 
 function countValues(column) {
@@ -351,14 +363,12 @@ function checkDataset(dataset) {
 function insertData(datasetName, dataset) {
     var headersObj = [];
     CSV_keys.forEach(function (key) {
-        headersObj.push({
-            header_val: key
-        });
+        headersObj.push(key);
     });
     var requestObject = {
         collectionName: datasetName,
         collectionData: dataset,
-        headers: headersObj
+        headers: CSV_keys
     };
 
     var elem = document.getElementById("storeDataBtn");
@@ -446,7 +456,7 @@ Template.tab_csv.onRendered(function () {
 
             var panel = document.getElementById("panel");
             panel.style.display = "none";
-            document.getElementById("HeaderConfig").innerHTML = "";
+            // document.getElementById("HeaderConfig").innerHTML = "";
             document.getElementById("restoreModelBody").innerHTML = "";
             Message.html("");
         }
@@ -475,10 +485,10 @@ Template.tab_csv.helpers({
     //     }
     // },
 
-    getKey: function () {
-        a = 1;
-        return CSV_keys
-    },
+    // getCSV_Keys: function () {
+    //     csv_key_dep.depend();
+    //     return CSV_keys
+    // },
 
     getData: function () {
         var a = 1;
@@ -519,7 +529,8 @@ Template.tab_csv.events({
                             SetUpCount();
                             console.log(CSV_Data);
                             // CSV_keys = Object.keys(data[0]);
-                            CreatePanel();
+
+                            setUpPanel();
                             var Message = $("#message");
                             Message.html("");
                             Code_Editor.setOption("readOnly", true);
@@ -580,6 +591,8 @@ Template.tab_csv.events({
         var elem = e.currentTarget;
         elem.className = "btn-success btn ProcessCSV";
         elem.innerHTML = "Process";
+        var datasetName = document.getElementById("datasetName");
+        datasetName.style.display = "none";
 
         var temp;
         CSV_keys = temp;
@@ -588,7 +601,7 @@ Template.tab_csv.events({
 
         var panel = document.getElementById("panel");
         panel.style.display = "none";
-        document.getElementById("HeaderConfig").innerHTML = "";
+        // document.getElementById("HeaderConfig").innerHTML = "";
         document.getElementById("restoreModelBody").innerHTML = "";
 
 
@@ -628,6 +641,8 @@ Template.tab_csv.events({
         processBtn.style.display = "none";
         var clearBtn = document.getElementById("clear_editor");
         clearBtn.style.display = "none";
+        var datasetName = document.getElementById("datasetName");
+        datasetName.style.display = "none";
 
         var temp;
         CSV_keys = temp;
@@ -636,7 +651,7 @@ Template.tab_csv.events({
 
         var panel = document.getElementById("panel");
         panel.style.display = "none";
-        document.getElementById("HeaderConfig").innerHTML = "";
+        // document.getElementById("HeaderConfig").innerHTML = "";
         document.getElementById("restoreModelBody").innerHTML = "";
 
         var Message = $("#message");

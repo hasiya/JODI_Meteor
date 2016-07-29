@@ -1,9 +1,86 @@
 <template name="visualisation_all">
     <div id="panel" style="display: none">
         <div id="HeaderConfig">
+            <div class='row top-buffer' style='margin-bottom: 10px'>
+                <div class='col-md-1'>
+                </div>
+                <div class='col-md-4' style='text-align: center'>
+                    <strong>Column Headers</strong>
+                </div>
+                <div class='col-md-4' style='text-align: center'>
+                    <strong>Data Type</strong>
+                </div>
+                <div class='col-md-3'>
+                    <div class='col-md-6'>
+                    </div>
+                    <div class='col-md-6'>
+                    </div>
+                </div>
+            </div>
 
+            {{#each get_keys}}
+
+                <div class='row top-buffer' id='row_{{this}}' style='display: inherit'>
+                    <div class='col-md-1'>
+                    </div>
+                    <div class='col-md-4'>
+                        <form class='form-inline'>
+                            <input type='text' index='{{@index}}' name='headerText' headerID='{{this}}'
+                                   style='width: 80%' readonly id='header_{{this}}' class='form-control input'
+                                   autocomplete='off' value='{{this}}'>
+                            <button type='button' id='editBtn_{{this}}' name='headerEditBtn' headerID='{{this}}'
+                                    data-toggle='tooltip' data-placement='top' title='Edit the Header Text Field'
+                                    style='width: 15%' class='tooltipped csvHeaderEdit  btn btn-default btn-sm'>
+                                <span class='glyphicon glyphicon-edit'></span>
+                            </button>
+                        </form>
+                    </div>
+                    <div class='col-md-4'>
+                        <select id='type_{{this}}' headerID='{{this}}' index='{{@index}}' name='headerType'
+                                class='csvHeaderType form-control'>
+                            <option value='string'>String</option>
+                            <option value='number'>Number</option>
+                            <option value='lon'>Longitude</option>
+                            <option value='lat'>Latitude</option>
+                            <option value='ip'>IP Address</option>
+                            <!--// <option value='latitude'>Latitude</option>-->
+                        </select>
+                    </div>
+                    <div class='col-md-3'>
+                        <div class='col-md-6'>
+                            <!--// <form class='form-inline'>-->
+                            <div class='checkbox' style='width: 50%'>
+                                <label for='checkBox_{{this}}' data-toggle='tooltip' data-placement='top'
+                                       title='Count Data'><input type='checkbox' name='headerCheck'
+                                                                 id='checkBox_{{this}}'/>Count</label>
+                            </div>
+                        </div>
+                        <div class='col-md-6'>
+                            <button type='button' id='remvBtn_{{this}}' headerID='{{this}}' name='headerremvbtn'
+                                    index='{{@index}}' data-toggle='tooltip' data-placement='top'
+                                    title='Delete Header Row' class='pull-left csvHeaderDelete btn btn-danger btn-sm'>
+                                <span class='glyphicon glyphicon-remove'></span>
+                            </button>
+                        </div>
+                        <!--// </form>-->
+
+                    </div>
+                </div>
+
+            {{/each}}
+
+            <!--<div class='pull-right btn-toolbar'>-->
+            <!--<button id='restore' style='display: none' data-toggle='modal' data-target='#restoreHeadersModal' class='btn-warning btn restoreDeleted'>Restore Deleted <span class='glyphicon glyphicon-refresh'></span></button>-->
+            <!--<button class='btn-success btn PanelDone'>Done</button>-->
+            <!--</div>-->
         </div>
         <div id="HeaderConfigBtns">
+            <div class='pull-right btn-toolbar'>
+                <button id='restore' style='display: none' data-toggle='modal' data-target='#restoreHeadersModal'
+                        class='btn-warning btn restoreDeleted'>Restore Deleted <span
+                        class='glyphicon glyphicon-refresh'></span></button>
+                <button class='btn-success btn PanelDone'>Done</button>
+            </div>
 
         </div>
 
