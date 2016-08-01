@@ -25,6 +25,7 @@ var showPanel_dep = new Tracker.Dependency();
 
 Code_Editor = [];
 headerValues = [];
+headers_dep = new Tracker.Dependency();
 var removedHeaderVals = [];
 headerOriginal = "originalVal";
 headerPresent = "presentVal";
@@ -177,101 +178,42 @@ function SetUpCount() {
         c.Count = 1;
     });
 }
+
+
 function setUpPanel() {
     headerValues = [];
 
-    // var HeaderConfigPanel = document.getElementById("HeaderConfig");
-
-
-    // var HeaderConfigInnerHtml = "<div class='row top-buffer' style='margin-bottom: 10px'>" +
-    //     "<div class='col-md-1'>" +
-    //     "</div>" +
-    //     "<div class='col-md-4' style='text-align: center'>" +
-    //     "<strong>Column Headers</strong>" +
-    //     "</div>" +
-    //     "<div class='col-md-4' style='text-align: center'>" +
-    //     "<strong>Data Type</strong>" +
-    //     "</div>" +
-    //     "<div class='col-md-3'>" +
-    //     "<div class='col-md-6'>" +
-    //     "</div>" +
-    //     "<div class='col-md-6'>" +
-    //     "</div>" +
-    //     // "</form> " +
+    // CSV_keys.forEach(function (key) {
+    //     var keyItem = {
+    //         "originalVal": key,
+    //         "presentVal": key,
+    //         "type": "",
+    //         "deleted": false,
+    //         "valCount": {}
+    //     };
+    //     headerValues.push(keyItem);
     //
-    //     "</div>" +
-    //     "</div>";
-
-
-    CSV_keys.forEach(function (key) {
-        var keyItem = {
-            "originalVal": key,
-            "presentVal": key,
-            "type": "",
-            "deleted": false,
-            "valCount": {}
-        };
-        headerValues.push(keyItem);
-
-    });
-
-
-    /* HeaderConfigInnerHtml +=
-            "<div class='row top-buffer' id='row_" + CSV_keys[i] + "' style='display: inherit'>" +
-            "<div class='col-md-1'>" +
-            "</div>" +
-            "<div class='col-md-4'>" +
-            "<form class='form-inline'>" +
-            "<input type='text' index='" + i + "' name='headerText' headerID='" + CSV_keys[i] + "' style='width: 80%' readonly id='header_" + CSV_keys[i] + "' class='form-control input' autocomplete='off' value='" + CSV_keys[i] + "'>" +
-            "<button type='button' id='editBtn_" + CSV_keys[i] + "' name='headerEditBtn' headerID='" + CSV_keys[i] + "' data-toggle='tooltip' data-placement='top' title='Edit the Header Text Field' style='width: 15%' class='tooltipped csvHeaderEdit  btn btn-default btn-sm'>" +
-            "<span class='glyphicon glyphicon-edit'></span>" +
-            "</button>" +
-            "</form>" +
-            "</div>" +
-            "<div class='col-md-4'>" +
-            "<select id='type_" + CSV_keys[i] + "' headerID='" + CSV_keys[i] + "' index='" + i + "' name='headerType' class='csvHeaderType form-control'>" +
-            "<option value='string'>String</option>" +
-            "<option value='number'>Number</option>" +
-            "<option value='lon'>Longitude</option>" +
-            "<option value='lat'>Latitude</option>" +
-            "<option value='ip'>IP Address</option>" +
-            // "<option value='latitude'>Latitude</option>"+
-            "</select>" +
-            "</div>" +
-            "<div class='col-md-3'>" +
-            "<div class='col-md-6'>" +
-            // "<form class='form-inline'>" +
-            "<div class='checkbox' style='width: 50%'>" +
-            "<label for='checkBox_" + CSV_keys[i] + "' data-toggle='tooltip' data-placement='top' title='Count Data'><input type='checkbox' name='headerCheck' id='checkBox_" + CSV_keys[i] + "'/>Count</label>" +
-            "</div>" +
-            "</div>" +
-            "<div class='col-md-6'>" +
-            "<button  type='button' id='remvBtn_" + CSV_keys[i] + "' headerID='" + CSV_keys[i] + "' name='headerremvbtn' index='" + i + " ' data-toggle='tooltip' data-placement='top' title='Delete Header Row'  class='pull-left csvHeaderDelete btn btn-danger btn-sm'>" +
-            "<span class='glyphicon glyphicon-remove'></span>" +
-            "</button>" +
-            "</div>" +
-            // "</form> " +
-
-            "</div>" +
-     "</div>";*/
-
-    /*  var HeaderConfigBtnsInnerHtml =
-        "<div class='pull-right btn-toolbar'>" +
-        "<button id='restore' style='display: none' data-toggle='modal' data-target='#restoreHeadersModal' class='btn-warning btn restoreDeleted'>Restore Deleted <span class='glyphicon glyphicon-refresh'></span></button>" +
-        "<button class='btn-success btn PanelDone'>Done</button>" +
-     "</div>";*/
-
-    /*HeaderConfigPanel.innerHTML += HeaderConfigInnerHtml;
-     document.getElementById("HeaderConfigBtns").innerHTML = HeaderConfigBtnsInnerHtml;*/
+    // });
 
     CSV_keys.forEach(function (k) {
 
+        var keyItem = {
+            "originalVal": k,
+            "presentVal": k,
+            "type": "string",
+            "deleted": false,
+            "valCount": {}
+        };
+
         if (k.toLowerCase() == "longitude") {
             var test = document.getElementById("type_" + k);
-            document.getElementById("type_" + k).value = "lon";
+            // document.getElementById("type_" + k).value = "lon";
+            keyItem['type'] = 'lon';
         }
         else if (k.toLowerCase() == "latitude") {
-            document.getElementById("type_" + k).value = "lat";
+            // document.getElementById("type_" + k).value = "lat";
+            keyItem['type'] = 'lat';
+
         }
         else {
             var propertiesArray = CSV_Data.map(function (d) {
@@ -294,12 +236,22 @@ function setUpPanel() {
                 var isNumbers = (!propertiesArray.some(isNaN));
 
                 if (isNumbers) {
-                    document.getElementById("type_" + k).value = "number";
+                    // document.getElementById("type_" + k).value = "number";
+                    keyItem['type'] = 'number';
+
                 }
             }
         }
+
+        headerValues.push(keyItem);
+        headers_dep.changed();
+        var panelDoneBtn = document.getElementById('panelDone');
+        panelDoneBtn.className = "pull-right btn-success btn PanelDone";
+        panelDoneBtn.innerHTML = "Done";
+
     });
 }
+
 
 function countValues(column) {
     var columnVals = [];
@@ -618,6 +570,8 @@ Template.tab_csv.events({
 
         var mapSvg = document.getElementById("svgMap");
         mapSvg.innerHTML = "";
+        mapSvg.style.height = 0;
+
 
         document.getElementById("exportChart").style.display = 'none';
         resetOutputEmbed();
@@ -666,6 +620,8 @@ Template.tab_csv.events({
 
         var mapSvg = document.getElementById("svgMap");
         mapSvg.innerHTML = "";
+        mapSvg.style.height = 0;
+
 
         document.getElementById("exportChart").style.display = 'none';
         resetOutputEmbed();

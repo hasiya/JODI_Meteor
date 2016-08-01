@@ -3,6 +3,12 @@
  */
 
 var removedHeaderVals = [];
+var map;
+var visualType;
+var headerOrig;
+var svg;
+var width;
+var height;
 
 
 function checkIPlist(ip, list) {
@@ -124,12 +130,20 @@ function checkDataset(dataset) {
             // }
         }
     });
+
 }
 
+Template.registerHelper("isEqual", function (type1, type2) {
+    // var date = new Date(dateTime);
+
+    return type1 == type2
+});
 Template.visualisation_all.helpers({
     get_keys: function () {
-        csv_key_dep.depend();
-        return CSV_keys;
+        // csv_key_dep.depend();
+        // return CSV_keys;
+        headers_dep.depend();
+        return headerValues;
     }
 });
 
@@ -380,7 +394,7 @@ Template.visualisation_all.events({
             chartsMenuInner +=
                 "<div class='col-lg-3 col-md-4 col-xs-6 thumb'>" +
                 "<a class='thumbnail visualThumb' visType='NormalBar' href='#' style='text-align: center'>" +
-                "<img class='img-responsive' src='http://placehold.it/400x300' alt=''>" +
+                "<img class='img-responsive' src='/images/bar_chart.png' alt=''>" +
                 "Bar Charts" +
                 "</a>" +
                 "</div>";
@@ -389,7 +403,7 @@ Template.visualisation_all.events({
             chartsMenuInner +=
                 "<div class='col-lg-3 col-md-4 col-xs-6 thumb'>" +
                 "<a class='thumbnail visualThumb' visType='CountBar' href='#' style='text-align: center'>" +
-                "<img class='img-responsive' src='http://placehold.it/400x300' alt=''>" +
+                "<img class='img-responsive' src='/images/bar_chart.png' alt=''>" +
                 "Bar Charts (Counts)" +
                 "</a>" +
                 "</div>";
@@ -398,7 +412,7 @@ Template.visualisation_all.events({
             mapsMenuInner +=
                 "<div class='col-lg-3 col-md-4 col-xs-6 thumb'>" +
                 "<a class='thumbnail visualThumb' vistype='Map' href='#' style='text-align: center'>" +
-                "<img class='img-responsive' src='http://placehold.it/400x300' alt=''>" +
+                "<img class='img-responsive' src='/images/map.png' alt=''>" +
                 "Maps" +
                 "</a>" +
                 "</div>";
@@ -407,7 +421,7 @@ Template.visualisation_all.events({
             chartsMenuInner +=
                 "<div class='col-lg-3 col-md-4 col-xs-6 thumb'>" +
                 "<a class='thumbnail visualThumb' visType='groupBar' href='#' style='text-align: center'>" +
-                "<img class='img-responsive' src='http://placehold.it/400x300' alt=''>" +
+                "<img class='img-responsive' src='/images/group_chart.png' alt=''>" +
                 "Grouped Bar Chart" +
                 "</a>" +
                 "</div>";
@@ -416,7 +430,7 @@ Template.visualisation_all.events({
             chartsMenuInner +=
                 "<div class='col-lg-3 col-md-4 col-xs-6 thumb'>" +
                 "<a class='thumbnail visualThumb' visType='pieChart' href='#' style='text-align: center'>" +
-                "<img class='img-responsive' src='http://placehold.it/400x300' alt=''>" +
+                "<img class='img-responsive' src='/images/pie_chart.png' alt=''>" +
                 "Pie Chart" +
                 "</a>" +
                 "</div>";
@@ -425,7 +439,7 @@ Template.visualisation_all.events({
             chartsMenuInner +=
                 "<div class='col-lg-3 col-md-4 col-xs-6 thumb'>" +
                 "<a class='thumbnail visualThumb' visType='lineChart' href='#' style='text-align: center'>" +
-                "<img class='img-responsive' src='http://placehold.it/400x300' alt=''>" +
+                "<img class='img-responsive' src='/images/line_chart.png' alt=''>" +
                 "Line Chart" +
                 "</a>" +
                 "</div>";
@@ -474,18 +488,20 @@ Template.visualisation_all.events({
         // var headerpanel = document.getElementById("headerLabels");
         // headerpanel.innerHTML = "";
 
-        var svg = document.getElementById("svgChar");
+        svg = document.getElementById("svgChar");
         svg.innerHTML = "";
         svg.style.display = "none";
 
         var mapSvg = document.getElementById("svgMap");
         mapSvg.innerHTML = "";
+        mapSvg.style.height = 0;
+
 
         document.getElementById("exportChart").style.display = 'none';
         resetOutputEmbed();
 
         var elem = e.currentTarget;
-        elem.className = "pull-right btn-success btn PanelDone";
+        elem.className = "btn-success btn PanelDone";
         elem.innerHTML = "Done";
 
         if (!headersNotDeleted()) {
@@ -494,6 +510,11 @@ Template.visualisation_all.events({
             restoreHeaderBtn.style.display = "inline";
         }
     },
+
+    // "click .chartTabs":function (e) {
+    //     document.getElementById('exportChart').style.display = 'none';
+    //     resetOutputEmbed();
+    // },
 
     "click .visualThumb": function (e) {
         isVisOn = false;
@@ -509,12 +530,17 @@ Template.visualisation_all.events({
 
         xAxiaLblDiv.style.display = "none";
 
-        var svg = document.getElementById("svgChar");
+        svg = document.getElementById("svgChar");
         svg.innerHTML = "";
         svg.style.display = "none";
 
         var mapSvg = document.getElementById("svgMap");
         mapSvg.innerHTML = "";
+        mapSvg.style.height = 0;
+
+        if (map) {
+            map.remove();
+        }
 
         document.getElementById("exportChart").style.display = 'none';
         resetOutputEmbed();
@@ -773,27 +799,29 @@ Template.visualisation_all.events({
         elem.disabled = true;
         elem.style.cursor = 'auto';
         // elem.className += ' disabled';
-        var headerOrig = elem.getAttribute("original");
-        var visType = elem.getAttribute("vistype");
+        headerOrig = elem.getAttribute("original");
+        visualType = elem.getAttribute("vistype");
         var count = elem.getAttribute("count");
 
         // var siblings = $("#"+elem.id).siblings();
         var siblings = elem.parentNode.childNodes;
 
 
-        var svg = document.getElementById("svgChar");
+        svg = document.getElementById("svgChar");
         svg.innerHTML = "";
         // svg.style.display = "none";
 
-        var width = document.getElementById("chartBody").offsetWidth;
-        var height = 0;
+        document.getElementById("embedCode").style.display = "inline";
+
+        width = document.getElementById("chartBody").offsetWidth;
+        height = 0;
         if (height < 500) {
             height = 500;
         }
 
         var selectedXlabel;
 
-        if (visType == "bar") {
+        if (visualType == "bar") {
             var xAxis = document.getElementById("xAxisLabels");
             var xAxisOptions = document.getElementsByClassName("xAxisLabel");
 
@@ -811,7 +839,7 @@ Template.visualisation_all.events({
             // elem.style.cursor = 'pointer';
             barChartHeaders(CSV_Data, headerOrig, selectedXlabel, "#svgChar", height, width);
         }
-        else if (visType == "count") {
+        else if (visualType == "count") {
             var values = [];
             var counts = [];
             var countObjects = {
@@ -833,7 +861,7 @@ Template.visualisation_all.events({
 
             barChartCounts(CSV_Data, headerOrig, "#svgChar", height, width);
         }
-        else if (visType == "group") {
+        else if (visualType == "group") {
 
             var subGroup = document.getElementById("subGroup");
             var subGroupOption = document.getElementsByClassName("subGroup");
@@ -853,7 +881,7 @@ Template.visualisation_all.events({
 
             groupedBarChart(CSV_Data, mainCat, subCat, yAxisMes, "#svgChar", height, width);
         }
-        else if (visType == "pie") {
+        else if (visualType == "pie") {
             /*svg.style.display = "inline";
              if (width > 900) {
              width = width - 200;
@@ -880,7 +908,7 @@ Template.visualisation_all.events({
             pieChart(CSV_Data, header, measure, false, "#svgChar", height, width);
 
         }
-        else if (visType == 'line') {
+        else if (visualType == 'line') {
             var LinexAxis = document.getElementById("xAxisLabels");
             var LinexAxisOptions = document.getElementsByClassName("xAxisLabel");
 
@@ -898,7 +926,7 @@ Template.visualisation_all.events({
             // elem.style.cursor = 'pointer';
             lineChart(CSV_Data, headerOrig, selectedXlabel, "#svgChar", height, width);
         }
-        else if (visType == "map") {
+        else if (visualType == "map") {
             var parentNodeId = elem.parentElement.getAttribute("id");
             var mapTypeRadio = document.getElementsByName("location_type");
             var mapType;
@@ -914,7 +942,7 @@ Template.visualisation_all.events({
             if (mapType == "ip") {
                 console.log(CSV_Data);
 
-                mapbox(CSV_Data, headerOrig, isVisOn);
+                map = mapbox(CSV_Data, headerOrig, isVisOn);
 
                 // maps(CSV_Data, headerOrig);
             }
@@ -933,11 +961,12 @@ Template.visualisation_all.events({
 
                 if (lonHeader && latHeader) {
 
-                    mapbox(CSV_Data, headerOrig, isVisOn, lonHeader, latHeader);
+                    map = mapbox(CSV_Data, headerOrig, isVisOn, lonHeader, latHeader);
 
                     // maps(CSV_Data, headerOrig, lonHeader, latHeader)
                 }
             }
+            document.getElementById("embedCode").style.display = "none";
 
             isVisOn = true;
         }
@@ -961,6 +990,7 @@ Template.visualisation_all.events({
         document.getElementById("exportChart").style.display = 'inline';
     },
 
+
     "keyup .downloadFileName": function (e) {
         var elem = e.currentTarget;
         var downloadBtn = document.getElementById('downloadCharBtn');
@@ -976,33 +1006,44 @@ Template.visualisation_all.events({
 
     "click .downloadCharBtn": function (e) {
 
+
         var fileName = document.getElementById('downloadFileName').value;
+        var canvas;
 
-        var svg = document.getElementById('svgChar');
-        var svgWidth = svg.clientWidth;
-        var svgHeight = svg.clientHeight;
-        var svgData = new XMLSerializer().serializeToString(svg);
-
-        var canvas = document.createElement("canvas");
-        canvas.width = svgWidth;
-        canvas.height = svgHeight;
-        var ctx = canvas.getContext("2d");
-
-        var img = document.createElement("img");
-        img.setAttribute("src", "data:image/svg+xml;base64," + btoa(svgData));
-
-        img.onload = function () {
-            ctx.drawImage(img, 0, 0);
-
-            // Now is done
-            console.log(canvas.toDataURL("image/png"));
-
+        if (visualType == 'map') {
+            canvas = map.getCanvas();
             var a = document.createElement("a");
             a.download = fileName;
             a.href = canvas.toDataURL("image/png");
             a.click();
+        }
+        else {
+            var svg = document.getElementById('svgChar');
+            var svgWidth = svg.clientWidth;
+            var svgHeight = svg.clientHeight;
+            var svgData = new XMLSerializer().serializeToString(svg);
 
-        };
+            canvas = document.createElement("canvas");
+            canvas.width = svgWidth;
+            canvas.height = svgHeight;
+            var ctx = canvas.getContext("2d");
+
+            var img = document.createElement("img");
+            img.setAttribute("src", "data:image/svg+xml;base64," + btoa(svgData));
+
+            img.onload = function () {
+                ctx.drawImage(img, 0, 0);
+
+                // Now is done
+                console.log(canvas.toDataURL("image/png"));
+
+                var a = document.createElement("a");
+                a.download = fileName;
+                a.href = canvas.toDataURL("image/png");
+                a.click();
+
+            };
+        }
 
     },
 
@@ -1013,11 +1054,35 @@ Template.visualisation_all.events({
     },
 
     "change #xAxisLabels": function (e) {
+
+        var elem = e.currentTarget;
+        var selectedXlabel = elem.options[elem.selectedIndex].getAttribute("original");
+        svg.innerHTML = "";
+
+        if (visualType == "bar") {
+            // var xAxis = document.getElementById("xAxisLabels");
+            // var xAxisOptions = document.getElementsByClassName("xAxisLabel");
+
+
+            svg.style.display = "inline";
+            barChartHeaders(CSV_Data, headerOrig, selectedXlabel, "#svgChar", height, width);
+        }
+
+
+        else if (visualType == 'line') {
+
+            svg.style.display = "inline";
+            lineChart(CSV_Data, headerOrig, selectedXlabel, "#svgChar", height, width);
+        }
+
+
         console.log(e);
     },
 
     "click .chartTabs": function (e) {
         document.getElementById("charts").style.display = "none";
+        document.getElementById('exportChart').style.display = 'none';
+        resetOutputEmbed();
     },
 
 });

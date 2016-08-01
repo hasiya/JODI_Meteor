@@ -8,26 +8,37 @@ var hit_sourceDep = new Tracker.Dependency();
 function setUpPanel() {
     headerValues = [];
 
-    CSV_keys.forEach(function (key) {
-        var keyItem = {
-            "originalVal": key,
-            "presentVal": key,
-            "type": "",
-            "deleted": false,
-            "valCount": {}
-        };
-        headerValues.push(keyItem);
-
-    });
+    // CSV_keys.forEach(function (key) {
+    //     var keyItem = {
+    //         "originalVal": key,
+    //         "presentVal": key,
+    //         "type": "",
+    //         "deleted": false,
+    //         "valCount": {}
+    //     };
+    //     headerValues.push(keyItem);
+    //
+    // });
 
     CSV_keys.forEach(function (k) {
 
+        var keyItem = {
+            "originalVal": k,
+            "presentVal": k,
+            "type": "string",
+            "deleted": false,
+            "valCount": {}
+        };
+
         if (k.toLowerCase() == "longitude") {
             var test = document.getElementById("type_" + k);
-            document.getElementById("type_" + k).value = "lon";
+            // document.getElementById("type_" + k).value = "lon";
+            keyItem['type'] = 'lon';
         }
         else if (k.toLowerCase() == "latitude") {
-            document.getElementById("type_" + k).value = "lat";
+            // document.getElementById("type_" + k).value = "lat";
+            keyItem['type'] = 'lat';
+
         }
         else {
             var propertiesArray = CSV_Data.map(function (d) {
@@ -50,10 +61,19 @@ function setUpPanel() {
                 var isNumbers = (!propertiesArray.some(isNaN));
 
                 if (isNumbers) {
-                    document.getElementById("type_" + k).value = "number";
+                    // document.getElementById("type_" + k).value = "number";
+                    keyItem['type'] = 'number';
+
                 }
             }
         }
+
+        headerValues.push(keyItem);
+        headers_dep.changed();
+        var panelDoneBtn = document.getElementById('panelDone');
+        panelDoneBtn.className = "pull-right btn-success btn PanelDone";
+        panelDoneBtn.innerHTML = "Done";
+
     });
 }
 
@@ -78,6 +98,25 @@ Template.registerHelper("dateTime", function (dateTime) {
     // var date = new Date(dateTime);
 
     return moment(dateTime).format('DD-MM-YYYY, HH:mm');
+});
+
+Template.registerHelper("setupPanel", function (dateTime) {
+    // var date = new Date(dateTime);
+
+    setUpPanel();
+});
+
+Template.registerHelper("setupPanel", function (dateTime) {
+    // var date = new Date(dateTime);
+
+    setUpPanel();
+});
+
+Template.registerHelper("checkKeys", function (dateTime) {
+    // var date = new Date(dateTime);
+
+    return !!CSV_keys;
+    // setUpPanel();
 });
 
 Template.load_data.events({
@@ -105,6 +144,11 @@ Template.load_data.events({
                     else {
                         hit_source = [];
                         hit_sourceDep.changed();
+                        document.getElementById("panel").style.display = "none";
+                        document.getElementById("visualMenu").style.display = "none";
+                        document.getElementById("charts").style.display = "none";
+                        document.getElementById("exportChart").style.display = "none";
+
                     }
                     console.log(hit_source);
                     // createSearchDataset(hit_source);
@@ -116,6 +160,10 @@ Template.load_data.events({
         else {
             hit_source = [];
             hit_sourceDep.changed();
+            document.getElementById("panel").style.display = "none";
+            document.getElementById("visualMenu").style.display = "none";
+            document.getElementById("charts").style.display = "none";
+            document.getElementById("exportChart").style.display = "none";
         }
         // var hit_source = []
         //
@@ -142,13 +190,14 @@ Template.load_data.events({
                 doc = data;
                 console.log(doc);
                 CSV_Data = doc['dataset'];
+
                 CSV_keys = doc['headers'];
-                csv_key_dep.changed();
+                // csv_key_dep.changed();
 
 
                 console.log(CSV_Data);
                 document.getElementById("panel").style.display = "inline";
-                // setUpPanel();
+                setUpPanel();
 
                 // createSearchDataset(hit_source);
             }

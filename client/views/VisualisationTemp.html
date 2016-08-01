@@ -1,178 +1,188 @@
 <template name="visualisation_all">
-    <div id="panel" style="display: none">
-        <div id="HeaderConfig">
-            <div class='row top-buffer' style='margin-bottom: 10px'>
-                <div class='col-md-1'>
-                </div>
-                <div class='col-md-4' style='text-align: center'>
-                    <strong>Column Headers</strong>
-                </div>
-                <div class='col-md-4' style='text-align: center'>
-                    <strong>Data Type</strong>
-                </div>
-                <div class='col-md-3'>
-                    <div class='col-md-6'>
-                    </div>
-                    <div class='col-md-6'>
-                    </div>
-                </div>
-            </div>
-
-            {{#each get_keys}}
-
-                <div class='row top-buffer' id='row_{{this}}' style='display: inherit'>
+    <div id="visual_all">
+        <div id="panel" style="display: none">
+            <div id="HeaderConfig">
+                <div class='row top-buffer' style='margin-bottom: 10px'>
                     <div class='col-md-1'>
                     </div>
-                    <div class='col-md-4'>
-                        <form class='form-inline'>
-                            <input type='text' index='{{@index}}' name='headerText' headerID='{{this}}'
-                                   style='width: 80%' readonly id='header_{{this}}' class='form-control input'
-                                   autocomplete='off' value='{{this}}'>
-                            <button type='button' id='editBtn_{{this}}' name='headerEditBtn' headerID='{{this}}'
-                                    data-toggle='tooltip' data-placement='top' title='Edit the Header Text Field'
-                                    style='width: 15%' class='tooltipped csvHeaderEdit  btn btn-default btn-sm'>
-                                <span class='glyphicon glyphicon-edit'></span>
-                            </button>
-                        </form>
+                    <div class='col-md-4' style='text-align: center'>
+                        <strong>Column Headers</strong>
                     </div>
-                    <div class='col-md-4'>
-                        <select id='type_{{this}}' headerID='{{this}}' index='{{@index}}' name='headerType'
-                                class='csvHeaderType form-control'>
-                            <option value='string'>String</option>
-                            <option value='number'>Number</option>
-                            <option value='lon'>Longitude</option>
-                            <option value='lat'>Latitude</option>
-                            <option value='ip'>IP Address</option>
-                            <!--// <option value='latitude'>Latitude</option>-->
-                        </select>
+                    <div class='col-md-4' style='text-align: center'>
+                        <strong>Data Type</strong>
                     </div>
                     <div class='col-md-3'>
                         <div class='col-md-6'>
-                            <!--// <form class='form-inline'>-->
-                            <div class='checkbox' style='width: 50%'>
-                                <label for='checkBox_{{this}}' data-toggle='tooltip' data-placement='top'
-                                       title='Count Data'><input type='checkbox' name='headerCheck'
-                                                                 id='checkBox_{{this}}'/>Count</label>
-                            </div>
                         </div>
                         <div class='col-md-6'>
-                            <button type='button' id='remvBtn_{{this}}' headerID='{{this}}' name='headerremvbtn'
-                                    index='{{@index}}' data-toggle='tooltip' data-placement='top'
-                                    title='Delete Header Row' class='pull-left csvHeaderDelete btn btn-danger btn-sm'>
-                                <span class='glyphicon glyphicon-remove'></span>
-                            </button>
                         </div>
-                        <!--// </form>-->
-
                     </div>
                 </div>
 
-            {{/each}}
+                {{#each get_keys}}
 
-            <!--<div class='pull-right btn-toolbar'>-->
-            <!--<button id='restore' style='display: none' data-toggle='modal' data-target='#restoreHeadersModal' class='btn-warning btn restoreDeleted'>Restore Deleted <span class='glyphicon glyphicon-refresh'></span></button>-->
-            <!--<button class='btn-success btn PanelDone'>Done</button>-->
+                    <div class='row top-buffer' id='row_{{originalVal}}' style='display: inherit'>
+                        <div class='col-md-1'>
+                        </div>
+                        <div class='col-md-4'>
+                            <form class='form-inline'>
+                                <input type='text' index='{{@index}}' name='headerText' headerID='{{originalVal}}'
+                                       style='width: 80%' readonly id='header_{{originalVal}}'
+                                       class='form-control input'
+                                       autocomplete='off' value='{{originalVal}}'>
+                                <button type='button' id='editBtn_{{originalVal}}' name='headerEditBtn'
+                                        headerID='{{originalVal}}'
+                                        data-toggle='tooltip' data-placement='top' title='Edit the Header Text Field'
+                                        style='width: 15%' class='tooltipped csvHeaderEdit  btn btn-default btn-sm'>
+                                    <span class='glyphicon glyphicon-edit'></span>
+                                </button>
+                            </form>
+                        </div>
+                        <div class='col-md-4'>
+                            <select id='type_{{originalVal}}' headerID='{{originalVal}}' index='{{@index}}'
+                                    name='headerType'
+                                    class='csvHeaderType form-control'>
+                                <option value='string' selected="{{isEqual type 'string'}}">String</option>
+                                <option value='number' selected="{{isEqual type 'number'}}">Number</option>
+                                <option value='lon' selected="{{isEqual type 'lon'}}">Longitude</option>
+                                <option value='lat' selected="{{isEqual type 'lat'}}">Latitude</option>
+                                <option value='ip' selected="{{isEqual type 'ip'}}">IP Address</option>
+                                <!--// <option value='latitude'>Latitude</option>-->
+                            </select>
+                        </div>
+                        <div class='col-md-3'>
+                            <div class='col-md-6'>
+                                <!--// <form class='form-inline'>-->
+                                <div class='checkbox' style='width: 50%'>
+                                    <label for='checkBox_{{originalVal}}' data-toggle='tooltip' data-placement='top'
+                                           title='Count Data'><input type='checkbox' name='headerCheck'
+                                                                     id='checkBox_{{originalVal}}'/>Count</label>
+                                </div>
+                            </div>
+                            <div class='col-md-6'>
+                                <button type='button' id='remvBtn_{{originalVal}}' headerID='{{originalVal}}'
+                                        name='headerremvbtn'
+                                        index='{{@index}}' data-toggle='tooltip' data-placement='top'
+                                        title='Delete Header Row'
+                                        class='pull-left csvHeaderDelete btn btn-danger btn-sm'>
+                                    <span class='glyphicon glyphicon-remove'></span>
+                                </button>
+                            </div>
+                            <!--// </form>-->
+
+                        </div>
+                    </div>
+
+                {{/each}}
+
+                    <!--{{#if checkKeys}}-->
+                <!--{{> setupPanel}}-->
+                    <!--{{/if}}-->
+
+                <!--<div class='pull-right btn-toolbar'>-->
+                <!--<button id='restore' style='display: none' data-toggle='modal' data-target='#restoreHeadersModal' class='btn-warning btn restoreDeleted'>Restore Deleted <span class='glyphicon glyphicon-refresh'></span></button>-->
+                <!--<button class='btn-success btn PanelDone'>Done</button>-->
+                <!--</div>-->
+            </div>
+            <div id="HeaderConfigBtns">
+                <div class='pull-right btn-toolbar'>
+                    <button id='restore' style='display: none' data-toggle='modal' data-target='#restoreHeadersModal'
+                            class='btn-warning btn restoreDeleted'>Restore Deleted <span
+                            class='glyphicon glyphicon-refresh'></span></button>
+                    <button id="panelDone" class='btn-success btn PanelDone'>Done</button>
+                </div>
+
+            </div>
+
+            <!--<div id="delHeadersPanel" style="display: none" >-->
+            <div id="restoreHeadersModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="griModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                    aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title" id="gridModalLabel">Restore Deleted Labels</h4>
+                        </div>
+                        <div id="restoreModelBody" class="modal-body">
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-success" data-dismiss="modal">Done</button>
+                            <!--<button type="button" class="btn btn-primary">Save changes</button>-->
+                        </div>
+                    </div>
+                </div>
+            </div>
             <!--</div>-->
         </div>
-        <div id="HeaderConfigBtns">
-            <div class='pull-right btn-toolbar'>
-                <button id='restore' style='display: none' data-toggle='modal' data-target='#restoreHeadersModal'
-                        class='btn-warning btn restoreDeleted'>Restore Deleted <span
-                        class='glyphicon glyphicon-refresh'></span></button>
-                <button class='btn-success btn PanelDone'>Done</button>
-            </div>
+        <br>
+        <br>
 
-        </div>
+        <div id="visualMenu" style="display: none">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel with-nav-tabs panel-info">
+                        <div class="panel-heading">
+                            <ul class="nav nav-tabs">
+                                <li class="active"><a class="chartTabs" href="#ChartsMenuTab" data-toggle="tab">Charts
+                                    Menu</a></li>
+                                <li><a class="chartTabs" href="#MapsMenuTab" data-toggle="tab">Maps Menu</a></li>
+                                <!--<li><a href="#tab3info" data-toggle="tab">Info 3</a></li>-->
+                                <!--<li><a href="#tab4info" data-toggle="tab">info 4</a></li>-->
+                            </ul>
+                        </div>
+                        <div class="panel-body">
+                            <div class="tab-content">
+                                <div class="tab-pane fade in active" id="ChartsMenuTab">
 
-        <!--<div id="delHeadersPanel" style="display: none" >-->
-        <div id="restoreHeadersModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="griModalLabel"
-             aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
-                                aria-hidden="true">&times;</span></button>
-                        <h4 class="modal-title" id="gridModalLabel">Restore Deleted Labels</h4>
-                    </div>
-                    <div id="restoreModelBody" class="modal-body">
-
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-success" data-dismiss="modal">Done</button>
-                        <!--<button type="button" class="btn btn-primary">Save changes</button>-->
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!--</div>-->
-    </div>
-    <br>
-    <br>
-
-    <div id="visualMenu" style="display: none">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="panel with-nav-tabs panel-info">
-                    <div class="panel-heading">
-                        <ul class="nav nav-tabs">
-                            <li class="active"><a class="chartTabs" href="#ChartsMenuTab" data-toggle="tab">Charts
-                                Menu</a></li>
-                            <li><a class="chartTabs" href="#MapsMenuTab" data-toggle="tab">Maps Menu</a></li>
-                            <!--<li><a href="#tab3info" data-toggle="tab">Info 3</a></li>-->
-                            <!--<li><a href="#tab4info" data-toggle="tab">info 4</a></li>-->
-                        </ul>
-                    </div>
-                    <div class="panel-body">
-                        <div class="tab-content">
-                            <div class="tab-pane fade in active" id="ChartsMenuTab">
-
+                                </div>
+                                <div class="tab-pane fade" id="MapsMenuTab">
+                                    Maps
+                                </div>
+                                <!--<div class="tab-pane fade" id="tab3info">Info 3</div>-->
+                                <!--<div class="tab-pane fade" id="tab4info">Info 4</div>-->
                             </div>
-                            <div class="tab-pane fade" id="MapsMenuTab">
-                                Maps
-                            </div>
-                            <!--<div class="tab-pane fade" id="tab3info">Info 3</div>-->
-                            <!--<div class="tab-pane fade" id="tab4info">Info 4</div>-->
                         </div>
                     </div>
-                </div>
-
-            </div>
-        </div>
-    </div>
-
-    <div id="charts" style="display: none; margin-top: 10px">
-        <div id="ChartsSvg">
-            <div id="chartsPanel" class="col-md-4"
-                 style="background: #d3d3d3; margin-bottom: 5px; text-align: center">
-                <div id="headerLabelGroup" class="btn-group-vertical col-md-12" style="margin: 5px">
 
                 </div>
-                <!--<button type="button" id="pers_chart" class="btn btn-primary"></button>-->
-                <!--<button id='pers_chart' style='display: none' data-toggle='modal' data-target='#restoreHeadersModal' class='btn-warning btn restoreDeleted'>Restore Deleted <span class='glyphicon glyphicon-refresh'></span></button>-->
-
-
-                <br>
-                <div id="xAxisLblsDiv" style="display: none; margin-top: 10px">
-                    Please choose X axis Label
-                    <label for="xAxisLabels"></label><select id="xAxisLabels" class="form-control"
-                                                             style="margin: 5px; text-align: left;">
-
-                </select>
-                </div>
-
-            </div>
-            <div id="chartBody" class="col-md-8">
-                <svg id="svgChar" class=""></svg>
-                <div id="svgMap" class="row col-md-12">
-                </div>
-
             </div>
         </div>
 
-    </div>
+        <div id="charts" style="display: none; margin-top: 10px">
+            <div id="ChartsSvg">
+                <div id="chartsPanel" class="col-md-4"
+                     style="background: #d3d3d3; margin-bottom: 5px; text-align: center">
+                    <div id="headerLabelGroup" class="btn-group-vertical col-md-12" style="margin: 5px">
 
-    <div id="exportChart" class="col-md-12"
-         style="background: #F5F5F5; padding-bottom:30px; display: none; margin-top: 10px">
+                    </div>
+                    <!--<button type="button" id="pers_chart" class="btn btn-primary"></button>-->
+                    <!--<button id='pers_chart' style='display: none' data-toggle='modal' data-target='#restoreHeadersModal' class='btn-warning btn restoreDeleted'>Restore Deleted <span class='glyphicon glyphicon-refresh'></span></button>-->
+
+
+                    <br>
+                    <div id="xAxisLblsDiv" style="display: none; margin-top: 10px">
+                        Please choose X axis Label
+                        <label for="xAxisLabels"></label><select id="xAxisLabels" class="form-control"
+                                                                 style="margin: 5px; text-align: left;">
+
+                    </select>
+                    </div>
+
+                </div>
+                <div id="chartBody" class="col-md-8">
+                    <svg id="svgChar" class=""></svg>
+                    <div id="svgMap" class="row col-md-12">
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+        <div id="exportChart" class="col-md-12"
+             style="background: #F5F5F5; padding-bottom:30px; display: none; margin-top: 10px">
         <div class="col-md-4" style="padding: 10px;">
             <h3>
                 <i class="fa fa-download fa-fw"></i>
@@ -186,7 +196,7 @@
                 Download Image
             </button>
         </div>
-        <div class="col-md-8" style="padding: 10px;">
+            <div id="embedCode" class="col-md-8" style="padding: 10px;">
             <h3>
                 <i class="fa fa-code fa-fw"></i>
                 Embed Code
@@ -204,6 +214,7 @@
                 <!--<img src="assets/clippy.svg" alt="Copy to clipboard">-->
             </button>
             <!--</div>-->
+        </div>
         </div>
     </div>
 </template>

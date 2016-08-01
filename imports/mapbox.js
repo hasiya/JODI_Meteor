@@ -26,8 +26,8 @@ mapbox = function (dataObj, countHeader, isVisOn, lon, lat) {
         var tmpSvg;
         svg.html("");
         svg = tmpSvg;
-
     }
+
     data = dataObj;
     count_h = countHeader;
     lon_h = lon;
@@ -47,8 +47,6 @@ mapbox = function (dataObj, countHeader, isVisOn, lon, lat) {
         c++;
     });
 
-
-
     if (lat_h && lon_h) {
         data.forEach(function (d) {
             d.location = {
@@ -57,6 +55,9 @@ mapbox = function (dataObj, countHeader, isVisOn, lon, lat) {
             };
         });
     }
+
+    var geoJson = createGeoJSON(data);
+
 
     compute_size();
 
@@ -69,40 +70,118 @@ mapbox = function (dataObj, countHeader, isVisOn, lon, lat) {
 
         map = new mapboxgl.Map({
             container: 'svgMap', // container id
-            style: 'mapbox://styles/mapbox/streets-v9' //stylesheet location
+            style: 'mapbox://styles/mapbox/streets-v9', //stylesheet location
+            // hash: true,
+            preserveDrawingBuffer: true
         });
 
         // map.scrollZoom.disable()
         map.dragRotate.disable();
     }
 
+    map.on('load', function () {
+        map.addSource("points", geoJson);
+        map.addLayer({
+            "id": "points",
+            "type": "symbol",
+            "source": "points",
+            "layout": {
+                "icon-image": "{icon}",
+                // "icon-allow-overlap": true,
+                // "icon-color":"#ff0000",
+                "text-field": "{title}",
+                "text-font": ["Open Sans Semibold", "Arial Unicode MS Bold"],
+                "text-offset": [0, 0.6],
+                "text-anchor": "top"
+            },
+            // "paint": {
+            //     "text-color": "{properties.color}"
+            // }
+        })
+    });
 
-    if (!svg) {
-        var container = map.getCanvasContainer();
-        svg = d3.select(container).append('svg');
-        svg.attr('class', 'map');
-    }
-    else {
-        svg.html("")
-    }
 
+    // geoJson.data.features.forEach(function(marker) {
+    //     // create an img element for the marker
+    //     var el = document.createElement('i');
+    //     el.className = 'marker fa fa-circle';
+    //     el.style.color = marker.properties.color;
+    //     // el.style.backgroundImage = 'url(https://placekitten.com/g/' + marker.properties.iconSize.join('/') + '/)';
+    //     // el.style.width = marker.properties.iconSize[0];
+    //     // el.style.height = marker.properties.iconSize[1];
+    //
+    //     // el.addEventListener('click', function() {
+    //     //     window.alert(marker.properties.message);
+    //     // });
+    //
+    //     // add marker to map
+    //     new mapboxgl.Marker(el)
+    //         .setLngLat(marker.geometry.coordinates)
+    //         .addTo(map);
+    //
+    // });
 
+    // if (!svg) {
+    //     var container = map.getCanvasContainer();
+    //     svg = d3.select(container).append('svg');
+    //     svg.attr('class', 'map');
+    // }
+    // else {
+    //     svg.html("")
+    // }
+    //
     var locationList = [];
 
     data.forEach(function (d) {
         locationList.push(d.location)
     });
 
-    // var dataLocMidpoint = getLocationMidpoint(locationList);
-    // var dataLocMidpoint = avgLoc(locationList);
-    // map.setCenter([dataLocMidpoint.lon, dataLocMidpoint.lat]);
     var mapBounds = getBounds(locationList);
-    map.fitBounds(mapBounds);
+    map.once('load', function () {
+        map.fitBounds(mapBounds);
+    });
 
-    mapLocations();
-    legend();
+    //
+    // mapLocations();
+    // legend();
+    return map;
 
 };
+
+function createGeoJSON(data) {
+    var geoJsonObj = {
+        type: "geojson",
+        data: {
+            type: "FeatureCollection",
+            features: []
+        }
+    };
+
+    data.forEach(function (d) {
+        var feature = {
+            type: "Feature",
+            geometry: {
+                type: "Point",
+                coordinates: [d.location.lon, d.location.lat]
+
+            },
+            properties: {
+                icon: "circle-11",
+                title: d[count_h],
+                iconSize: [10, 10],
+                color: getHeaderColor(d[count_h])
+
+
+            }
+        };
+        geoJsonObj.data.features.push(feature);
+
+    });
+
+    return geoJsonObj;
+
+
+}
 
 function getcolours(count) {
     var i = 0;
@@ -174,26 +253,6 @@ function mapLocations() {
         .transition().duration(1000)
         .attr("r", 3);
 
-
-    // var key = svg.selectAll(".key")
-    //     .data(count_data)
-    //     .enter().append("g")
-    //     .attr("class", "key");
-    //
-    // dots = key.selectAll(".pin")
-    //     .data(function (d) {
-    //         return d.values;
-    //     })
-    //     .enter().append("circle", ".pin")
-    //     .attr("r", 1)
-    //     .style("fill", function (d) {
-    //         return colours(d[count_h]);
-    //     })
-    //     .style("fill-opacity", "2")
-    //     .transition().duration(1000)
-    //     .attr("r", 6);
-
-
     render();
 
     function render() {
@@ -214,14 +273,6 @@ function mapLocations() {
     map.on("move", function () {
         render()
     });
-
-    // })
-    // .attr("transform", function (d) {
-    //
-    //     if (d.hasOwnProperty("location")) {
-    //         return "translate(" + project(d) + ")";
-    //     }
-    // });
 
 }
 
@@ -281,98 +332,6 @@ function render() {
             return project(d).y
         }
     });
-}
-
-function getLocationMidpoint(locations) {
-    var cartesianCoords = [];
-    var latLon_r = [];
-    var X = 0, Y = 0, Z = 0;
-    locations.forEach(function (l) {
-        var lat_r = l.lat * Math.PI / 180;
-        var lon_r = l.lon * Math.PI / 180;
-
-        latLon_r.push({
-            lat_r: lat_r,
-            lon_r: lon_r
-        });
-
-        var x, y, z;
-
-        x = Math.cos(lat_r) * Math.cos(lon_r);
-        y = Math.cos(lat_r) * Math.sin(lon_r);
-        z = Math.sin(lat_r);
-
-        var coords = {
-            x: x,
-            y: y,
-            z: z
-        };
-
-        cartesianCoords.push(coords);
-    });
-
-    var totWeight = locations.length;
-
-    cartesianCoords.forEach(function (c) {
-        X += (c.x);
-        Z += (c.z);
-        Y += (c.x);
-    });
-
-    X = X / totWeight;
-    Y = Y / totWeight;
-    Z = Z / totWeight;
-
-    var Lon = Math.atan2(X, Y);
-    var Hyp = Math.sqrt(X * X + Y * Y);
-    var Lat = Math.atan2(Hyp, Z);
-
-    var center_lat = Lat * 180 / Math.PI;
-    var center_lon = Lon * 180 / Math.PI;
-
-    var lat = 0, lon = 0;
-    latLon_r.forEach(function (l) {
-        lat += l.lat_r;
-        lon += l.lon_r;
-    });
-
-    lat = lat / totWeight;
-    lon = lon / totWeight;
-
-    if (lon < -180) {
-        lon = lon - 360;
-    }
-    if (lon > 180) {
-        lon = lon + 360;
-    }
-    //
-    // return {
-    //     lat: center_lat,
-    //     lon: center_lon
-    // };
-
-    return {
-        lat: lat,
-        lon: lon
-    };
-}
-
-function avgLoc(locations) {
-    var totLon = 0, totLat = 0;
-
-    locations.forEach(function (l) {
-        totLat += l.lat;
-        totLon += l.lon;
-    });
-
-    var latAvg = totLat / locations.length;
-    var lonAvg = totLon / locations.length;
-
-    return {
-        lat: latAvg,
-        lon: lonAvg
-    };
-
 }
 
 function getBounds(locations) {
