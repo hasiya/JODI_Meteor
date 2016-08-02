@@ -1,6 +1,7 @@
 /**
  * Created by RajithaHasith on 28/07/2016.
  */
+import Clipboard from 'clipboard';
 
 var removedHeaderVals = [];
 var map;
@@ -9,6 +10,7 @@ var headerOrig;
 var svg;
 var width;
 var height;
+
 
 
 function checkIPlist(ip, list) {
@@ -133,6 +135,11 @@ function checkDataset(dataset) {
 
 }
 
+Template.visualisation_all.onRendered(function () {
+    var clipboard = new Clipboard('.clipboardBtn');
+
+});
+
 Template.registerHelper("isEqual", function (type1, type2) {
     // var date = new Date(dateTime);
 
@@ -146,6 +153,7 @@ Template.visualisation_all.helpers({
         return headerValues;
     }
 });
+
 
 Template.visualisation_all.events({
 
@@ -837,7 +845,7 @@ Template.visualisation_all.events({
             // var createBarAsyc = Meteor.wrapAsync(createBar);
             // elem.disabled = false;
             // elem.style.cursor = 'pointer';
-            barChartHeaders(CSV_Data, headerOrig, selectedXlabel, "#svgChar", height, width);
+            barChartHeaders(CSV_Data, headerOrig, selectedXlabel, "#svgChar", height, width, Data_Source);
         }
         else if (visualType == "count") {
             var values = [];
@@ -859,7 +867,7 @@ Template.visualisation_all.events({
             svg.style.display = "inline";
 
 
-            barChartCounts(CSV_Data, headerOrig, "#svgChar", height, width);
+            barChartCounts(CSV_Data, headerOrig, "#svgChar", height, width, Data_Source);
         }
         else if (visualType == "group") {
 
@@ -879,7 +887,7 @@ Template.visualisation_all.events({
             svg.style.display = "inline";
 
 
-            groupedBarChart(CSV_Data, mainCat, subCat, yAxisMes, "#svgChar", height, width);
+            groupedBarChart(CSV_Data, mainCat, subCat, yAxisMes, "#svgChar", height, width, Data_Source);
         }
         else if (visualType == "pie") {
             /*svg.style.display = "inline";
@@ -905,7 +913,7 @@ Template.visualisation_all.events({
             var measure = pieMeasureOption[pieMeasure.selectedIndex].getAttribute("original");
 
             svg.style.display = "inline";
-            pieChart(CSV_Data, header, measure, false, "#svgChar", height, width);
+            pieChart(CSV_Data, header, measure, false, "#svgChar", height, width, Data_Source);
 
         }
         else if (visualType == 'line') {
@@ -924,7 +932,7 @@ Template.visualisation_all.events({
             // var createBarAsyc = Meteor.wrapAsync(createBar);
             // elem.disabled = false;
             // elem.style.cursor = 'pointer';
-            lineChart(CSV_Data, headerOrig, selectedXlabel, "#svgChar", height, width);
+            lineChart(CSV_Data, headerOrig, selectedXlabel, "#svgChar", height, width, Data_Source);
         }
         else if (visualType == "map") {
             var parentNodeId = elem.parentElement.getAttribute("id");
@@ -942,7 +950,7 @@ Template.visualisation_all.events({
             if (mapType == "ip") {
                 console.log(CSV_Data);
 
-                map = mapbox(CSV_Data, headerOrig, isVisOn);
+                map = mapbox(CSV_Data, headerOrig, isVisOn, Data_Source);
 
                 // maps(CSV_Data, headerOrig);
             }
@@ -961,7 +969,7 @@ Template.visualisation_all.events({
 
                 if (lonHeader && latHeader) {
 
-                    map = mapbox(CSV_Data, headerOrig, isVisOn, lonHeader, latHeader);
+                    map = mapbox(CSV_Data, headerOrig, isVisOn, Data_Source, lonHeader, latHeader);
 
                     // maps(CSV_Data, headerOrig, lonHeader, latHeader)
                 }
@@ -1065,14 +1073,14 @@ Template.visualisation_all.events({
 
 
             svg.style.display = "inline";
-            barChartHeaders(CSV_Data, headerOrig, selectedXlabel, "#svgChar", height, width);
+            barChartHeaders(CSV_Data, headerOrig, selectedXlabel, "#svgChar", height, width, Data_Source);
         }
 
 
         else if (visualType == 'line') {
 
             svg.style.display = "inline";
-            lineChart(CSV_Data, headerOrig, selectedXlabel, "#svgChar", height, width);
+            lineChart(CSV_Data, headerOrig, selectedXlabel, "#svgChar", height, width), Data_Source;
         }
 
 

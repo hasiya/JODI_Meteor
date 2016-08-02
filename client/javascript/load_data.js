@@ -4,21 +4,13 @@
 var hit_source = [];
 var hit_sourceDep = new Tracker.Dependency();
 
+var loadDoc = {};
+var load_doc_dep = new Tracker.Dependency();
+
+
 
 function setUpPanel() {
     headerValues = [];
-
-    // CSV_keys.forEach(function (key) {
-    //     var keyItem = {
-    //         "originalVal": key,
-    //         "presentVal": key,
-    //         "type": "",
-    //         "deleted": false,
-    //         "valCount": {}
-    //     };
-    //     headerValues.push(keyItem);
-    //
-    // });
 
     CSV_keys.forEach(function (k) {
 
@@ -82,6 +74,20 @@ Template.load_data.helpers({
     getSearchData: function () {
         hit_sourceDep.depend();
         return hit_source;
+    },
+
+    getHeaders: function () {
+        headers_dep.depend();
+        return headerValues;
+    },
+    getDoc: function () {
+        load_doc_dep.depend();
+        return loadDoc;
+    },
+    getData: function () {
+
+        csv_data_dep.depend();
+        return CSV_Data;
     }
 });
 // Template.load_data.Test = function () {
@@ -100,19 +106,8 @@ Template.registerHelper("dateTime", function (dateTime) {
     return moment(dateTime).format('DD-MM-YYYY, HH:mm');
 });
 
-Template.registerHelper("setupPanel", function (dateTime) {
-    // var date = new Date(dateTime);
 
-    setUpPanel();
-});
-
-Template.registerHelper("setupPanel", function (dateTime) {
-    // var date = new Date(dateTime);
-
-    setUpPanel();
-});
-
-Template.registerHelper("checkKeys", function (dateTime) {
+Template.registerHelper("getHeaders", function (dateTime) {
     // var date = new Date(dateTime);
 
     return !!CSV_keys;
@@ -139,15 +134,23 @@ Template.load_data.events({
                         hits.forEach(function (hit) {
                             hit_source.push(hit['_source']);
                             hit_sourceDep.changed();
-                        })
+                        });
+
+                        document.getElementById("searchList").style.display = 'inline';
+                        document.getElementById("visual_all").style.display = "none";
+                        document.getElementById('viewDataSetInfo').style.display = 'none';
+
                     }
                     else {
+                        document.getElementById("searchList").style.display = 'none';
+                        document.getElementById("visual_all").style.display = "none";
+                        document.getElementById('viewDataSetInfo').style.display = 'none';
                         hit_source = [];
                         hit_sourceDep.changed();
-                        document.getElementById("panel").style.display = "none";
-                        document.getElementById("visualMenu").style.display = "none";
-                        document.getElementById("charts").style.display = "none";
-                        document.getElementById("exportChart").style.display = "none";
+                        // document.getElementById("panel").style.display = "none";
+                        // document.getElementById("visualMenu").style.display = "none";
+                        // document.getElementById("charts").style.display = "none";
+                        // document.getElementById("exportChart").style.display = "none";
 
                     }
                     console.log(hit_source);
@@ -158,26 +161,56 @@ Template.load_data.events({
             // console.log(hits)
         }
         else {
+            document.getElementById("searchList").style.display = 'none';
+            document.getElementById("visual_all").style.display = "none";
+            document.getElementById('viewDataSetInfo').style.display = 'none';
+
             hit_source = [];
             hit_sourceDep.changed();
-            document.getElementById("panel").style.display = "none";
-            document.getElementById("visualMenu").style.display = "none";
-            document.getElementById("charts").style.display = "none";
-            document.getElementById("exportChart").style.display = "none";
+            // document.getElementById("panel").style.display = "none";
+            // document.getElementById("visualMenu").style.display = "none";
+            // document.getElementById("charts").style.display = "none";
+            // document.getElementById("exportChart").style.display = "none";
         }
-        // var hit_source = []
-        //
-        // if(hits.length > 0){
-        //     hits.forEach(function (hit) {
-        //         hit_source.push(hit['_source']);
-        //     })
-        // }
-        // console.log(hit_source)
-
 
     },
 
     "click .loadData": function (e) {
+        var elem = e.currentTarget;
+        var dataset_name = elem.value;
+
+        document.getElementById("searchList").style.display = 'none';
+        document.getElementById("visual_all").style.display = "inline";
+        document.getElementById('viewDataSetInfo').style.display = 'inline';
+
+
+
+        $.ajax({
+            method: "GET",
+            url: "http://" + pythonServer + "/get_dataset/" + dataset_name,
+            success: function (data) {
+                loadDoc = data;
+                load_doc_dep.changed();
+                console.log(loadDoc);
+                CSV_Data = loadDoc['dataset'];
+                Data_Source = loadDoc["data_source"];
+                // csv_data_dep.changed();
+
+                CSV_keys = loadDoc['headers'];
+                // csv_key_dep.changed();
+
+
+                console.log(CSV_Data);
+                document.getElementById("panel").style.display = "inline";
+                setUpPanel();
+
+                // createSearchDataset(hit_source);
+            }
+        });
+    },
+
+    "click .viewData": function (e) {
+        e.preventDefault();
         var elem = e.currentTarget;
         var dataset_name = elem.value;
 
@@ -190,17 +223,15 @@ Template.load_data.events({
                 doc = data;
                 console.log(doc);
                 CSV_Data = doc['dataset'];
+                Data_Source = loadDoc["data_source"];
+                csv_data_dep.changed();
+                $('#viewDataModal').modal('show');
 
-                CSV_keys = doc['headers'];
-                // csv_key_dep.changed();
-
-
-                console.log(CSV_Data);
-                document.getElementById("panel").style.display = "inline";
-                setUpPanel();
 
                 // createSearchDataset(hit_source);
             }
         });
+
     }
+
 });

@@ -1,4 +1,4 @@
-pieChart = function (data, header, measure, count, svgID, h, w) {
+pieChart = function (data, header, measure, count, svgID, h, w, Data_Source) {
 
     var margin = {
         top: 10,
@@ -18,7 +18,13 @@ pieChart = function (data, header, measure, count, svgID, h, w) {
     myChart.addLegend('70%', '1%', '30%', '100%', "left");
     myChart.draw();
 
+    svg.append("text")
+        .attr("x", w / 2 + w / 5)
+        .attr("y", h - 20)
+        .text(Data_Source);
+
     var chartSvg = myChart.svg[0][0];
     document.getElementById('chartEmbedTxt').value = chartSvg.outerHTML;
+
 
 };

@@ -6,7 +6,7 @@
                 <div class="panel-heading">
                     <ul class="nav nav-tabs">
                         <li class="active"><a href="#tabCSV" data-toggle="tab">CSV Data</a></li>
-                        <li><a href="#tabPDF" data-toggle="tab">PDF</a></li>
+                        <li><a href="#tabAPI" data-toggle="tab">API Data</a></li>
                         <!--<li><a href="#tab3info" data-toggle="tab">Info 3</a></li>-->
                         <!--<li><a href="#tab4info" data-toggle="tab">info 4</a></li>-->
                     </ul>
@@ -18,12 +18,9 @@
                             {{>tab_csv}}
 
                         </div>
-                        <div class="tab-pane fade" id="tabPDF">
+                        <div class="tab-pane fade" id="tabAPI">
+                            {{>tab_api}}
 
-                            <form action="" method=post enctype=multipart/form-data>
-                                <input type=file name=file>
-                                <input type=submit value=Upload>
-                            </form>
 
                         </div>
                         <!--<div class="tab-pane fade" id="tab3info">Info 3</div>-->

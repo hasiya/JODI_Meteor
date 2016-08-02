@@ -10,7 +10,6 @@ import "../../imports/mapbox";
 import "../../imports/dimple_line";
 import "../../imports/functions";
 
-import Clipboard from 'clipboard';
 
 // var pythonServer = "139.59.186.138/";
 pythonServer = "localhost:5000";
@@ -19,6 +18,8 @@ pythonServer = "localhost:5000";
 CSV_keys = [];
 csv_key_dep = new Tracker.Dependency();
 CSV_Data = [];
+csv_data_dep = new Tracker.Dependency();
+Data_Source = "";
 
 var showPanel = false;
 var showPanel_dep = new Tracker.Dependency();
@@ -294,11 +295,11 @@ function checkDataset(dataset) {
         success: function (data) {
             if (data.message == dataAlreadyExist) {
                 Message.html("The CSV data already exist in the database. Data set name: '" + data.data_set_name + "'");
-                document.getElementById("datasetName").style.display = "none";
+                document.getElementById("datasetStorePanel").style.display = "none";
                 document.getElementById("panel").style.display = "inline";
             }
             else if (data.message == newDataset) {
-                document.getElementById("datasetName").style.display = "inline";
+                document.getElementById("datasetStorePanel").style.display = "inline";
 
             }
             elem.disabled = false;
@@ -312,14 +313,14 @@ function checkDataset(dataset) {
     });
 }
 
-function insertData(datasetName, dataset) {
+function insertData(dataInfo, dataset) {
     var headersObj = [];
     CSV_keys.forEach(function (key) {
         headersObj.push(key);
     });
     var requestObject = {
-        collectionName: datasetName,
-        collectionData: dataset,
+        datasetInfo: dataInfo,
+        DataSet: dataset,
         headers: CSV_keys
     };
 
@@ -338,7 +339,7 @@ function insertData(datasetName, dataset) {
 
             // if(data.message == dataAlreadyExist){
             //     Message.html("The CSV data already exist in the database. Data set name: '"+data.data_set_name+"'");
-            //     document.getElementById("datasetName").style.display = "none";
+            //     document.getElementById("datasetStorePanel").style.display = "none";
             //     document.getElementById("panel").style.display = "inline";
             // }
             if (data.message == dataNameAlreadyExist) {
@@ -346,7 +347,7 @@ function insertData(datasetName, dataset) {
                 elem.disabled = false;
             }
             else if (data.message == dataStored) {
-                document.getElementById("datasetName").style.display = "none";
+                document.getElementById("datasetStorePanel").style.display = "none";
                 document.getElementById("panel").style.display = "inline";
                 // elem.disabled = false;
                 var csvDataName = document.getElementById("csvDataName").value = "";
@@ -405,6 +406,9 @@ Template.tab_csv.onRendered(function () {
         if (!/\S/.test(text)) {
             processBtn.style.display = "none";
             clearBtn.style.display = "none";
+            var fileUploader = document.getElementById("fileUpload");
+            fileUploader.style.display = "inline";
+            document.getElementById("csvFileName").value = "";
 
             var panel = document.getElementById("panel");
             panel.style.display = "none";
@@ -419,7 +423,6 @@ Template.tab_csv.onRendered(function () {
         }
     });
 
-    var clipboard = new Clipboard('.clipboardBtn');
     // GoogleMaps.load(
     //     {    key:"AIzaSyB8shH7uf30GbAWTRFAiWPzcIY1grpw9Xc"}
     // );
@@ -487,7 +490,7 @@ Template.tab_csv.events({
                             Message.html("");
                             Code_Editor.setOption("readOnly", true);
                             // checkDataset(CSV_Data);
-                            document.getElementById("datasetName").style.display = "inline";
+                            document.getElementById("datasetStorePanel").style.display = "inline";
 
 
                             elem.disabled = false;
@@ -524,18 +527,57 @@ Template.tab_csv.events({
     "click .storeDataBtn": function (e) {
         var elem = e.currentTarget;
         var csvDataName = document.getElementById("csvDataName");
+        var csvPersonName = document.getElementById("PersonName");
+        var csvDataSource = document.getElementById("DataSource");
+
+        var dataInfo = {
+            dataset_name: csvDataName.value,
+            person_name: csvPersonName.value,
+            data_source: csvDataSource.value
+        };
+        Data_Source = csvDataSource.value;
+
         var text = Code_Editor.getValue();
 
         elem.disabled = true;
-        insertData(csvDataName.value, CSV_Data);
+        insertData(dataInfo, CSV_Data);
 
 
     },
 
     "keyup .csvDataName": function (e) {
         var elem = e.currentTarget;
+        var elemVal = elem.value;
+        var personTxt = document.getElementById("PersonName").value;
+        var dataSourceTxt = document.getElementById("DataSource").value;
         var storeBtn = document.getElementById("storeDataBtn");
-        storeBtn.disabled = elem.value <= 0;
+
+        storeBtn.disabled = !(elemVal && personTxt && dataSourceTxt);
+
+
+    },
+
+    "keyup .PersonName": function (e) {
+        var elem = e.currentTarget;
+        var elemVal = elem.value;
+        var dataNameTxt = document.getElementById("csvDataName").value;
+        var dataSourceTxt = document.getElementById("DataSource").value;
+        var storeBtn = document.getElementById("storeDataBtn");
+
+
+        storeBtn.disabled = !(elemVal && dataNameTxt && dataSourceTxt);
+
+    },
+
+    "keyup .DataSource": function (e) {
+        var elem = e.currentTarget;
+        var elemVal = elem.value;
+        var dataNameTxt = document.getElementById("csvDataName").value;
+        var personTxt = document.getElementById("PersonName").value;
+        var storeBtn = document.getElementById("storeDataBtn");
+
+        storeBtn.disabled = !(elemVal && dataNameTxt && personTxt);
+
     },
 
     "click .EditCSV": function (e) {
@@ -543,13 +585,14 @@ Template.tab_csv.events({
         var elem = e.currentTarget;
         elem.className = "btn-success btn ProcessCSV";
         elem.innerHTML = "Process";
-        var datasetName = document.getElementById("datasetName");
+        var datasetName = document.getElementById("datasetStorePanel");
         datasetName.style.display = "none";
 
         var temp;
         CSV_keys = temp;
         CSV_Data = temp;
         headerValues = [];
+        Data_Source = "";
 
         var panel = document.getElementById("panel");
         panel.style.display = "none";
@@ -595,13 +638,14 @@ Template.tab_csv.events({
         processBtn.style.display = "none";
         var clearBtn = document.getElementById("clear_editor");
         clearBtn.style.display = "none";
-        var datasetName = document.getElementById("datasetName");
+        var datasetName = document.getElementById("datasetStorePanel");
         datasetName.style.display = "none";
 
         var temp;
         CSV_keys = temp;
         CSV_Data = temp;
         headerValues = [];
+        Data_Source = "";
 
         var panel = document.getElementById("panel");
         panel.style.display = "none";

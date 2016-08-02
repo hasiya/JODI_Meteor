@@ -1,4 +1,4 @@
-barChartHeaders = function (data, property, xLabel, svgID, h, w) {
+barChartHeaders = function (data, property, xLabel, svgID, h, w, Data_Source) {
 
     var margin = {
         top: 50,
@@ -26,11 +26,18 @@ barChartHeaders = function (data, property, xLabel, svgID, h, w) {
         $(svgID).height(svgHeight + labelSizeApprx);
     }
 
+    svg.append("text")
+        .attr("x", w / 2 + w / 5)
+        .attr("y", h - 20)
+        .text(Data_Source);
+
     var chartSvg = myChart.svg[0][0];
     document.getElementById('chartEmbedTxt').value = chartSvg.outerHTML;
+
+
 };
 
-barChartCounts = function (data, property, svgID, h, w) {
+barChartCounts = function (data, property, svgID, h, w, Data_Source) {
 
     var margin = {
         top: 50,
@@ -57,10 +64,15 @@ barChartCounts = function (data, property, svgID, h, w) {
         var svgHeight = $(svgID).height();
         $(svgID).height(svgHeight + labelSizeApprx);
     }
+    svg.append("text")
+        .attr("x", w / 2 + w / 5)
+        .attr("y", h - 20)
+        .text(Data_Source);
 
     var chartSvg = myChart.svg[0][0];
 
     document.getElementById('chartEmbedTxt').value = chartSvg.outerHTML;
+
 
 };
 

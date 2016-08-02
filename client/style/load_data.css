@@ -1,0 +1,9 @@
+.viewDataModelBody {
+    width: 100%;
+    overflow-x: auto;
+    word-wrap: normal;
+    margin: 1px;
+    max-height: calc(100vh - 150px);
+    overflow-y: auto;
+    /*overflow-x:auto;*/
+}

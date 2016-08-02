@@ -18,7 +18,7 @@ var map, dots;
 var headers_colors = [];
 
 
-mapbox = function (dataObj, countHeader, isVisOn, lon, lat) {
+mapbox = function (dataObj, countHeader, isVisOn, Data_Source, lon, lat) {
 
     // Mapbox.load();
 
@@ -100,36 +100,6 @@ mapbox = function (dataObj, countHeader, isVisOn, lon, lat) {
         })
     });
 
-
-    // geoJson.data.features.forEach(function(marker) {
-    //     // create an img element for the marker
-    //     var el = document.createElement('i');
-    //     el.className = 'marker fa fa-circle';
-    //     el.style.color = marker.properties.color;
-    //     // el.style.backgroundImage = 'url(https://placekitten.com/g/' + marker.properties.iconSize.join('/') + '/)';
-    //     // el.style.width = marker.properties.iconSize[0];
-    //     // el.style.height = marker.properties.iconSize[1];
-    //
-    //     // el.addEventListener('click', function() {
-    //     //     window.alert(marker.properties.message);
-    //     // });
-    //
-    //     // add marker to map
-    //     new mapboxgl.Marker(el)
-    //         .setLngLat(marker.geometry.coordinates)
-    //         .addTo(map);
-    //
-    // });
-
-    // if (!svg) {
-    //     var container = map.getCanvasContainer();
-    //     svg = d3.select(container).append('svg');
-    //     svg.attr('class', 'map');
-    // }
-    // else {
-    //     svg.html("")
-    // }
-    //
     var locationList = [];
 
     data.forEach(function (d) {

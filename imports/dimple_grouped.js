@@ -1,4 +1,4 @@
-groupedBarChart = function (data, bigGroup, subGroup, yAxis, svgID, h, w) {
+groupedBarChart = function (data, bigGroup, subGroup, yAxis, svgID, h, w, Data_Source) {
     var margin = {
         top: 50,
         right: 70,
@@ -32,6 +32,12 @@ groupedBarChart = function (data, bigGroup, subGroup, yAxis, svgID, h, w) {
         var svgHeight = $(svgID).height();
         $(svgID).height(svgHeight + labelSizeApprx);
     }
+
+
+    svg.append("text")
+        .attr("x", w / 2 + w / 5)
+        .attr("y", h - 10)
+        .text(Data_Source);
 
     var chartSvg = myChart.svg[0][0];
     document.getElementById('chartEmbedTxt').value = chartSvg.outerHTML;
