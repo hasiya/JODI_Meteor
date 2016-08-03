@@ -143,14 +143,14 @@ Template.load_data.events({
                     }
                     else {
                         document.getElementById("searchList").style.display = 'none';
-                        document.getElementById("visual_all").style.display = "none";
+                        // document.getElementById("visual_all").style.display = "none";
                         document.getElementById('viewDataSetInfo').style.display = 'none';
                         hit_source = [];
                         hit_sourceDep.changed();
-                        // document.getElementById("panel").style.display = "none";
-                        // document.getElementById("visualMenu").style.display = "none";
-                        // document.getElementById("charts").style.display = "none";
-                        // document.getElementById("exportChart").style.display = "none";
+                        document.getElementById("panel").style.display = "none";
+                        document.getElementById("visualMenu").style.display = "none";
+                        document.getElementById("charts").style.display = "none";
+                        document.getElementById("exportChart").style.display = "none";
 
                     }
                     console.log(hit_source);
@@ -162,15 +162,15 @@ Template.load_data.events({
         }
         else {
             document.getElementById("searchList").style.display = 'none';
-            document.getElementById("visual_all").style.display = "none";
+            // document.getElementById("visual_all").style.display = "none";
             document.getElementById('viewDataSetInfo').style.display = 'none';
 
             hit_source = [];
             hit_sourceDep.changed();
-            // document.getElementById("panel").style.display = "none";
-            // document.getElementById("visualMenu").style.display = "none";
-            // document.getElementById("charts").style.display = "none";
-            // document.getElementById("exportChart").style.display = "none";
+            document.getElementById("panel").style.display = "none";
+            document.getElementById("visualMenu").style.display = "none";
+            document.getElementById("charts").style.display = "none";
+            document.getElementById("exportChart").style.display = "none";
         }
 
     },

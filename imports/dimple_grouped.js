@@ -36,8 +36,8 @@ groupedBarChart = function (data, bigGroup, subGroup, yAxis, svgID, h, w, Data_S
 
     svg.append("text")
         .attr("x", w / 2 + w / 5)
-        .attr("y", h - 10)
-        .text(Data_Source);
+        .attr("y", h - 20)
+        .text("Data Source: " + Data_Source);
 
     var chartSvg = myChart.svg[0][0];
     document.getElementById('chartEmbedTxt').value = chartSvg.outerHTML;

@@ -33,8 +33,8 @@ lineChart = function (data, property, xAxis, svgID, h, w, Data_Source) {
 
     svg.append("text")
         .attr("x", w / 2 + w / 5)
-        .attr("y", h - 20)
-        .text(Data_Source);
+        .attr("y", h - 10)
+        .text("Data Source: " + Data_Source);
 
     var chartSvg = myChart.svg[0][0];
     document.getElementById('chartEmbedTxt').value = chartSvg.outerHTML;

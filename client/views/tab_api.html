@@ -1,12 +1,13 @@
 <template name="tab_api">
+    {{>navbar2}}
     <div class="container" style="margin-bottom: 10px; margin-top: 20px">
         <div class="row">
             <div class="col-md-12">
-                <h3>Enter the API Url</h3>
+                <h3>Enter the API URL</h3>
                 <!--<div id="custom-search-input">-->
                 <!--<div class="input-group col-md-12">-->
-                <input type="text" class="form-control input-lg inputSearch" placeholder="Enter API URL..."
-                       style="border: 1px solid lightgray; border-radius: 5px; padding: 6px; color: black; "/>
+                <input id="apiUrl" type="url" class="form-control input-lg inputSearch" placeholder="Enter API URL..."
+                       style="border: 1px solid lightgray; border-radius: 5px; padding: 6px; color: black; margin-bottom: 5px "/>
 
                 <form role="form">
                     <label class="radio-inline">
@@ -15,6 +16,7 @@
                     <label class="radio-inline">
                         <input type="radio" name="optradio">XML
                     </label>
+                    <button class="btn btn-success pull-right loadApi">load</button>
                 </form>
                 <!--<span class="input-group-btn">-->
                 <!--<button class="btn btn-info btn-lg" type="button">-->
@@ -27,4 +29,12 @@
         </div>
 
     </div>
+    <div class="col-md-1"></div>
+
+    <div class="col-md-10">
+        {{>visualisation_all}}
+
+    </div>
+    <div class="col-md-1"></div>
+
 </template>
