@@ -239,7 +239,44 @@ Template.load_data.events({
             document.getElementById("charts").style.display = "none";
             document.getElementById("exportChart").style.display = "none";
         }
+    },
 
+    "click .showAll": function (e) {
+        e.preventDefault();
+        var hits = [];
+        $.ajax({
+            method: "GET",
+            url: "http://" + pythonServer + "/get_all_dataset",
+            success: function (data) {
+                hits = data;
+                console.log(hits);
+
+                if (hits.length > 0) {
+                    hit_source = [];
+                    hits.forEach(function (hit) {
+                        hit_source.push(hit['_source']);
+                        hit_sourceDep.changed();
+                    });
+
+                    document.getElementById("searchList").style.display = 'inline';
+                    document.getElementById("visual_all").style.display = "none";
+                    document.getElementById('viewDataSetInfo').style.display = 'none';
+                }
+                else {
+                    document.getElementById("searchList").style.display = 'none';
+                    // document.getElementById("visual_all").style.display = "none";
+                    document.getElementById('viewDataSetInfo').style.display = 'none';
+                    hit_source = [];
+                    hit_sourceDep.changed();
+                    document.getElementById("panel").style.display = "none";
+                    document.getElementById("visualMenu").style.display = "none";
+                    document.getElementById("charts").style.display = "none";
+                    document.getElementById("exportChart").style.display = "none";
+
+                }
+                console.log(hit_source);
+            }
+        });
     },
 
     "click .loadData": function (e) {
@@ -250,8 +287,6 @@ Template.load_data.events({
         document.getElementById("visual_all").style.display = "inline";
         document.getElementById('viewDataSetInfo').style.display = 'inline';
 
-
-
         $.ajax({
             method: "GET",
             url: "http://" + pythonServer + "/get_dataset/" + dataset_name,
@@ -259,7 +294,6 @@ Template.load_data.events({
                 loadDoc = data;
                 load_doc_dep.changed();
                 console.log(loadDoc);
-
 
                 // csv_data_dep.changed();
                 if (loadDoc["is_api"]) {
@@ -278,12 +312,7 @@ Template.load_data.events({
                 // csv_key_dep.changed();
                 Data_Source = loadDoc["data_source"];
 
-
                 console.log(CSV_Data);
-                // document.getElementById("panel").style.display = "inline";
-                // setUpPanel();
-
-                // createSearchDataset(hit_source);
             }
         });
     },
@@ -335,18 +364,11 @@ Template.load_data.events({
                 url: "http://" + pythonServer + "/delete_dataset/" + datasetID,
                 success: function (data) {
                     alert(data["message"]);
-
-
-                    // createSearchDataset(hit_source);
                 }
             });
-
         }
         else {
             console.log(sure_delete)
         }
-
     }
-
-
 });

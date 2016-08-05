@@ -4,7 +4,7 @@
     <inspection_tool class="HtmlUnknownAttribute" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="myValues">
         <value>
-§§          <list size="12">
+          <list size="12">
             <item index="0" class="java.lang.String" itemvalue="headerid" />
             <item index="1" class="java.lang.String" itemvalue="index" />
             <item index="2" class="java.lang.String" itemvalue="original" />
