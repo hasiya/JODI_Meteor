@@ -321,7 +321,9 @@ function insertData(dataInfo, dataset) {
     var requestObject = {
         datasetInfo: dataInfo,
         DataSet: dataset,
-        headers: CSV_keys
+        headers: CSV_keys,
+        apiData: false
+
     };
 
     var elem = document.getElementById("storeDataBtn");
@@ -473,32 +475,55 @@ Template.tab_csv.events({
             var lineMatch = linesMatch(lines);
             if (lineMatch) {
                 if (lineMatch["lineMatch"]) {
-                    $.ajax({
-                        method: "POST",
-                        url: "http://" + pythonServer + "/csv_data",
-                        data: {
-                            'data': text
-                        },
-                        success: function (data) {
-                            CSV_Data = data;
-                            SetUpCount();
-                            console.log(CSV_Data);
-                            // CSV_keys = Object.keys(data[0]);
+                    // $.ajax({
+                    //     method: "POST",
+                    //     url: "http://" + pythonServer + "/csv_data",
+                    //     data: {
+                    //         'data': text
+                    //     },
+                    //     success: function (data) {
+                    //         CSV_Data = data;
+                    //         SetUpCount();
+                    //         console.log(CSV_Data);
+                    //         // CSV_keys = Object.keys(data[0]);
+                    //
+                    //         setUpPanel();
+                    //         var Message = $("#message");
+                    //         Message.html("");
+                    //         Code_Editor.setOption("readOnly", true);
+                    //         // checkDataset(CSV_Data);
+                    //         document.getElementById("datasetStorePanel").style.display = "inline";
+                    //
+                    //
+                    //         elem.disabled = false;
+                    //         elem.style.cursor = 'pointer';
+                    //         elem.className = "btn-primary btn EditCSV";
+                    //         elem.innerHTML = "Edit";
+                    //     }
+                    // });
 
-                            setUpPanel();
-                            var Message = $("#message");
-                            Message.html("");
-                            Code_Editor.setOption("readOnly", true);
-                            // checkDataset(CSV_Data);
-                            document.getElementById("datasetStorePanel").style.display = "inline";
-
-
-                            elem.disabled = false;
-                            elem.style.cursor = 'pointer';
-                            elem.className = "btn-primary btn EditCSV";
-                            elem.innerHTML = "Edit";
-                        }
+                    var data = d3.csv.parse(text, function (d) {
+                        d.Count = 1;
+                        return d;
                     });
+                    CSV_Data = data;
+                    // SetUpCount();
+                    console.log(CSV_Data);
+                    // CSV_keys = Object.keys(data[0]);
+
+                    setUpPanel();
+                    // var Message = $("#message");
+                    Message.html("");
+                    Code_Editor.setOption("readOnly", true);
+                    // checkDataset(CSV_Data);
+                    document.getElementById("datasetStorePanel").style.display = "inline";
+
+
+                    elem.disabled = false;
+                    elem.style.cursor = 'pointer';
+                    elem.className = "btn-primary btn EditCSV";
+                    elem.innerHTML = "Edit";
+
                 }
                 else {
                     Message.html("There is the problem in line: " + lineMatch["lineNum"]);

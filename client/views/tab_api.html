@@ -3,28 +3,76 @@
     <div class="container" style="margin-bottom: 10px; margin-top: 20px">
         <div class="row">
             <div class="col-md-12">
-                <h3>Enter the API URL</h3>
-                <!--<div id="custom-search-input">-->
-                <!--<div class="input-group col-md-12">-->
-                <input id="apiUrl" type="url" class="form-control input-lg inputSearch" placeholder="Enter API URL..."
-                       style="border: 1px solid lightgray; border-radius: 5px; padding: 6px; color: black; margin-bottom: 5px "/>
+                <div class="col-md-12 col-sm-12 col-xs-12 col-lg-12">
+                    <h3>Enter the API URL</h3>
+                    <!--<div id="custom-search-input">-->
+                    <!--<div class="input-group col-md-12">-->
+                    <input id="apiUrl" type="url" class="form-control input-lg apiUrl"
+                           placeholder="Enter API URL..." autocomplete="off"
+                           style="border: 1px solid lightgray; border-radius: 5px; padding: 6px; color: black; margin-bottom: 5px "/>
 
-                <form role="form">
-                    <label class="radio-inline">
-                        <input type="radio" name="optradio">JSON
-                    </label>
-                    <label class="radio-inline">
-                        <input type="radio" name="optradio">XML
-                    </label>
-                    <button class="btn btn-success pull-right loadApi">load</button>
-                </form>
-                <!--<span class="input-group-btn">-->
-                <!--<button class="btn btn-info btn-lg" type="button">-->
-                <!--<i class="glyphicon glyphicon-search"></i>-->
-                <!--</button>-->
-                <!--</span>-->
-                <!--</div>-->
-                <!--</div>-->
+                    <form role="form">
+                        <label class="radio-inline">
+                            <input type="radio" name="apiType" apiType="json" class="apiType">JSON
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" name="apiType" apiType="xml" class="apiType">XML
+                        </label>
+                    </form>
+                    <h4>Data Set Parth</h4>
+
+                    <input id="apiDataPath" type="text" class="form-control input-sm apiDataPath"
+                           placeholder="API Data Path, eg: ' /.../... '" autocomplete="off"
+                           style="border: 1px solid lightgray; border-radius: 5px; padding: 6px; color: black; margin-bottom: 5px "/>
+
+                    <button class="btn btn-success pull-right getApi" id="getApi" disabled>Get Data</button>
+                    <label id="message" class="pull-left"></label>
+
+                </div>
+
+                <div id="datasetStorePanel" class="" style="display: none">
+
+                    <div class="container">
+                        <form id="DataSetStore">
+                            <div class="form-group row">
+                                <label for="csvDataName" class="col-md-3 col-sm-6 col-xs-6 col-form-label">CSV Data Set
+                                    Name: </label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="csvDataName col-form-label" id="csvDataName"
+                                           placeholder="CSV Data set Name" autocomplete="off"
+                                           style="border: 1px solid lightgray; border-radius: 4px; padding: 6px; color: grey; width: 100% ">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="PersonName" class="col-md-3 col-sm-6 col-xs-6 col-form-label">Your
+                                    Name: </label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="PersonName col-form-label" id="PersonName"
+                                           placeholder="Your Name" autocomplete="off"
+                                           style="border: 1px solid lightgray; border-radius: 4px; padding: 6px; color: grey; width: 100% ">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="DataSource" class="col-md-3 col-sm-6 col-xs-6 col-form-label">Data
+                                    Source: </label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="DataSource col-form-label" id="DataSource"
+                                           placeholder="Data Source" autocomplete="off"
+                                           style="border: 1px solid lightgray; border-radius: 4px; padding: 6px; color: grey; width: 100% ">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="offset-sm-2 col-sm-10">
+                                    <button id="storeDataBtn"
+                                            class=" btn btn-success col-md-2 col-sm-2 col-xs-2 storeDataBtn pull-right"
+                                            disabled>
+                                        Store
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -32,7 +80,7 @@
     <div class="col-md-1"></div>
 
     <div class="col-md-10">
-        {{>visualisation_all}}
+        <!--{{>visualisation_all}}-->
 
     </div>
     <div class="col-md-1"></div>

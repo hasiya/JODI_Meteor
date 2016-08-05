@@ -1,6 +1,9 @@
 /**
  * Created by RajithaHasith on 28/07/2016.
  */
+var xml_convert = new X2JS();
+
+
 var hit_source = [];
 var hit_sourceDep = new Tracker.Dependency();
 
@@ -8,7 +11,71 @@ var loadDoc = {};
 var load_doc_dep = new Tracker.Dependency();
 
 
+function getDatasetHeaders(datset) {
+    var headers = [];
+    for (var prop in datset[0]) {
+        headers.push(prop)
+    }
+    return headers;
+}
+function setUpCount() {
+    CSV_Data.forEach(function (c) {
+        c.Count = 1;
+    });
+}
+function get_api_Data(api_data, data_path) {
+    // if(api_type == 'json'){
+    var path = data_path.split('/');
+    var data = api_data;
 
+    path.forEach(function (p) {
+        data = data[p];
+    });
+
+    return data;
+    // }
+}
+
+
+function getAPIdata(url, data_path, apiType) {
+    var j_data;
+    var dataset;
+    $.ajax({
+        method: "GET",
+        url: "http://" + pythonServer + "/get_api_data",
+        data: url,
+        // contentType: 'application/json',
+        success: function (data) {
+            if (apiType == 'json') {
+                j_data = JSON.parse(data);
+                dataset = get_api_Data(j_data, data_path)
+
+            }
+            else if (apiType == 'xml') {
+                j_data = xml_convert.xml_str2json(data);
+                dataset = get_api_Data(j_data, data_path)
+            }
+
+            if (dataset) {
+                console.log(dataset);
+
+                CSV_Data = dataset;
+                CSV_keys = Object.keys(dataset[0]);
+
+                setUpCount();
+                csv_data_dep.changed();
+                document.getElementById("panel").style.display = "inline";
+                setUpPanel();
+
+                // setUpPanel();
+            }
+            else {
+                // Message.html("Something went wrong.");
+            }
+        }
+
+    });
+}
 function setUpPanel() {
     headerValues = [];
 
@@ -192,17 +259,29 @@ Template.load_data.events({
                 loadDoc = data;
                 load_doc_dep.changed();
                 console.log(loadDoc);
-                CSV_Data = loadDoc['dataset'];
-                Data_Source = loadDoc["data_source"];
-                // csv_data_dep.changed();
 
-                CSV_keys = loadDoc['headers'];
+
+                // csv_data_dep.changed();
+                if (loadDoc["is_api"]) {
+                    var url = loadDoc["APIurl"];
+                    var url_dataPath = loadDoc["url_dataset_path"];
+                    var apiType = loadDoc["api_type"];
+                    // CSV_keys = getDatasetHeaders(CSV_keys)
+                    getAPIdata(url, url_dataPath, apiType)
+                }
+                else {
+                    CSV_keys = loadDoc['headers'];
+                    CSV_Data = loadDoc['dataset'];
+                    document.getElementById("panel").style.display = "inline";
+                    setUpPanel();
+                }
                 // csv_key_dep.changed();
+                Data_Source = loadDoc["data_source"];
 
 
                 console.log(CSV_Data);
-                document.getElementById("panel").style.display = "inline";
-                setUpPanel();
+                // document.getElementById("panel").style.display = "inline";
+                // setUpPanel();
 
                 // createSearchDataset(hit_source);
             }
@@ -221,17 +300,53 @@ Template.load_data.events({
             url: "http://" + pythonServer + "/get_dataset/" + dataset_name,
             success: function (data) {
                 doc = data;
+
+                if (doc["is_api"]) {
+                    var url = doc["APIurl"];
+                    var url_dataPath = doc["url_dataset_path"];
+                    var apiType = doc["api_type"];
+                    // CSV_keys = getDatasetHeaders(CSV_keys)
+                    getAPIdata(url, url_dataPath, apiType)
+                }
+                else {
+                    CSV_keys = doc['headers'];
+                    CSV_Data = doc['dataset'];
+                }
+
                 console.log(doc);
-                CSV_Data = doc['dataset'];
-                Data_Source = loadDoc["data_source"];
-                csv_data_dep.changed();
+                // CSV_Data = doc['dataset'];
+                Data_Source = doc["data_source"];
                 $('#viewDataModal').modal('show');
+                csv_data_dep.changed();
 
 
                 // createSearchDataset(hit_source);
             }
         });
+    },
+
+    "click .deleteData": function (e) {
+        e.preventDefault();
+        var elem = e.currentTarget;
+        var datasetID = elem.value;
+        var sure_delete = confirm("Are your sure, you want to delete '" + datasetID + "' data set?");
+        if (sure_delete) {
+            $.ajax({
+                url: "http://" + pythonServer + "/delete_dataset/" + datasetID,
+                success: function (data) {
+                    alert(data["message"]);
+
+
+                    // createSearchDataset(hit_source);
+                }
+            });
+
+        }
+        else {
+            console.log(sure_delete)
+        }
 
     }
+
 
 });

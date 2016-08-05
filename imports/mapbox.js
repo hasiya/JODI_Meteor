@@ -70,13 +70,40 @@ mapbox = function (dataObj, countHeader, isVisOn, Data_Source, lon, lat) {
 
         map = new mapboxgl.Map({
             container: 'svgMap', // container id
-            style: 'mapbox://styles/mapbox/streets-v9', //stylesheet location
+            style: 'mapbox://styles/mapbox/basic-v9', //stylesheet location
             // hash: true,
             preserveDrawingBuffer: true
         });
 
         // map.scrollZoom.disable()
         map.dragRotate.disable();
+    }
+
+    var mapSource = map.getSource("points");
+    var mapLayer = map.getLayer("points");
+
+    if (mapSource && mapLayer) {
+        map.removeSource("points");
+        map.removeLayer("points");
+
+        map.addSource("points", geoJson);
+        map.addLayer({
+            "id": "points",
+            "type": "symbol",
+            "source": "points",
+            "layout": {
+                "icon-image": "{icon}",
+                // "icon-allow-overlap": true,
+                // "icon-color":"#ff0000",
+                "text-field": "{title}",
+                "text-font": ["Open Sans Semibold", "Arial Unicode MS Bold"],
+                "text-offset": [0, 0.6],
+                "text-anchor": "top"
+            },
+            // "paint": {
+            //     "text-color": "{properties.color}"
+            // }
+        })
     }
 
     map.on('load', function () {
