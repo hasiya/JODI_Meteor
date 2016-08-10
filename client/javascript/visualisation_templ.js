@@ -2,6 +2,17 @@
  * Created by RajithaHasith on 28/07/2016.
  */
 import Clipboard from 'clipboard';
+// import "../../imports/bar_chart.js";
+import "../../imports/dimple_bar";
+import "../../imports/bar";
+// import "../../imports/grouped_bar";
+import "../../imports/dimple_grouped";
+// import "../../imports/pie_chart";
+import "../../imports/dimple_pie";
+import "../../imports/map";
+import "../../imports/mapbox";
+import "../../imports/dimple_line";
+import "../../imports/functions";
 
 var removedHeaderVals = [];
 var map;
@@ -10,8 +21,19 @@ var headerOrig;
 var svg;
 var width;
 var height;
+var panelEdit = true;
+var panel_edit_dep = new Tracker.Dependency();
 
-
+var headerOriginal = "originalVal";
+var headerPresent = "presentVal";
+var headerType = "type";
+var headerValCount = "valCount";
+var dataAlreadyExist = "Data set already exist";
+var newDataset = "New data set";
+/**
+ *
+ */
+var isMapDraw;
 
 function checkIPlist(ip, list) {
 
@@ -23,6 +45,43 @@ function checkIPlist(ip, list) {
         }
     });
     return ipData;
+}
+
+function resetPanel() {
+
+    var textElems = document.getElementsByName("headerText");
+    var editBtnElems = document.getElementsByName("headerEditBtn");
+    var selectElems = document.getElementsByName("headerType");
+    var checkElem = document.getElementsByName("headerCheck");
+    var remvBtnElems = document.getElementsByName("headerremvbtn");
+
+    if (textElems) {
+        Array.from(textElems).forEach(function (e) {
+            e.readOnly = true;
+        });
+    }
+    if (editBtnElems) {
+        Array.from(editBtnElems).forEach(function (e) {
+            e.innerHTML = "<span class='glyphicon glyphicon-edit'></span>";
+            e.className = "csvHeaderEdit btn btn-default btn-sm";
+            e.style.display = "inline";
+        });
+    }
+    if (selectElems) {
+        Array.from(selectElems).forEach(function (e) {
+            e.disabled = false;
+        });
+    }
+    if (checkElem) {
+        Array.from(checkElem).forEach(function (e) {
+            e.disabled = false;
+        });
+    }
+    if (remvBtnElems) {
+        Array.from(remvBtnElems).forEach(function (e) {
+            e.style.display = "inline";
+        });
+    }
 }
 
 function lon_lat_check() {
@@ -140,17 +199,18 @@ Template.visualisation_all.onRendered(function () {
 
 });
 
-Template.registerHelper("isEqual", function (type1, type2) {
-    // var date = new Date(dateTime);
-
-    return type1 == type2
-});
 Template.visualisation_all.helpers({
     get_keys: function () {
         // csv_key_dep.depend();
         // return CSV_keys;
+        panelEdit = true;
+        panel_edit_dep.changed();
         headers_dep.depend();
         return headerValues;
+    },
+    panelEditing: function () {
+        panel_edit_dep.depend();
+        return panelEdit;
     }
 });
 
@@ -373,17 +433,10 @@ Template.visualisation_all.events({
                         }
                     });
                     pieChartThumb = true;
-                    // groupBarChartThumb = true;
-
-                    // headerLabelinnerhtml +=
-                    //     "<button type='button' id='headerLabels' style='word-wrap: break-word; white-space: normal; position: relative; margin: 5px' count='false' class='btn btn-primary headerLabels' original='" + h[headerOriginal] + "'>" + h[headerPresent] + "</button>";
                 }
                 if (!jQuery.isEmptyObject(h[headerValCount])) {
                     countChartsThumb = true;
                     pieChartThumb = true;
-                    // groupBarChartThumb = true;
-                    // headerLabelinnerhtml +=
-                    //     "<button type='button' id='headerLabels' style='word-wrap: break-word; white-space: normal; position: relative; margin: 5px' count='true' class='btn btn-primary headerLabels' original='" + h[headerOriginal] + "'>" + h[headerPresent] + " (Count)</button>";
                 }
                 if ((h[headerType] == "lon") || (h[headerType] == "lat") || (h[headerType] == "ip")) {
 
@@ -453,14 +506,8 @@ Template.visualisation_all.events({
                 "</div>";
         }
 
-
         chartsMenu.innerHTML = chartsMenuInner;
         mapsMenu.innerHTML = mapsMenuInner;
-
-
-        // headerLabels.innerHTML = headerLabelinnerhtml;
-        // xAxisLabels.innerHTML = xAxisInnerhtml;
-        // document.getElementsByClassName("xAxisLabels")[0].checked = true;
     },
 
     "click .PanelEdit": function (e) {
@@ -525,7 +572,7 @@ Template.visualisation_all.events({
     // },
 
     "click .visualThumb": function (e) {
-        isVisOn = false;
+        isMapDraw = false;
         var elem = e.currentTarget;
         var visType = elem.getAttribute("vistype");
 
@@ -584,13 +631,6 @@ Template.visualisation_all.events({
                         document.getElementById("charts").style.display = "inline";
 
                     }
-                    // if (h[headerType] == "string") {
-                    //     xAxisInnerhtml +=
-                    //         "<option class='xAxisLabels' name='optradio' original='" + h[headerOriginal] + "'>"+ h[headerPresent] + "</option>";
-                    //
-                    //     // headerLabelinnerhtml +=
-                    //     //     "<button type='button' id='headerLabels' style='word-wrap: break-word; white-space: normal; position: relative; margin: 5px' count='false' class='btn btn-primary headerLabels' original='" + h[headerOrinal] + "'>" + h[headerPresent] + "</button>";
-                    // }
                 }
             });
             // headerLabelinnerhtml += "<hr>" +
@@ -837,14 +877,6 @@ Template.visualisation_all.events({
 
             svg.style.display = "inline";
 
-            // var createBar = function (callback) {
-            //     // var future = new Future;
-            //     // future.return()
-            //     callback(null, barChartHeaders(CSV_Data, headerOrig, selectedXlabel, "#svgChar", height, width))
-            // };
-            // var createBarAsyc = Meteor.wrapAsync(createBar);
-            // elem.disabled = false;
-            // elem.style.cursor = 'pointer';
             barChartHeaders(CSV_Data, headerOrig, selectedXlabel, "#svgChar", height, width, Data_Source);
         }
         else if (visualType == "count") {
@@ -950,7 +982,7 @@ Template.visualisation_all.events({
             if (mapType == "ip") {
                 console.log(CSV_Data);
 
-                map = mapbox(CSV_Data, headerOrig, isVisOn, Data_Source);
+                map = mapbox(CSV_Data, headerOrig, isMapDraw, Data_Source);
 
                 // maps(CSV_Data, headerOrig);
             }
@@ -969,14 +1001,14 @@ Template.visualisation_all.events({
 
                 if (lonHeader && latHeader) {
 
-                    map = mapbox(CSV_Data, headerOrig, isVisOn, Data_Source, lonHeader, latHeader);
+                    map = mapbox(CSV_Data, headerOrig, isMapDraw, Data_Source, lonHeader, latHeader);
 
                     // maps(CSV_Data, headerOrig, lonHeader, latHeader)
                 }
             }
             document.getElementById("embedCode").style.display = "none";
 
-            isVisOn = true;
+            isMapDraw = true;
         }
 
         for (var i = 0; i < siblings.length; i++) {

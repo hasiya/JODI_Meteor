@@ -1,29 +1,102 @@
 /**
- * Created by RajithaHasith on 28/07/2016.
+ * Created by Rajitha Hasith on 28/07/2016.
+ * This file controls all the client side actions of the 'load_data.html' file (client/views/load_data.html)
+ * this file contains the functions that uses in the load_data.html file, as well as the Meteor Template Helpers
+ * functions and Events functions.
+ */
+
+/**
+ * This variable is creating a new instance of 'X2JS' library, that uses to convert string in to JSON object.
  */
 var xml_convert = new X2JS();
-
-
+/**
+ * This variable is use to store the data source that retrieve from the elasticsearch.
+ * @type {Array}
+ */
 var hit_source = [];
+/**
+ * This is a Tracker variable that will track the 'hit_source' array variable. this variable helps to trigger an action
+ * when the 'hit_source' array variable changes.
+ *
+ * Doc: https://docs.meteor.com/api/tracker.html#tracker_dependency
+ *
+ * @type {Tracker.Dependency}
+ */
 var hit_sourceDep = new Tracker.Dependency();
-
+/**
+ * This is an object variable, that will store the elasticsearch document when retrieving a document.
+ * @type {{}}
+ */
 var loadDoc = {};
+/**
+ * This is a Tracker variable that will track the 'loadDoc' object variable. This variable helps to trigger an action
+ * when the 'loadDoc' object variable changes.
+ *
+ * Doc: https://docs.meteor.com/api/tracker.html#tracker_dependency
+ *
+ * @type {Tracker.Dependency}
+ */
 var load_doc_dep = new Tracker.Dependency();
 
+/**
+ * This function resets the header configuration panel in the load_data page.
+ * then the user load the data once and if user wants to load a different data set, this function resets the header
+ * configuration panel for the second data set
+ */
+function resetPanel() {
 
-function getDatasetHeaders(datset) {
-    var headers = [];
-    for (var prop in datset[0]) {
-        headers.push(prop)
+    var textElems = document.getElementsByName("headerText");
+    var editBtnElems = document.getElementsByName("headerEditBtn");
+    var selectElems = document.getElementsByName("headerType");
+    var checkElem = document.getElementsByName("headerCheck");
+    var remvBtnElems = document.getElementsByName("headerremvbtn");
+
+    if (textElems) {
+        Array.from(textElems).forEach(function (e) {
+            e.readOnly = true;
+        });
     }
-    return headers;
+    if (editBtnElems) {
+        Array.from(editBtnElems).forEach(function (e) {
+            e.innerHTML = "<span class='glyphicon glyphicon-edit'></span>";
+            e.className = "csvHeaderEdit btn btn-default btn-sm";
+            e.style.display = "inline";
+        });
+    }
+    if (selectElems) {
+        Array.from(selectElems).forEach(function (e) {
+            e.disabled = false;
+        });
+    }
+    if (checkElem) {
+        Array.from(checkElem).forEach(function (e) {
+            e.disabled = false;
+        });
+    }
+    if (remvBtnElems) {
+        Array.from(remvBtnElems).forEach(function (e) {
+            e.style.display = "inline";
+        });
+    }
 }
+
+/**
+ * this function add a count property to the Data object that is get from the API.
+ * the 'setUPCount()' function is called in this file in 'getAPIdata()' function.
+ */
 function setUpCount() {
     CSV_Data.forEach(function (c) {
         c.Count = 1;
     });
 }
-function get_api_Data(api_data, data_path) {
+
+/**
+ * This function gets the data that need to process in the application from the API.
+ * @param api_data
+ * @param data_path
+ * @returns {*}
+ */
+function get_data_api_obj(api_data, data_path) {
     // if(api_type == 'json'){
     var path = data_path.split('/');
     var data = api_data;
@@ -36,7 +109,15 @@ function get_api_Data(api_data, data_path) {
     // }
 }
 
-
+/**
+ * Some API does not allow JavaScript do API calls to servers with 'access-control-allow-origin': no.
+ * Because of this, the javascript sends a ajax call to the server side (flask) of system.
+ * This function get the api data, by calling to flask server to send the API request and get data through the python
+ * server.
+ * @param url
+ * @param data_path
+ * @param apiType
+ */
 function getAPIdata(url, data_path, apiType) {
     var j_data;
     var dataset;
@@ -46,14 +127,18 @@ function getAPIdata(url, data_path, apiType) {
         data: url,
         // contentType: 'application/json',
         success: function (data) {
+            // document.getElementById("searchList").style.display = 'none';
+            // // document.getElementById("visual_all").style.display = "inline";
+            // document.getElementById("panel").style.display = "none";
+            // document.getElementById('viewDataSetInfo').style.display = 'inline';
             if (apiType == 'json') {
                 j_data = JSON.parse(data);
-                dataset = get_api_Data(j_data, data_path)
+                dataset = get_data_api_obj(j_data, data_path)
 
             }
             else if (apiType == 'xml') {
                 j_data = xml_convert.xml_str2json(data);
-                dataset = get_api_Data(j_data, data_path)
+                dataset = get_data_api_obj(j_data, data_path)
             }
 
             if (dataset) {
@@ -66,6 +151,7 @@ function getAPIdata(url, data_path, apiType) {
                 csv_data_dep.changed();
                 document.getElementById("panel").style.display = "inline";
                 setUpPanel();
+                resetPanel();
 
                 // setUpPanel();
             }
@@ -76,6 +162,12 @@ function getAPIdata(url, data_path, apiType) {
 
     });
 }
+
+/**
+ * This function function set up the header configuration panel.
+ * The function updates the 'headerValues' array and then the 'headers_dep' Tracker variable calls the .changed()
+ * function. This will trigger
+ */
 function setUpPanel() {
     headerValues = [];
 
@@ -90,7 +182,6 @@ function setUpPanel() {
         };
 
         if (k.toLowerCase() == "longitude") {
-            var test = document.getElementById("type_" + k);
             // document.getElementById("type_" + k).value = "lon";
             keyItem['type'] = 'lon';
         }
@@ -136,52 +227,73 @@ function setUpPanel() {
     });
 }
 
-
+/**
+ * The load_data template helpers function. These helper functions send that send data to the template.
+ *
+ * Doc: https://docs.meteor.com/api/templates.html#Template-helpers
+ */
 Template.load_data.helpers({
+    /**
+     * This function returns the hit_source array to the load data template. because of the 'hit_sourceDep' Tracker
+     * variable every time the hit_source array changes this function triggers.
+     * @returns {Array}
+     */
     getSearchData: function () {
         hit_sourceDep.depend();
         return hit_source;
     },
 
-    getHeaders: function () {
-        headers_dep.depend();
-        return headerValues;
-    },
+    /**
+     * This function returns the loadDoc object to the load data template. Because of the 'load_doc_dep' Tracker
+     * variable every time the loadDoc object updates this function triggers.
+     * @returns {{}}
+     */
     getDoc: function () {
         load_doc_dep.depend();
         return loadDoc;
     },
+    /**
+     * this function returns the CSV_Data object to the load data template. csv_data_dep Tracker variable depends on
+     * the CSV_Data variable, so when ever the CSV_Data variable changes this function returns the CSV_Data to the
+     * template. in this call the function is called in meteor 'reactiveTable' as a collection.
+     * @returns {*|Array}
+     */
     getData: function () {
-
         csv_data_dep.depend();
         return CSV_Data;
     }
 });
-// Template.load_data.Test = function () {
-//     hit_sourceDep.depend();
-//     return hit_source
-// };
 
+/**
+ * This is a meteor function that registers functions that will call when the template is rendering to the DOM.
+ * you can also update variables in this function.
+ */
 Template.load_data.onRendered(function () {
+    /**
+     * In this render function, the hit_source array variable is initialising with an empty array. This is same an
+     * resetting the array.
+     * @type {Array}
+     */
     hit_source = [];
+
+    /**
+     * Triggering the changed status in the hit_sourceDep Tracker variable. Which will trigger the 'getSearchData'
+     * helper function.
+     * Doc: https://docs.meteor.com/api/tracker.html#tracker_dependency
+     */
     hit_sourceDep.changed();
 });
 
-Template.registerHelper("dateTime", function (dateTime) {
-    // var date = new Date(dateTime);
-
-    return moment(dateTime).format('DD-MM-YYYY, HH:mm');
-});
-
-
-Template.registerHelper("getHeaders", function (dateTime) {
-    // var date = new Date(dateTime);
-
-    return !!CSV_keys;
-    // setUpPanel();
-});
-
+/**
+ * The load_data event functions. These functions specify event handler for this template.
+ */
 Template.load_data.events({
+
+    /**
+     * This is the key up function for the search textbox. Every key press up will trigger this function.
+     * in this function I do an Ajax call to the server side to search in elasticsearch.
+     * @param e
+     */
     "keyup .inputSearch": function (e) {
         e.preventDefault();
         console.log(e);
@@ -204,7 +316,10 @@ Template.load_data.events({
                         });
 
                         document.getElementById("searchList").style.display = 'inline';
-                        document.getElementById("visual_all").style.display = "none";
+                        document.getElementById("panel").style.display = "none";
+                        document.getElementById("visualMenu").style.display = "none";
+                        document.getElementById("charts").style.display = "none";
+                        document.getElementById("exportChart").style.display = "none";
                         document.getElementById('viewDataSetInfo').style.display = 'none';
 
                     }
@@ -241,6 +356,11 @@ Template.load_data.events({
         }
     },
 
+    /**
+     * The Show All button on click event function.
+     * the function calls the python backend to get all the data sets from the elasticsearch.
+     * @param e
+     */
     "click .showAll": function (e) {
         e.preventDefault();
         var hits = [];
@@ -259,7 +379,10 @@ Template.load_data.events({
                     });
 
                     document.getElementById("searchList").style.display = 'inline';
-                    document.getElementById("visual_all").style.display = "none";
+                    document.getElementById("panel").style.display = "none";
+                    document.getElementById("visualMenu").style.display = "none";
+                    document.getElementById("charts").style.display = "none";
+                    document.getElementById("exportChart").style.display = "none";
                     document.getElementById('viewDataSetInfo').style.display = 'none';
                 }
                 else {
@@ -279,12 +402,17 @@ Template.load_data.events({
         });
     },
 
+    /**
+     * The Load Data button click event function.
+     * The function sends and GET request to retrieve a specific data set from the elasticsearch.
+     * @param e
+     */
     "click .loadData": function (e) {
         var elem = e.currentTarget;
         var dataset_name = elem.value;
 
         document.getElementById("searchList").style.display = 'none';
-        document.getElementById("visual_all").style.display = "inline";
+        // document.getElementById("visual_all").style.display = "inline";
         document.getElementById('viewDataSetInfo').style.display = 'inline';
 
         $.ajax({
@@ -295,6 +423,7 @@ Template.load_data.events({
                 load_doc_dep.changed();
                 console.log(loadDoc);
 
+
                 // csv_data_dep.changed();
                 if (loadDoc["is_api"]) {
                     var url = loadDoc["APIurl"];
@@ -304,10 +433,16 @@ Template.load_data.events({
                     getAPIdata(url, url_dataPath, apiType)
                 }
                 else {
+                    document.getElementById("searchList").style.display = 'none';
+                    // document.getElementById("visual_all").style.display = "inline";
+                    document.getElementById("panel").style.display = "none";
+                    document.getElementById('viewDataSetInfo').style.display = 'inline';
                     CSV_keys = loadDoc['headers'];
                     CSV_Data = loadDoc['dataset'];
                     document.getElementById("panel").style.display = "inline";
+
                     setUpPanel();
+                    resetPanel();
                 }
                 // csv_key_dep.changed();
                 Data_Source = loadDoc["data_source"];
@@ -317,6 +452,11 @@ Template.load_data.events({
         });
     },
 
+    /**
+     * The View Data button click event function.
+     * The function call the server to get data from the elasticsearch.
+     * @param e
+     */
     "click .viewData": function (e) {
         e.preventDefault();
         var elem = e.currentTarget;
@@ -354,15 +494,22 @@ Template.load_data.events({
         });
     },
 
+    /**
+     * The Delete data button on click event function.
+     * This function sends a ajax call to delete the data set from the elasticsearch.
+     * @param e
+     */
     "click .deleteData": function (e) {
         e.preventDefault();
         var elem = e.currentTarget;
         var datasetID = elem.value;
+        var datasetContainer = document.getElementById(datasetID.trim().replace(/\s/g, ''));
         var sure_delete = confirm("Are your sure, you want to delete '" + datasetID + "' data set?");
         if (sure_delete) {
             $.ajax({
                 url: "http://" + pythonServer + "/delete_dataset/" + datasetID,
                 success: function (data) {
+                    datasetContainer.style.display = 'none';
                     alert(data["message"]);
                 }
             });

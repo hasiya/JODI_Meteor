@@ -28,7 +28,7 @@ barChartHeaders = function (data, property, xLabel, svgID, h, w, Data_Source) {
 
     svg.append("text")
         .attr("x", w / 2 + w / 5)
-        .attr("y", h - 10)
+        .attr("y", h)
         .text("Data Source: " + Data_Source);
 
     var chartSvg = myChart.svg[0][0];

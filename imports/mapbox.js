@@ -134,9 +134,11 @@ mapbox = function (dataObj, countHeader, isVisOn, Data_Source, lon, lat) {
     });
 
     var mapBounds = getBounds(locationList);
-    map.once('load', function () {
-        map.fitBounds(mapBounds);
-    });
+    // map.once('load', function () {
+    //     map.fitBounds(mapBounds);
+    // });
+    map.fitBounds(mapBounds);
+
 
     //
     // mapLocations();

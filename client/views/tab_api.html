@@ -35,10 +35,10 @@
                     <div class="container">
                         <form id="DataSetStore">
                             <div class="form-group row">
-                                <label for="csvDataName" class="col-md-3 col-sm-6 col-xs-6 col-form-label">CSV Data Set
+                                <label for="apiDataName" class="col-md-3 col-sm-6 col-xs-6 col-form-label">CSV Data Set
                                     Name: </label>
                                 <div class="col-sm-10">
-                                    <input type="text" class="csvDataName col-form-label" id="csvDataName"
+                                    <input type="text" class="apiDataName col-form-label" id="apiDataName"
                                            placeholder="CSV Data set Name" autocomplete="off"
                                            style="border: 1px solid lightgray; border-radius: 4px; padding: 6px; color: grey; width: 100% ">
                                 </div>
@@ -73,16 +73,12 @@
                         </form>
                     </div>
                 </div>
+                <div id="apiMessage">
+                    <label id="api_message" class="label-info label" style="font-size: small"></label>
+                </div>
             </div>
         </div>
 
     </div>
-    <div class="col-md-1"></div>
-
-    <div class="col-md-10">
-        <!--{{>visualisation_all}}-->
-
-    </div>
-    <div class="col-md-1"></div>
 
 </template>
