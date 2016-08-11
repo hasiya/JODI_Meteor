@@ -1,7 +1,34 @@
 /**
- * Created by RajithaHasith on 25/07/2016.
+ * Created by Rajitha Hasith on 13/07/2016.
+ * This file contains the line chart chart visualisation function.
+ *
  */
-
+/**
+ * The function draws the line chart
+ *
+ * Doc: https://github.com/PMSI-AlignAlytics/dimple/wiki
+ *
+ * @param data
+ * the data object, which contains all the data.
+ *
+ * @param property
+ * The property variable, which is the the y axis values.
+ *
+ * @param xAxis
+ * property name for x axis values.
+ *
+ * @param svgID
+ * the element that draw the chart in.
+ *
+ * @param h
+ * height of the chart.
+ *
+ * @param w
+ * width of the chart.
+ *
+ * @param Data_Source
+ * Data source, which will display in the chart.
+ */
 lineChart = function (data, property, xAxis, svgID, h, w, Data_Source) {
 
     var margin = {
@@ -40,7 +67,10 @@ lineChart = function (data, property, xAxis, svgID, h, w, Data_Source) {
     document.getElementById('chartEmbedTxt').value = chartSvg.outerHTML;
 };
 
-
+/**
+ * Tis function is used to check the longest x axis label to display the data source in the chart.
+ * @return {number}
+ */
 var longest_label = function (nodeList) {
     var longest = 0;
     nodeList.forEach(function (n) {

@@ -1,29 +1,50 @@
 /**
- * Created by RajithaHasith on 28/07/2016.
+ * Created by Rajitha Hasith on 28/07/2016.
+ * This file controls all the client side actions of the 'Visualisation_Temp.html' file
+ * (client/views/Visualisation_Temp.html) this file contains the functions that uses in the Visualisation_Temp.html
+ * file, as well as the Meteor Template Helpers functions and Events functions.
+ */
+/**
+ * Importing libraries and files need to use in this file.
  */
 import Clipboard from 'clipboard';
-// import "../../imports/bar_chart.js";
-import "../../imports/dimple_bar";
-import "../../imports/bar";
-// import "../../imports/grouped_bar";
-import "../../imports/dimple_grouped";
-// import "../../imports/pie_chart";
-import "../../imports/dimple_pie";
-import "../../imports/map";
-import "../../imports/mapbox";
-import "../../imports/dimple_line";
+import "../../imports/Visualisations/dimple_bar";
+import "../../imports/Visualisations/dimple_grouped";
+import "../../imports/Visualisations/dimple_pie";
+import "../../imports/Visualisations/mapbox";
+import "../../imports/Visualisations/dimple_line";
 import "../../imports/functions";
 
-var removedHeaderVals = [];
+/**
+ * this is a instance of the mapboxgl from the 'mapbox' function in 'imports/Visualisations/mapbox.js. file
+ */
 var map;
+/**
+ * this variable keeps track of what visualisation type the application outputting
+ */
 var visualType;
+/**
+ * the column header name that the user clicked
+ */
 var headerOrig;
+/**
+ * svg chart's SVG element
+ */
 var svg;
+/**
+ * width of the SVG element
+ */
 var width;
+/**
+ * height of the SVG element
+ */
 var height;
-var panelEdit = true;
-var panel_edit_dep = new Tracker.Dependency();
 
+/**
+ * obbject properties names stored in these variables.
+ * easier to call them.
+ * @type {string}
+ */
 var headerOriginal = "originalVal";
 var headerPresent = "presentVal";
 var headerType = "type";
@@ -31,59 +52,14 @@ var headerValCount = "valCount";
 var dataAlreadyExist = "Data set already exist";
 var newDataset = "New data set";
 /**
- *
+ * this variable tracks the map is drawn or not.
  */
 var isMapDraw;
 
-function checkIPlist(ip, list) {
-
-    var ipData = null;
-
-    list.forEach(function (d) {
-        if (d.ip == ip) {
-            ipData = d;
-        }
-    });
-    return ipData;
-}
-
-function resetPanel() {
-
-    var textElems = document.getElementsByName("headerText");
-    var editBtnElems = document.getElementsByName("headerEditBtn");
-    var selectElems = document.getElementsByName("headerType");
-    var checkElem = document.getElementsByName("headerCheck");
-    var remvBtnElems = document.getElementsByName("headerremvbtn");
-
-    if (textElems) {
-        Array.from(textElems).forEach(function (e) {
-            e.readOnly = true;
-        });
-    }
-    if (editBtnElems) {
-        Array.from(editBtnElems).forEach(function (e) {
-            e.innerHTML = "<span class='glyphicon glyphicon-edit'></span>";
-            e.className = "csvHeaderEdit btn btn-default btn-sm";
-            e.style.display = "inline";
-        });
-    }
-    if (selectElems) {
-        Array.from(selectElems).forEach(function (e) {
-            e.disabled = false;
-        });
-    }
-    if (checkElem) {
-        Array.from(checkElem).forEach(function (e) {
-            e.disabled = false;
-        });
-    }
-    if (remvBtnElems) {
-        Array.from(remvBtnElems).forEach(function (e) {
-            e.style.display = "inline";
-        });
-    }
-}
-
+/**
+ * this function checks if the data set headers have longitude and latitude data.
+ * @returns {boolean}
+ */
 function lon_lat_check() {
     var lon = false;
     var lat = false;
@@ -101,14 +77,26 @@ function lon_lat_check() {
     return (lon && lat);
 }
 
-function headersDeleted() {
+/**
+ * this function checks whether any header is deleted or not in the 'headerValues' array.
+ * this function helps to display 'header restore' button in header config panel.
+ * @returns {{deleted: boolean, notDeleted: boolean}}
+ */
+function isHeadersDeleted() {
     var headersDeleted = true;
+    var headersNotDeleted = true;
     headerValues.forEach(function (h) {
         if (!h.deleted) {
             headersDeleted = false;
         }
+        else {
+            headersNotDeleted = false;
+        }
     });
-    return headersDeleted;
+    return {
+        deleted: headersDeleted,
+        notDeleted: headersNotDeleted
+    };
 }
 
 function headersNotDeleted() {
@@ -121,6 +109,12 @@ function headersNotDeleted() {
     return headersNotDeleted;
 }
 
+/**
+ * the function counts the value frequency of the parameter column name.
+ * returns an array of obects with column value and the frequency of that value.
+ * @param column
+ * @returns {Array}
+ */
 function countValues(column) {
     var columnVals = [];
     var countsObj = {};
@@ -147,7 +141,9 @@ function countValues(column) {
 
     return counts
 }
-
+/**
+ * This function resets the values in the export data panel.
+ */
 function resetOutputEmbed() {
     var downloadBtn = document.getElementById('downloadCharBtn');
     var fileNameTxt = document.getElementById('downloadFileName');
@@ -194,29 +190,43 @@ function checkDataset(dataset) {
 
 }
 
+/**
+ * This is a meteor function that registers functions that will call when the template is rendering to the DOM.
+ * you can also update variables in this function.
+ *
+ * Doc: http://docs.meteor.com/api/templates.html#Template-onRendered
+ */
 Template.visualisation_all.onRendered(function () {
+    /**
+     * creating a instence of Clipboard instance to copy the embed code.
+     * @type {Clipboard}
+     */
     var clipboard = new Clipboard('.clipboardBtn');
-
 });
-
+/**
+ * The load_data template helpers function. These helper functions send that send data to the template.
+ *
+ * Doc: https://docs.meteor.com/api/templates.html#Template-helpers
+ */
 Template.visualisation_all.helpers({
     get_keys: function () {
         // csv_key_dep.depend();
         // return CSV_keys;
-        panelEdit = true;
-        panel_edit_dep.changed();
         headers_dep.depend();
         return headerValues;
-    },
-    panelEditing: function () {
-        panel_edit_dep.depend();
-        return panelEdit;
     }
 });
 
-
+/**
+ * The tab_api event functions. These functions specify event handler for this template.
+ */
 Template.visualisation_all.events({
 
+    /**
+     * The click event fucntion for Header Edit button.
+     * this allow user to edit the header name of the csv file, which will show in charts.
+     * @param e
+     */
     "click .csvHeaderEdit": function (e) {
         var headerIndex;
         var elem = e.currentTarget;
@@ -241,6 +251,10 @@ Template.visualisation_all.events({
         }
     },
 
+    /**
+     * the function triggers evertime the user change the header type in the header configuration panel.
+     * @param e
+     */
     "change .csvHeaderType": function (e) {
         var elem = e.currentTarget;
         var headerId = elem.getAttribute("headerID");
@@ -251,6 +265,11 @@ Template.visualisation_all.events({
         headerValues[headerIndex] = header;
     },
 
+    /**
+     * the function trigger when user delete a header from the header config. panel.
+     * this hides the header row in the panel and add the deleted header in to the restore header model body.
+     * @param e
+     */
     "click .csvHeaderDelete": function (e) {
         var elem = e.currentTarget;
         var restoreBtn = document.getElementById("restore");
@@ -260,41 +279,40 @@ Template.visualisation_all.events({
         var rowElem = document.getElementById("row_" + rowID);
         var headerIndex = +elem.getAttribute("index");
         var delHeaderVal = headerValues[headerIndex];
-        removedHeaderVals.push(delHeaderVal);
-
-        var removedHeaderIndex = removedHeaderVals.length - 1;
 
         rowElem.style.display = "none";
 
         headerValues[headerIndex].deleted = true;
-        // HeaderConfigPanel.removeChild(rowElem);
 
         restoreBtn.style.display = "inline";
         restoreModalBody.innerHTML +=
             "<div id='restore_" + rowID + "' class='container-fluid'>" +
             "<div class='row'>" +
-            "<button type='button' id='restoreHeader' style='word-wrap: break-word; white-space: normal; position: relative; margin: 5px' class='btn btn-warning restoreHeader' removedHeaderIndex='" + removedHeaderIndex + "' headerIndex='" + headerIndex + "'>" +
+            "<button type='button' id='restoreHeader' style='word-wrap: break-word; white-space: normal; position: relative; margin: 5px' class='btn btn-warning restoreHeader' headerIndex='" + headerIndex + "'>" +
             delHeaderVal.presentVal + " <span class='glyphicon glyphicon-refresh'></span>" +
             "</button>" +
             "</div>" +
             "</div>";
 
+        var is_H_deleted = isHeadersDeleted();
 
-        if (headersDeleted()) {
+        if (is_H_deleted.deleted) {
             restoreBtn.style.display = "none";
             document.getElementById("panel").style.display = "none";
             var processBtn = document.getElementById("process_edit_btn");
             processBtn.className = "btn-success btn ProcessCSV";
             processBtn.innerHTML = "Process";
-            removedHeaderVals = [];
         }
     },
 
+    /**
+     * The restore header button click event.
+     * @param e
+     */
     "click .restoreHeader": function (e) {
         var elem = e.currentTarget;
         var headerConfigPanel = document.getElementById("HeaderConfig");
         var headerIndex = elem.getAttribute("headerIndex");
-        var removedHeaderIndex = elem.getAttribute("removedHeaderIndex");
         var headerVal = headerValues[headerIndex];
         var restoreModalBody = document.getElementById("restoreModelBody");
         var restoreBtnContainer = document.getElementById("restore_" + headerVal.originalVal);
@@ -305,15 +323,20 @@ Template.visualisation_all.events({
 
 
         restoreModalBody.removeChild(restoreBtnContainer);
-        // removedHeaderVals.splice(removedHeaderIndex,1);
         headerVal.deleted = false;
 
-        if (headersNotDeleted()) {
+        var is_h_deleted = isHeadersDeleted();
+        if (is_h_deleted.notDeleted) {
             $("#restoreHeadersModal").modal('hide');
             restoreBtn.style.display = "none";
         }
     },
 
+    /**
+     * the event function displays the charts menu to the use. the header config panel becomes read only. The the panel
+     * done button becomes edit button.
+     * @param e
+     */
     "click .PanelDone": function (e) {
         headerValues.forEach(function (h) {
             if (!h.deleted) {
@@ -330,8 +353,6 @@ Template.visualisation_all.events({
                     h[headerValCount] = {}
                 }
             }
-            // var header = h;
-
 
         });
 
@@ -359,12 +380,7 @@ Template.visualisation_all.events({
                                 // console.log(data)
                             }
                         });
-                        // data[h[headerOriginal]] = parseFloat(data[h[headerOriginal]]);
                     }
-
-                    // else if(h[headerType] == "latitude"){
-                    //     data[h[headerOriginal]] = parseFloat(data[h[headerOriginal]]);
-                    // }
                 }
             })
         });
@@ -406,16 +422,15 @@ Template.visualisation_all.events({
 
         var headerLabelinnerhtml = "";
         var xAxisInnerhtml = "";
-        // var headerLabels = document.getElementById("headerLabels");
         var xAxisLabels = document.getElementById("xAxisLabels");
 
         var chartsMenu = document.getElementById("ChartsMenuTab");
         var normalChartsThumb = false;
         var countChartsThumb = false;
+        var lineChartThumb = false;
         /*for now the grouped bar and pie charts set to true.*/
         var pieChartThumb = true;
         var groupBarChartThumb = true;
-        var lineChartThumb = true;
 
         var chartsMenuInner = "";
 
@@ -430,6 +445,7 @@ Template.visualisation_all.events({
                     headerValues.forEach(function (hs) {
                         if (hs[headerType] == "string") {
                             normalChartsThumb = true;
+                            lineChartThumb = true;
                         }
                     });
                     pieChartThumb = true;
@@ -510,6 +526,10 @@ Template.visualisation_all.events({
         mapsMenu.innerHTML = mapsMenuInner;
     },
 
+    /**
+     * The edit panel button click event function.
+     * @param e
+     */
     "click .PanelEdit": function (e) {
         var textElems = document.getElementsByName("headerText");
         var editBtnElems = document.getElementsByName("headerEditBtn");
@@ -559,18 +579,18 @@ Template.visualisation_all.events({
         elem.className = "btn-success btn PanelDone";
         elem.innerHTML = "Done";
 
-        if (!headersNotDeleted()) {
+        var is_h_deleted = isHeadersDeleted();
+        if (!is_h_deleted.notDeleted) {
 
             var restoreHeaderBtn = document.getElementById("restore");
             restoreHeaderBtn.style.display = "inline";
         }
     },
 
-    // "click .chartTabs":function (e) {
-    //     document.getElementById('exportChart').style.display = 'none';
-    //     resetOutputEmbed();
-    // },
-
+    /**
+     * This event function triggers when user chooses the chart type they want to create.
+     * @param e
+     */
     "click .visualThumb": function (e) {
         isMapDraw = false;
         var elem = e.currentTarget;
@@ -600,6 +620,9 @@ Template.visualisation_all.events({
         document.getElementById("exportChart").style.display = 'none';
         resetOutputEmbed();
 
+        /**
+         * this satement checks the chart type user selected and create UI acording to that.
+         */
         if (visType == "NormalBar") {
             headerValues.forEach(function (h) {
                 if (!h.deleted) {
@@ -633,8 +656,6 @@ Template.visualisation_all.events({
                     }
                 }
             });
-            // headerLabelinnerhtml += "<hr>" +
-            //     "<label for='xLabelRot' >Rotate X axis Labels <input id='xLabelRot' type='checkbox' class='xLabelRot'></label>"
         }
         else if (visType == "groupBar") {
 
@@ -697,14 +718,6 @@ Template.visualisation_all.events({
                 "<button type='button' id='headerLabels' style='word-wrap: break-word; white-space: normal; position: relative; margin: 5px' vistype='group' count='true' class='btn btn-primary headerLabels' > Create </button>" +
                 "</div>";
             document.getElementById("charts").style.display = "inline";
-
-            // var svg = document.getElementById("svgChar");
-            // svg.innerHTML = "";
-            // var width = document.getElementById("chartBody").offsetWidth;
-            // var height = document.getElementById("chartBody").offsetHeight - 5;
-            // if (height < 450) {
-            //     height = 450;
-            // }
 
         }
         else if (visType == "pieChart") {
@@ -842,6 +855,9 @@ Template.visualisation_all.events({
 
     },
 
+    /**
+     * This is the on click function for the button that displays the appropriate chart.
+     */
     "click .headerLabels": function (e) {
         var elem = e.currentTarget;
         elem.disabled = true;
@@ -851,13 +867,11 @@ Template.visualisation_all.events({
         visualType = elem.getAttribute("vistype");
         var count = elem.getAttribute("count");
 
-        // var siblings = $("#"+elem.id).siblings();
         var siblings = elem.parentNode.childNodes;
 
 
         svg = document.getElementById("svgChar");
         svg.innerHTML = "";
-        // svg.style.display = "none";
 
         document.getElementById("embedCode").style.display = "inline";
 
@@ -869,6 +883,10 @@ Template.visualisation_all.events({
 
         var selectedXlabel;
 
+        /**
+         * each type of visualisations have different functions to draw the chart or map. this if statement is to check
+         * which chart is visualising and call the correct function.
+         */
         if (visualType == "bar") {
             var xAxis = document.getElementById("xAxisLabels");
             var xAxisOptions = document.getElementsByClassName("xAxisLabel");
@@ -880,22 +898,6 @@ Template.visualisation_all.events({
             barChartHeaders(CSV_Data, headerOrig, selectedXlabel, "#svgChar", height, width, Data_Source);
         }
         else if (visualType == "count") {
-            var values = [];
-            var counts = [];
-            var countObjects = {
-                "counts": [],
-                "values": []
-            };
-
-            headerValues.forEach(function (h) {
-                if (!h.deleted) {
-                    if (h[headerOriginal] == headerOrig) {
-                        if (!jQuery.isEmptyObject(h[headerValCount])) {
-                            counts = h[headerValCount]
-                        }
-                    }
-                }
-            });
             svg.style.display = "inline";
 
 
@@ -922,18 +924,6 @@ Template.visualisation_all.events({
             groupedBarChart(CSV_Data, mainCat, subCat, yAxisMes, "#svgChar", height, width, Data_Source);
         }
         else if (visualType == "pie") {
-            /*svg.style.display = "inline";
-             if (width > 900) {
-             width = width - 200;
-             }
-             if (count == "true") {
-             pieChart(CSV_Data, headerOrig, true, "#svgChar", height, width);
-
-             }
-             else if (count == "false") {
-             pieChart(CSV_Data, headerOrig, false, "#svgChar", height, width);
-
-             }*/
 
             var pieHeader = document.getElementById("pieHeader");
             var pieHeaderOption = document.getElementsByClassName("pieHeader");
@@ -945,7 +935,7 @@ Template.visualisation_all.events({
             var measure = pieMeasureOption[pieMeasure.selectedIndex].getAttribute("original");
 
             svg.style.display = "inline";
-            pieChart(CSV_Data, header, measure, false, "#svgChar", height, width, Data_Source);
+            pieChart(CSV_Data, header, measure, "#svgChar", height, width, Data_Source);
 
         }
         else if (visualType == 'line') {
@@ -956,14 +946,6 @@ Template.visualisation_all.events({
 
             svg.style.display = "inline";
 
-            // var createBar = function (callback) {
-            //     // var future = new Future;
-            //     // future.return()
-            //     callback(null, barChartHeaders(CSV_Data, headerOrig, selectedXlabel, "#svgChar", height, width))
-            // };
-            // var createBarAsyc = Meteor.wrapAsync(createBar);
-            // elem.disabled = false;
-            // elem.style.cursor = 'pointer';
             lineChart(CSV_Data, headerOrig, selectedXlabel, "#svgChar", height, width, Data_Source);
         }
         else if (visualType == "map") {
@@ -976,15 +958,11 @@ Template.visualisation_all.events({
                 }
             });
 
-            // var mapType =$("#"+parentNodeId +" input[name=location_type]:checked");
-
-
             if (mapType == "ip") {
                 console.log(CSV_Data);
 
                 map = mapbox(CSV_Data, headerOrig, isMapDraw, Data_Source);
 
-                // maps(CSV_Data, headerOrig);
             }
             else if (mapType == "lon/lat") {
                 var lonHeader;
@@ -1030,7 +1008,50 @@ Template.visualisation_all.events({
         document.getElementById("exportChart").style.display = 'inline';
     },
 
+    /**
+     * this is the on change function for xAxisLabel dropdown list. When user changes the x axis value in bar charts or
+     * line charts this function trigger and create the visualisation acording to the change.
+     * @param e
+     */
+    "change #xAxisLabels": function (e) {
 
+        var elem = e.currentTarget;
+        var selectedXlabel = elem.options[elem.selectedIndex].getAttribute("original");
+        svg.innerHTML = "";
+
+        if (visualType == "bar") {
+
+            svg.style.display = "inline";
+            barChartHeaders(CSV_Data, headerOrig, selectedXlabel, "#svgChar", height, width, Data_Source);
+        }
+
+
+        else if (visualType == 'line') {
+
+            svg.style.display = "inline";
+            lineChart(CSV_Data, headerOrig, selectedXlabel, "#svgChar", height, width), Data_Source;
+        }
+
+
+        console.log(e);
+    },
+
+    /**
+     * The function is to reset everthing below the charts menu.
+     * @param e
+     */
+    "click .chartTabs": function (e) {
+        document.getElementById("charts").style.display = "none";
+        document.getElementById('exportChart').style.display = 'none';
+        resetOutputEmbed();
+    },
+
+
+    /**
+     * this is the key up event function to check whether file name text box is empty or not. depends on this function
+     * result that download image button become availabale to the user.
+     * @param e
+     */
     "keyup .downloadFileName": function (e) {
         var elem = e.currentTarget;
         var downloadBtn = document.getElementById('downloadCharBtn');
@@ -1044,9 +1065,11 @@ Template.visualisation_all.events({
         }
     },
 
+    /**
+     * the function creates the image of chart or mapbox map and allow user to download.
+     * @param e
+     */
     "click .downloadCharBtn": function (e) {
-
-
         var fileName = document.getElementById('downloadFileName').value;
         var canvas;
 
@@ -1085,44 +1108,5 @@ Template.visualisation_all.events({
             };
         }
 
-    },
-
-    "click .xLabelRot": function (e) {
-        var elem = e.currentTarget;
-        console.log(e);
-        rotate_X_labels(elem.checked, "#svgChar");
-    },
-
-    "change #xAxisLabels": function (e) {
-
-        var elem = e.currentTarget;
-        var selectedXlabel = elem.options[elem.selectedIndex].getAttribute("original");
-        svg.innerHTML = "";
-
-        if (visualType == "bar") {
-            // var xAxis = document.getElementById("xAxisLabels");
-            // var xAxisOptions = document.getElementsByClassName("xAxisLabel");
-
-
-            svg.style.display = "inline";
-            barChartHeaders(CSV_Data, headerOrig, selectedXlabel, "#svgChar", height, width, Data_Source);
-        }
-
-
-        else if (visualType == 'line') {
-
-            svg.style.display = "inline";
-            lineChart(CSV_Data, headerOrig, selectedXlabel, "#svgChar", height, width), Data_Source;
-        }
-
-
-        console.log(e);
-    },
-
-    "click .chartTabs": function (e) {
-        document.getElementById("charts").style.display = "none";
-        document.getElementById('exportChart').style.display = 'none';
-        resetOutputEmbed();
-    },
-
+    }
 });

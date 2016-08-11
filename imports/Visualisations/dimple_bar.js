@@ -1,3 +1,36 @@
+/**
+ * Created by Rajitha Hasith on 11/07/2016.
+ * This file contains the bar chart visualisation functions.
+ */
+
+
+/**
+ * This function draws bar charts with numerical column in the y axis.
+ * the function uses dimple.js to draw the charts.
+ *
+ * Doc: https://github.com/PMSI-AlignAlytics/dimple/wiki
+ *
+ * @param data
+ * the data object, which contains all the data.
+ *
+ * @param property
+ * The property variable, which is the the y axis values.
+ *
+ * @param xLabel
+ * The x axis values.
+ *
+ * @param svgID
+ * the element that draw the chart in.
+ *
+ * @param h
+ * Height of the chart.
+ *
+ * @param w
+ * Width of the chart.
+ *
+ * @param Data_Source
+ * Data source, which will display in the chart.
+ */
 barChartHeaders = function (data, property, xLabel, svgID, h, w, Data_Source) {
 
     var margin = {
@@ -37,6 +70,18 @@ barChartHeaders = function (data, property, xLabel, svgID, h, w, Data_Source) {
 
 };
 
+/**
+ * This function draws chart with value frequency of specific property in the data object.
+ *
+ * Doc: https://github.com/PMSI-AlignAlytics/dimple/wiki
+ *
+ * @param data
+ * @param property
+ * @param svgID
+ * @param h
+ * @param w
+ * @param Data_Source
+ */
 barChartCounts = function (data, property, svgID, h, w, Data_Source) {
 
     var margin = {
@@ -77,6 +122,7 @@ barChartCounts = function (data, property, svgID, h, w, Data_Source) {
 };
 
 /**
+ * Tis function is used to check the longest x axis label to display the data source in the chart.
  * @return {number}
  */
 var longest_label = function (nodeList) {

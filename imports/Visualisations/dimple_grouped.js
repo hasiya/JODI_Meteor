@@ -1,3 +1,37 @@
+/**
+ * Created by Rajitha Hasith on 12/07/2016.
+ * This file contains the grouped bar chart visualisation function.
+ */
+
+/**
+ * The function draws a grouped bar chart in the application.
+ *
+ * Doc: https://github.com/PMSI-AlignAlytics/dimple/wiki
+ *
+ * @param data
+ * the data object, which contains all the data.
+ *
+ * @param bigGroup
+ * The main category name to get the values from that column.
+ *
+ * @param subGroup
+ * The sub category name to get the values from that column.
+ *
+ * @param yAxis
+ * the colunm name for y axis values.
+ *
+ * @param svgID
+ * the element that draw the chart in.
+ *
+ * @param h
+ * Height of the chart.
+ *
+ * @param w
+ * Width of the chart.
+ *
+ * @param Data_Source
+ * Data source, which will display in the chart.
+ */
 groupedBarChart = function (data, bigGroup, subGroup, yAxis, svgID, h, w, Data_Source) {
     var margin = {
         top: 50,
@@ -41,11 +75,12 @@ groupedBarChart = function (data, bigGroup, subGroup, yAxis, svgID, h, w, Data_S
 
     var chartSvg = myChart.svg[0][0];
     document.getElementById('chartEmbedTxt').value = chartSvg.outerHTML;
-
-    return true;
-
 };
 
+/**
+ * Tis function is used to check the longest x axis label to display the data source in the chart.
+ * @return {number}
+ */
 var longest_label = function (nodeList) {
     var longest = 0;
     nodeList.forEach(function (n) {

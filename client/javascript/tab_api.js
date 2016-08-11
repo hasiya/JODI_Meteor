@@ -6,6 +6,11 @@
  */
 
 /**
+ * importing the functions file in the /imports directory.
+ */
+import "../../imports/functions";
+
+/**
  * this variable is to keep track of the API type that that user is dealing with.
  */
 var apiType;
@@ -30,7 +35,8 @@ var dataNameAlreadyExist = "Data set name already exist";
 var dataStored = "Successfully data added to elasticsearch";
 
 /**
- * this function add a count property to the Data object that is get from the API.
+ * this function add a count property with value of 1 to the Data object that is get from the API.
+ * This added property value is used in creating visualisations.
  * the 'setUPCount()' function is called in this file in Get Api button click event function.
  */
 function setUpCount() {
@@ -86,82 +92,6 @@ function insertData(dataInfo, url, data_path, api_type) {
     });
 }
 
-/**
- * This function gets the data that need to process in the application from the API.
- * @param api_data
- * @param data_path
- * @returns {*}
- */
-function get_data_api_obj(api_data, data_path) {
-    var path = data_path.split('/');
-    var data = api_data;
-
-    path.forEach(function (p) {
-        data = data[p];
-    });
-
-    return data;
-}
-
-function setUpPanel() {
-    headerValues = [];
-
-    CSV_keys.forEach(function (k) {
-
-        var keyItem = {
-            "originalVal": k,
-            "presentVal": k,
-            "type": "string",
-            "deleted": false,
-            "valCount": {}
-        };
-
-        if (k.toLowerCase() == "longitude") {
-            var test = document.getElementById("type_" + k);
-            // document.getElementById("type_" + k).value = "lon";
-            keyItem['type'] = 'lon';
-        }
-        else if (k.toLowerCase() == "latitude") {
-            // document.getElementById("type_" + k).value = "lat";
-            keyItem['type'] = 'lat';
-
-        }
-        else {
-            var propertiesArray = CSV_Data.map(function (d) {
-                return d[k];
-            });
-
-            var testEmptyArray = [];
-
-            propertiesArray.forEach(function (p) {
-                if (p === "") {
-                    testEmptyArray.push(null);
-                }
-                else {
-                    testEmptyArray.push(p);
-                }
-            });
-
-
-            if (!isArrayNull(testEmptyArray)) {
-                var isNumbers = (!propertiesArray.some(isNaN));
-
-                if (isNumbers) {
-                    // document.getElementById("type_" + k).value = "number";
-                    keyItem['type'] = 'number';
-
-                }
-            }
-        }
-
-        headerValues.push(keyItem);
-        headers_dep.changed();
-        var panelDoneBtn = document.getElementById('panelDone');
-        panelDoneBtn.className = "pull-right btn-success btn PanelDone";
-        panelDoneBtn.innerHTML = "Done";
-
-    });
-}
 
 /**
  * The tab_api event functions. These functions specify event handler for this template.
@@ -277,9 +207,6 @@ Template.tab_api.events({
             person_name: csvPersonName.value.trim(),
             data_source: csvDataSource.value.trim(),
         };
-        // Data_Source = csvDataSource.value;
-
-        // var text = Code_Editor.getValue();
 
         elem.disabled = true;
         insertData(dataInfo, url, data_path, apiType);
@@ -287,7 +214,7 @@ Template.tab_api.events({
     },
 
     /**
-     * the keyup event function for the api data name textbox.
+     * the key up event function for the api data name textbox.
      * @param e
      */
     "keyup .apiDataName": function (e) {
@@ -301,7 +228,7 @@ Template.tab_api.events({
         Message.html("");
     },
     /**
-     * the keyup event function for the api data uploaded person's name textbox.
+     * the key up event function for the api data uploaded person's name textbox.
      * @param e
      */
     "keyup .PersonName": function (e) {
@@ -316,7 +243,7 @@ Template.tab_api.events({
     },
 
     /**
-     * the keyup event function for the api data source textbox.
+     * the key up event function for the api data source textbox.
      * @param e
      */
     "keyup .DataSource": function (e) {

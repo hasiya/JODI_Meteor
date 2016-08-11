@@ -5,6 +5,8 @@
  * functions and Events functions.
  */
 
+import "../../imports/functions";
+
 /**
  * This variable is creating a new instance of 'X2JS' library, that uses to convert string in to JSON object.
  */
@@ -91,25 +93,6 @@ function setUpCount() {
 }
 
 /**
- * This function gets the data that need to process in the application from the API.
- * @param api_data
- * @param data_path
- * @returns {*}
- */
-function get_data_api_obj(api_data, data_path) {
-    // if(api_type == 'json'){
-    var path = data_path.split('/');
-    var data = api_data;
-
-    path.forEach(function (p) {
-        data = data[p];
-    });
-
-    return data;
-    // }
-}
-
-/**
  * Some API does not allow JavaScript do API calls to servers with 'access-control-allow-origin': no.
  * Because of this, the javascript sends a ajax call to the server side (flask) of system.
  * This function get the api data, by calling to flask server to send the API request and get data through the python
@@ -152,77 +135,11 @@ function getAPIdata(url, data_path, apiType) {
                 document.getElementById("panel").style.display = "inline";
                 setUpPanel();
                 resetPanel();
-
-                // setUpPanel();
             }
             else {
                 // Message.html("Something went wrong.");
             }
         }
-
-    });
-}
-
-/**
- * This function function set up the header configuration panel.
- * The function updates the 'headerValues' array and then the 'headers_dep' Tracker variable calls the .changed()
- * function. This will trigger
- */
-function setUpPanel() {
-    headerValues = [];
-
-    CSV_keys.forEach(function (k) {
-
-        var keyItem = {
-            "originalVal": k,
-            "presentVal": k,
-            "type": "string",
-            "deleted": false,
-            "valCount": {}
-        };
-
-        if (k.toLowerCase() == "longitude") {
-            // document.getElementById("type_" + k).value = "lon";
-            keyItem['type'] = 'lon';
-        }
-        else if (k.toLowerCase() == "latitude") {
-            // document.getElementById("type_" + k).value = "lat";
-            keyItem['type'] = 'lat';
-
-        }
-        else {
-            var propertiesArray = CSV_Data.map(function (d) {
-                return d[k];
-            });
-
-            var testEmptyArray = [];
-
-            propertiesArray.forEach(function (p) {
-                if (p === "") {
-                    testEmptyArray.push(null);
-                }
-                else {
-                    testEmptyArray.push(p);
-                }
-            });
-
-
-            if (!isArrayNull(testEmptyArray)) {
-                var isNumbers = (!propertiesArray.some(isNaN));
-
-                if (isNumbers) {
-                    // document.getElementById("type_" + k).value = "number";
-                    keyItem['type'] = 'number';
-
-                }
-            }
-        }
-
-        headerValues.push(keyItem);
-        headers_dep.changed();
-        var panelDoneBtn = document.getElementById('panelDone');
-        panelDoneBtn.className = "pull-right btn-success btn PanelDone";
-        panelDoneBtn.innerHTML = "Done";
 
     });
 }
@@ -267,6 +184,8 @@ Template.load_data.helpers({
 /**
  * This is a meteor function that registers functions that will call when the template is rendering to the DOM.
  * you can also update variables in this function.
+ *
+ * DOc: http://docs.meteor.com/api/templates.html#Template-onRendered
  */
 Template.load_data.onRendered(function () {
     /**
@@ -300,10 +219,10 @@ Template.load_data.events({
         var target = e.currentTarget;
         var searchTerm = target.value;
         var hits = [];
-        if (searchTerm) {
+        if (/\S/.test(searchTerm)) {
             $.ajax({
                 method: "GET",
-                url: "http://" + pythonServer + "/search_dataset/" + searchTerm,
+                url: "http://" + pythonServer + "/search_dataset/" + searchTerm.trim(),
                 success: function (data) {
                     hits = data;
                     console.log(hits);

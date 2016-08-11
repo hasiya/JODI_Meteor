@@ -6,6 +6,11 @@
  */
 
 /**
+ * importing the functions file in the /imports directory.
+ */
+import "../../imports/functions";
+
+/**
  * this variable store the string value of the python (server side) sever address.
  * @type {string}
  */
@@ -82,34 +87,6 @@ var dataStored = "Successfully data added to elasticsearch";
  */
 var newDataset = "New data set";
 
-// Return array of string values, or NULL if CSV string not well formed.
-/**
- * the function takes a string (line from the csv file in this case), then checks if the line looks like an csv line.
- * If it passes the check returns the values of the line in an array, returns Null otherwise.
- * @param text
- * @returns {*}
- */
-function csv_to_array(text) {
-    var re_valid;
-    re_valid = /^\s*(?:'[^'\\]*(?:\\[\S\s][^'\\]*)*'|"[^"\\]*(?:\\[\S\s][^"\\]*)*"|[^,'"\s\\]*(?:\s+[^,'"\s\\]+)*)\s*(?:,\s*(?:'[^'\\]*(?:\\[\S\s][^'\\]*)*'|"[^"\\]*(?:\\[\S\s][^"\\]*)*"|[^,'"\s\\]*(?:\s+[^,'"\s\\]+)*)\s*)*$/;
-    var re_value;
-    re_value = /(?!\s*$)\s*(?:'([^'\\]*(?:\\[\S\s][^'\\]*)*)'|"([^"\\]*(?:\\[\S\s][^"\\]*)*)"|([^,'"\s\\]*(?:\s+[^,'"\s\\]+)*))\s*(?:,|$)/g;
-    // Return NULL if input string is not well formed CSV string.
-    if (!re_valid.test(text)) return null;
-    var a = [];                     // Initialize array to receive values.
-    text.replace(re_value, // "Walk" the string using replace with callback.
-        function (m0, m1, m2, m3) {
-            // Remove backslash from \' in single quoted values.
-            if (m1 !== undefined) a.push(m1.replace(/\\'/g, "'"));
-            // Remove backslash from \" in double quoted values.
-            else if (m2 !== undefined) a.push(m2.replace(/\\"/g, '"'));
-            else if (m3 !== undefined) a.push(m3);
-            return ''; // Return empty string.
-        });
-    // Handle special case of empty last value.
-    if (/,\s*$/.test(text)) a.push('');
-    return a;
-}
 /**
  * This function checks if the csv file's number of headers and number of values in each line is same.
  * returns an object with the boolean value stating is the lines matching or not. if the lines are not matching, the
@@ -120,7 +97,6 @@ function csv_to_array(text) {
 function linesMatch(lines) {
 
     CSV_keys = [];
-    // csv_key_dep.changed();
 
     var lineMatch = {
         "lineMatch": true,
@@ -162,70 +138,7 @@ function linesMatch(lines) {
     }
     return lineMatch;
 }
-/**
- * This function function set up the header configuration panel.
- * The function updates the 'headerValues' array and then the 'headers_dep' Tracker variable calls the .changed()
- * function. This will trigger
- */
-function setUpPanel() {
-    headerValues = [];
 
-    CSV_keys.forEach(function (k) {
-
-        var keyItem = {
-            "originalVal": k,
-            "presentVal": k,
-            "type": "string",
-            "deleted": false,
-            "valCount": {}
-        };
-
-        if (k.toLowerCase() == "longitude") {
-            var test = document.getElementById("type_" + k);
-            // document.getElementById("type_" + k).value = "lon";
-            keyItem['type'] = 'lon';
-        }
-        else if (k.toLowerCase() == "latitude") {
-            // document.getElementById("type_" + k).value = "lat";
-            keyItem['type'] = 'lat';
-
-        }
-        else {
-            var propertiesArray = CSV_Data.map(function (d) {
-                return d[k];
-            });
-
-            var testEmptyArray = [];
-
-            propertiesArray.forEach(function (p) {
-                if (p === "") {
-                    testEmptyArray.push(null);
-                }
-                else {
-                    testEmptyArray.push(p);
-                }
-            });
-
-
-            if (!isArrayNull(testEmptyArray)) {
-                var isNumbers = (!propertiesArray.some(isNaN));
-
-                if (isNumbers) {
-                    // document.getElementById("type_" + k).value = "number";
-                    keyItem['type'] = 'number';
-
-                }
-            }
-        }
-
-        headerValues.push(keyItem);
-        headers_dep.changed();
-        var panelDoneBtn = document.getElementById('panelDone');
-        panelDoneBtn.className = "pull-right btn-success btn PanelDone";
-        panelDoneBtn.innerHTML = "Done";
-
-    });
-}
 /**
  * This function calls an ajax calla POST request to the server to store the CSV data in the elasticsearch.
  * @param dataInfo
@@ -284,10 +197,17 @@ function insertData(dataInfo, dataset) {
 /**
  * This is a meteor function that registers functions that will call when the template is rendering to the DOM.
  * you can also update variables in this function.
+ *
+ * Doc: http://docs.meteor.com/api/templates.html#Template-onRendered
  */
 Template.tab_csv.onRendered(function () {
-    // this.$(".tooltipped").tooltip();
-
+    /**
+     * Creating the Editor in the tab_csv template.
+     * the CodeMirror.fromTextArea() function creates the editor text area with the properties that passes in to the
+     * function.
+     *
+     * Doc: http://codemirror.net/doc/manual.html
+     */
     Code_Editor = CodeMirror.fromTextArea(this.find("#codemirror_id"), {
         lineNumbers: true,
         lineWrapping: true,
@@ -296,6 +216,12 @@ Template.tab_csv.onRendered(function () {
         placeholder: "Paste your CSV file content or drag and drop the file here..."
     });
 
+    /**
+     * The CodeMirror event function.
+     * This function trigger when ever a file drop in to the editor.
+     *
+     * Doc: http://codemirror.net/doc/manual.html#events
+     */
     Code_Editor.on("drop", function (cm, e) {
         // e.preventDefault()
         var processBtn = document.getElementById("process_edit_btn");
@@ -314,10 +240,13 @@ Template.tab_csv.onRendered(function () {
 
         }
 
-        // Mapbox.load()
-
     });
-
+    /**
+     * The CodeMirror event function.
+     * This function trigger when ever the text editor updates.
+     *
+     * Doc: http://codemirror.net/doc/manual.html#events
+     */
     Code_Editor.on("update", function (cm) {
         var processBtn = document.getElementById("process_edit_btn");
         var clearBtn = document.getElementById("clear_editor");
@@ -347,17 +276,23 @@ Template.tab_csv.onRendered(function () {
             // Message.html("")
         }
     });
-
-    // GoogleMaps.load(
-    //     {    key:"AIzaSyB8shH7uf30GbAWTRFAiWPzcIY1grpw9Xc"}
-    // );
 });
+
 /**
  * The tab_csv event functions. These functions specify event handler for this template.
  */
 Template.tab_csv.events({
 
-    "click .ProcessCSV": function (e, t) {
+    /**
+     * The Process CSV button on click event function.
+     * The function gets the value in the CodeMirror editer value and check whether it is CSV format, if so uses
+     * d3.csv.parse() function to create an object array from the editor data. if the data in the editor is CSV data,
+     * the 'Process CSV' button changes to 'Edit' button, and the editor becomes read only.
+     *
+     * Doc: https://github.com/d3/d3-3.x-api-reference/blob/master/CSV.md#parse
+     * @param e
+     */
+    "click .ProcessCSV": function (e) {
         // var text = t.find("#codemirror_id").value;
         var elem = e.currentTarget;
         // elem.className +=' disabled';
@@ -423,6 +358,12 @@ Template.tab_csv.events({
         fileUploader.style.display = "none";
     },
 
+    /**
+     * The on click event for the Store data button.
+     * This event function calls the 'insertData' which will send the ajax call to store the CSV data set information
+     * and the data set itself in the elasticsearch.
+     * @param e
+     */
     "click .storeDataBtn": function (e) {
         var elem = e.currentTarget;
         var csvDataName = document.getElementById("csvDataName");
@@ -440,10 +381,12 @@ Template.tab_csv.events({
 
         elem.disabled = true;
         insertData(dataInfo, CSV_Data);
-
-
     },
 
+    /**
+     * the key up event function for the CSV data set name textbox.
+     * @param e
+     */
     "keyup .csvDataName": function (e) {
         var elem = e.currentTarget;
         var elemVal = elem.value;
@@ -452,10 +395,12 @@ Template.tab_csv.events({
         var storeBtn = document.getElementById("storeDataBtn");
 
         storeBtn.disabled = !(elemVal && personTxt && dataSourceTxt);
-
-
     },
 
+    /**
+     * the key up event function for the CSV data set uploaded person's name textbox.
+     * @param e
+     */
     "keyup .PersonName": function (e) {
         var elem = e.currentTarget;
         var elemVal = elem.value;
@@ -463,11 +408,14 @@ Template.tab_csv.events({
         var dataSourceTxt = document.getElementById("dataSource").value;
         var storeBtn = document.getElementById("storeDataBtn");
 
-
         storeBtn.disabled = !(elemVal && dataNameTxt && dataSourceTxt);
 
     },
 
+    /**
+     * the key up event function for the CSV data set source textbox.
+     * @param e
+     */
     "keyup .DataSource": function (e) {
         var elem = e.currentTarget;
         var elemVal = elem.value;
@@ -479,6 +427,12 @@ Template.tab_csv.events({
 
     },
 
+    /**
+     * The 'Edit' button on click event.
+     * when the use click this button the button changes to 'Process CSV' button. The Editor's read only state become
+     * false. This allow user to any changes to the CSV file.
+     * @param e
+     */
     "click .EditCSV": function (e) {
         Code_Editor.setOption("readOnly", false);
         var elem = e.currentTarget;
@@ -498,22 +452,16 @@ Template.tab_csv.events({
         // document.getElementById("HeaderConfig").innerHTML = "";
         document.getElementById("restoreModelBody").innerHTML = "";
 
-
         var Message = $("#message");
         Message.html("");
-
-        // var headerpanel = document.getElementById("headerLabels");
-        // headerpanel.innerHTML = "";
 
         var svg = document.getElementById("svgChar");
         svg.innerHTML = "";
         svg.style.display = "none";
 
-
         var mapSvg = document.getElementById("svgMap");
         mapSvg.innerHTML = "";
         mapSvg.style.height = 0;
-
 
         document.getElementById("exportChart").style.display = 'none';
         resetOutputEmbed();
@@ -528,21 +476,25 @@ Template.tab_csv.events({
 
     },
 
-    "click .ClearCSV": function (e, t) {
+    /**
+     * The 'Clear CSV' button on click event. the function clear everythin on the editor and make the tab_csv template
+     * in to the original state.
+     * @param e
+     */
+    "click .ClearCSV": function (e) {
         Code_Editor.setOption("readOnly", false);
         Code_Editor.setValue("");
         var processBtn = document.getElementById("process_edit_btn");
         processBtn.className = "btn-success btn ProcessCSV";
         processBtn.innerHTML = "Process";
         processBtn.style.display = "none";
-        var clearBtn = document.getElementById("clear_editor");
-        clearBtn.style.display = "none";
+        var elem = e.currentTarget;
+        elem.style.display = "none";
         var datasetName = document.getElementById("datasetStorePanel");
         datasetName.style.display = "none";
 
-        var temp;
-        CSV_keys = temp;
-        CSV_Data = temp;
+        CSV_keys = [];
+        CSV_Data = [];
         headerValues = [];
         Data_Source = "";
 
@@ -553,9 +505,6 @@ Template.tab_csv.events({
 
         var Message = $("#message");
         Message.html("");
-
-        // var headerpanel = document.getElementById("headerLabels");
-        // headerpanel.innerHTML = "";
 
         var svg = document.getElementById("svgChar");
         svg.innerHTML = "";
@@ -576,10 +525,14 @@ Template.tab_csv.events({
         var fileUploader = document.getElementById("fileUpload");
         fileUploader.style.display = "inline";
         document.getElementById("csvFileName").value = "";
-        // var fileUploadInner = document.getElementById("innerFileUpload");
-        // fileUploadInner.innerHTML = "Browse&hellip; <input class='csv_upload' type='file' style='display: none;'>"
     },
 
+    /**
+     * As well as the editor the user have to option to upload CSV files in to the syste.
+     * This is the input file on change function.
+     * When user upload a CSV file the content of the file is displayed in the CSV Editor.
+     * @param e
+     */
     "change .csv_upload": function (e) {
         var elem = e.currentTarget;
         var file = elem.files[0];
@@ -604,6 +557,10 @@ Template.tab_csv.events({
 
 });
 
+/**
+ * This function resets the values in the export data panel.
+ * The function is used in 'Clear' button on click and 'Edit' on click events.
+ */
 function resetOutputEmbed() {
     var downloadBtn = document.getElementById('downloadCharBtn');
     var fileNameTxt = document.getElementById('downloadFileName');
