@@ -9,7 +9,6 @@ isArrayNull = function (inputArray) {
     return true;
 };
 
-
 /**
  * This function gets the data that need to process in the application from the API.
  * @param api_data
