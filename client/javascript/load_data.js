@@ -101,7 +101,7 @@ function setUpCount() {
  * @param data_path
  * @param apiType
  */
-function getAPIdata(url, data_path, apiType) {
+function getAPIdata(url, data_path, apiType, isView) {
     var j_data;
     var dataset;
     $.ajax({
@@ -132,7 +132,12 @@ function getAPIdata(url, data_path, apiType) {
 
                 setUpCount();
                 csv_data_dep.changed();
-                document.getElementById("panel").style.display = "inline";
+                if (isView) {
+                    document.getElementById("panel").style.display = "none";
+                }
+                else {
+                    document.getElementById("panel").style.display = "inline";
+                }
                 setUpPanel();
                 resetPanel();
             }
@@ -177,7 +182,20 @@ Template.load_data.helpers({
      */
     getData: function () {
         csv_data_dep.depend();
-        return CSV_Data;
+        var table_data = [];
+        CSV_Data.forEach((d) => {
+            let new_obj = {
+                ...d
+            };
+            table_data.push(new_obj)
+        });
+
+        table_data.forEach(function (d) {
+            delete d.Count;
+        });
+        // delete table_data.Count;
+        return table_data;
+        // return CSV_Data;
     }
 });
 
@@ -349,7 +367,7 @@ Template.load_data.events({
                     var url_dataPath = loadDoc["url_dataset_path"];
                     var apiType = loadDoc["api_type"];
                     // CSV_keys = getDatasetHeaders(CSV_keys)
-                    getAPIdata(url, url_dataPath, apiType)
+                    getAPIdata(url, url_dataPath, apiType, false)
                 }
                 else {
                     document.getElementById("searchList").style.display = 'none';
@@ -394,7 +412,7 @@ Template.load_data.events({
                     var url_dataPath = doc["url_dataset_path"];
                     var apiType = doc["api_type"];
                     // CSV_keys = getDatasetHeaders(CSV_keys)
-                    getAPIdata(url, url_dataPath, apiType)
+                    getAPIdata(url, url_dataPath, apiType, true)
                 }
                 else {
                     CSV_keys = doc['headers'];

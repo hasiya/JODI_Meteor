@@ -22,7 +22,7 @@ var xml_conv = new X2JS();
  * this is Message variable that takes the Message label element.
  * @type {any}
  */
-var Message = $("#message");
+var Message;
 /**
  * This string variable store the server return message to check.
  * @type {string}
@@ -44,6 +44,10 @@ function setUpCount() {
         c.Count = 1;
     });
 }
+
+Template.tab_api.onRendered(function () {
+    Message = $("#api_message");
+});
 
 /**
  * This function calls an ajax call with a POST request to the server to store the api information data in the
@@ -77,14 +81,15 @@ function insertData(dataInfo, url, data_path, api_type) {
         success: function (data) {
 
             if (data.message == dataNameAlreadyExist) {
-                Message.html("There is another CSV data set under this name. Please change the data set name. ");
+                Message.html("There is another data set under this name. Please change the data set name. ");
                 elem.disabled = false;
             }
             else if (data.message == dataStored) {
                 document.getElementById("datasetStorePanel").style.display = "none";
                 // document.getElementById("panel").style.display = "inline";
                 // elem.disabled = false;
-                var csvDataName = document.getElementById("csvDataName").value = "";
+                var apiDataName = document.getElementById("apiDataName").value = "";
+                Message.className = "pull-left label-success label";
                 Message.html("Data Stored in Database...")
             }
             console.log(data);
@@ -110,8 +115,9 @@ Template.tab_api.events({
         var j_data;
         var dataset;
 
-        var Message = $("#message");
         Message.html("");
+        Message.className = "pull-left label-danger label";
+
 
         $.ajax({
             method: "GET",
@@ -143,7 +149,12 @@ Template.tab_api.events({
                 else {
                     Message.html("Something went wrong.");
                 }
+            },
+            error: function (err) {
+                Message.html("API Request Failed.");
+
             }
+
 
         });
     },
@@ -196,16 +207,17 @@ Template.tab_api.events({
      */
     "click .storeDataBtn": function (e) {
         var elem = e.currentTarget;
-        var csvDataName = document.getElementById("csvDataName");
-        var csvPersonName = document.getElementById("PersonName");
-        var csvDataSource = document.getElementById("DataSource");
+        var apiDataName = document.getElementById("apiDataName");
+        var apiPersonName = document.getElementById("PersonName");
+        var apiDataSource = document.getElementById("DataSource");
         var url = document.getElementById("apiUrl").value;
         var data_path = document.getElementById("apiDataPath").value;
+        // Message = $("#message");
 
         var dataInfo = {
-            dataset_name: csvDataName.value.trim(),
-            person_name: csvPersonName.value.trim(),
-            data_source: csvDataSource.value.trim(),
+            dataset_name: apiDataName.value.trim(),
+            person_name: apiPersonName.value.trim(),
+            data_source: apiDataSource.value.trim(),
         };
 
         elem.disabled = true;
@@ -234,7 +246,7 @@ Template.tab_api.events({
     "keyup .PersonName": function (e) {
         var elem = e.currentTarget;
         var elemVal = elem.value;
-        var dataNameTxt = document.getElementById("csvDataName").value;
+        var dataNameTxt = document.getElementById("apiDataName").value;
         var dataSourceTxt = document.getElementById("DataSource").value;
         var storeBtn = document.getElementById("storeDataBtn");
 
@@ -249,7 +261,7 @@ Template.tab_api.events({
     "keyup .DataSource": function (e) {
         var elem = e.currentTarget;
         var elemVal = elem.value;
-        var dataNameTxt = document.getElementById("csvDataName").value;
+        var dataNameTxt = document.getElementById("apiDataName").value;
         var personTxt = document.getElementById("PersonName").value;
         var storeBtn = document.getElementById("storeDataBtn");
 
